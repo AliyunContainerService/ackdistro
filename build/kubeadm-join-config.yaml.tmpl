@@ -1,0 +1,9 @@
+kind: JoinConfiguration
+{{- if .Master }}
+controlPlane:
+  localAPIEndpoint:
+    advertiseAddress: {{.Master}}
+    bindPort: 6443
+{{- end}}
+nodeRegistration:
+  criSocket: /var/run/dockershim.sock

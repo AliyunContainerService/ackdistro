@@ -1,0 +1,4 @@
+apiVersion: v1
+description: cloud-native local storage management system
+name: open-local
+version: v0.2.2

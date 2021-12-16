@@ -1,0 +1,13 @@
+---
+apiVersion: networking.alibaba.com/v1
+kind: Subnet
+metadata:
+  name: subnet-0-network-0
+spec:
+  config:
+    autoNatOutgoing: true
+  network: network-0
+  range:
+    cidr: {{ .Values.globalconfig.PodCIDR }}
+    gateway: {{ .Values.globalconfig.Gateway }}
+    version: "{{ .Values.globalconfig.IPVersion }}"

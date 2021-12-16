@@ -1,0 +1,18 @@
+FROM registry.cn-qingdao.aliyuncs.com/sealer-io/ack:genesis
+COPY kubectl ./bin
+COPY kubeadm ./bin
+COPY kubelet ./bin
+COPY helm ./bin
+COPY imageList manifests
+COPY Metadata .
+COPY kubeadm-cluster-config.yaml.tmpl ./etc
+COPY kubeadm-init.yaml.tmpl ./etc
+COPY kubeadm-join-config.yaml.tmpl ./etc
+COPY charts/kube-core charts
+COPY charts/hybridnet charts
+COPY charts/open-local charts
+COPY yamls ack-distro-yamls
+CMD helm -n kube-system install kube-core charts/kube-core
+CMD kubectl apply -f ack-distro-yamls/*
+CMD helm -n kube-system install hybridnet charts/hybridnet
+CMD helm -n kube-system install open-local charts/open-local
