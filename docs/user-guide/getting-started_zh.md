@@ -9,7 +9,7 @@ wget "https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/tmp/sealer" -O /usr/bin/seale
 ```
 使用sealer获取ACK Distro制品，并创建集群：
 ```bash
-sealer run registry.cn-hangzhou.aliyuncs.com/oecp/ack-distro:v1.20.4-aliyun.1-alpha5 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+sealer run aecp-turbo-registry.cn-hangzhou.cr.aliyuncs.com/oecp/ackdistro:v1.20.4-aliyun.1-alpha5 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
 ```
 查看集群状态：
 ```bash

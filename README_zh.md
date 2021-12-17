@@ -49,7 +49,7 @@ ACK Distro作为ACK的下游，会紧跟ACK的发版节奏，具体发版策略�
 wget "https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/tmp/sealer" -O /usr/bin/sealer && chmod +x /usr/bin/sealer
 
 # 获取ACK Distro制品并拉起集群
-sealer run registry.cn-hangzhou.aliyuncs.com/oecp/ack-distro:v1.20.4-aliyun.1-alpha5 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+sealer run aecp-turbo-registry.cn-hangzhou.cr.aliyuncs.com/oecp/ackdistro:v1.20.4-aliyun.1-alpha5 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
 
 # 检查集群
 kubectl get cs
