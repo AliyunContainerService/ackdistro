@@ -1,15 +1,19 @@
 # FAQ
-## ACK-distro发版策略
-ACK Distro发版策略如下：
 
-- 发布周期：ACK Distro会不定期推出更新版本。版本更新一般在：1.公有云ACK发布新Kubernetes版本后的2个月内，ACK Distro支持同版本的Kubernetes。2.ACK Distro自身的功能更新以及各种漏洞修复时，会推出相应的更新版本。
-- 技术支持：ACK Distro提供最近一个Kubernetes版本的创建功能，以及最近三个Kubernetes大版本的技术支持。对于过期版本的Kubernetes集群，ACK Distro将停止支持。
+## ACK-distro publishing strategy
+Based on the [ACK release strategy](https://help.aliyun.com/document_detail/115453.html), the ACK Distro release strategy is as follows:
+
+- Release cycle: In principle, ACK keeps the frequency of updating the big version of Kubernetes once every six months. After the big version is released, ACK will release the update of the small version from time to time due to the function update and bug fix.
+- Cluster creation: ACK Distro only publishes the big version of Kubernetes even number, and supports the creation of two big versions of Kubernetes, such as v1.16 and v1.18. When the new version of Kubernetes is released, the older version will no longer open the creation function. For example, when v1.20 is released, v1.16 will no longer open the creation function.
+- Upgrade and O&M guarantee: Ensure the stable operation of the three most recent major versions of Kubernetes, and support the upgrade function of the latest version to the previous two major versions. For example, if the current latest version is v1.20, ACK Distro supports the upgrade function of v1.18 and v1.16. It is recommended that you upgrade your Kubernetes version in a timely manner as there is a risk of instability and cluster upgrade failure for outdated versions.
+- Technical support: ACK Distro provides technical support for the last three major Kubernetes releases in the community, but ACK Distro will stop supporting Kubernetes clusters with outdated versions.
 
 
-版本号定义：
-v{major}.{minio}.{patch}-ackdistro-k8s{kubernetes version}
-例如：
 
-- v1.0.0-ackdistro-k8s1.20.4​
-- v1.0.1-ackdistro-k8s1.20.4
-- v1.1.0-ackdistro-k8s1.22.4
+Version number definition:
+v{kubernetes-major}.{kubernetes-minio}.{kubernetes-patch}-ack-{patch}
+For example:
+
+- v1.20.4-ack-1
+- v1.20.4-ack-2
+- v1.22.8-ack-1
