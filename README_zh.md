@@ -20,6 +20,7 @@ ACK Distro作为ACK的下游，会紧跟ACK的发版节奏，具体发版策略�
 
 ## 核心功能
 ### 集群创建
+
 - 支持单节点非高可用、三节点高可用、etcd/apiserver分离（规划中）多种部署形态
 - 支持环境预检和部署完成后的集群验证；（规划中）
 - 支持在ECS、VMware、VirtualBox、ZStack、OpenStack、裸金属等多种IaaS上部署；
@@ -27,23 +28,27 @@ ACK Distro作为ACK的下游，会紧跟ACK的发版节奏，具体发版策略�
 - 支持在x86、arm64（规划中）等多种架构上部署。
 
 ### 集群运维
+
 - 支持节点扩缩容、节点替换
 - 支持被CNStack社区版纳管（规划中）
 - 支持运行时集群健康检查（规划中）
 - 支持备份/恢复（规划中）、Kubernetes版本升级（规划中）
 
 ### 高性能网络
+
 - 支持underlay 和 overlay 容器混合部署，兼具 “通过隧道网络与底层网络环境部署完全解耦”   和“通过非隧道高性能网络与底层网络灵活对接” 两大优势；
 - 灵活的IP管理策略、自由的网段动态扩缩容以及丰富的 IP 指定特性
 - 直观、全面的网络资源审计
 - 多集群网络能力支持
 
 ### 本地存储管理
+
 - 支持本地存储池管理、存储卷动态分配、存储卷扩容、存储卷快照
 - 支持存储调度算法扩展
 - 支持存储卷监控
 
 ## 快速开始
+
 ```shell
 # 获取sealer工具
 wget "https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/tmp/sealer" -O /usr/bin/sealer && chmod +x /usr/bin/sealer
@@ -54,6 +59,7 @@ sealer run aecp-turbo-registry.cn-hangzhou.cr.aliyuncs.com/oecp/ackdistro:v1.20.
 # 检查集群
 kubectl get cs
 ```
+
 更多内容请见：[user-guide](docs/user-guide)
 
 ## 组件介绍
