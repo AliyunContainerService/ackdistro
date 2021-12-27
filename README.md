@@ -47,7 +47,7 @@ ACK Distro作为ACK的下游，会紧跟ACK的发版节奏，具体发版策略�
 ```shell
 # 获取sealer工具
 wget -c http://sealer.oss-cn-beijing.aliyuncs.com/sealers/sealer-v0.5.2-linux-amd64.tar.gz && \\
-        tar -xvf sealer-v0.5.2-linux-amd64.tar.gz -C /usr/bin
+     tar -xvf sealer-v0.5.2-linux-amd64.tar.gz -C /usr/bin
 
 # 获取ACK Distro制品并拉起集群
 sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1.20.4-aliyun.1-alpha6 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
