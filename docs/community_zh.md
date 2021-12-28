@@ -17,7 +17,7 @@
 把alibaba/ackdistro的代码更新到自己的仓库中：
 
 ```bash
-git remote add upstream https://github.com/AliyunContainerService/ackdistro.git git remote set-url --push upstream no-pushing
+git remote add upstream https://github.com.cnpmjs.org/AliyunContainerService/ackdistro.git
 ```
 
 更新主分支代码到自己的仓库可以用：
