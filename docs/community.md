@@ -1,4 +1,4 @@
-# community
+# Community
 
 We are committed to making ACK Distro a stable and easy-to-use Kubernetes distribution. We value every user's feedback and will provide long-term support to ACK Distro in the community. Please read this document carefully before submitting Issue and Pull Request for better support.
 ## Feedback
