@@ -51,22 +51,22 @@ For more information, please refer to: [User-guide].
 ## Component Introduction
 
 #### Basic Components
-Including:Inapiserver/scheduler/kcm/kubelet/kube-proxy/coredns/metrics-server/kubectl/kubeadm,etc.
+Including:Inapiserver/scheduler/kcm/kubelet/kube-proxy/coredns/metrics-server/kubectl/kubeadm, etc.
 
 #### Container during runtime
 Including docker, containerd, nvidia-docker, etc.
 
 #### Cluster Installation Tools
-[sealer](https://github.com/alibaba/sealer?spm=5176.25695502.J_6725771560.1.67f754edVGlgxa),open source
+[sealer] (https://github.com/alibaba/sealer?spm=5176.25695502.J_6725771560.1.67f754edVGlgxa), open source
 
-#### Network plug-in
-[hybridnet](https://github.com/alibaba/hybridnet?spm=5176.25695502.J_6725771560.2.67f754edVGlgxa)，support underlay and overlay, open source
+#### Network plugin
+[hybridnet] (https://github.com/alibaba/hybridnet?spm=5176.25695502.J_6725771560.2.67f754edVGlgxa)，support underlay and overlay, open source
 
-#### Local storage plug-in
-[open-local](https://github.com/alibaba/open-local?spm=5176.25695502.J_6725771560.3.67f754edVGlgxa), Support local disk scheduling,open source
+#### Local storage plugin
+[open-local] (https://github.com/alibaba/open-local?spm=5176.25695502.J_6725771560.3.67f754edVGlgxa), Support local disk scheduling,open source
 
 ## Community
-Please refer to: [community](docs/community.md)
+Please refer to: [community] (docs/community.md)
 
 ## License
-ACK Distro is licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the full license text.
+ACK Distro is licensed under the Apache License, Version 2.0. See [LICENSE] (LICENSE) for the full license text.
