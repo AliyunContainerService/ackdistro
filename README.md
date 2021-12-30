@@ -39,8 +39,11 @@ ACK Distro, as a downstream of ACK, will keep up with ACK's release. ACK Distro 
 
 ## Qucik start
 ```bash
-wget "https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/tmp/sealer" -O /usr/bin/sealer && chmod +x /usr/bin/sealer 
-sealer run registry.cn-hangzhou.aliyuncs.com/oecp/ack-distro:v1.20.4-aliyun.1-alpha5 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+wget -c http://sealer.oss-cn-beijing.aliyuncs.com/sealers/sealer-v0.5.2-linux-amd64.tar.gz && \\
+        tar -xvf sealer-v0.5.2-linux-amd64.tar.gz -C /usr/bin
+
+sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1.20.4-aliyun.1-alpha6 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+
 kubectl get cs
 ```
 For more information, please refer to: [User-guide].

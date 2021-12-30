@@ -11,18 +11,21 @@
 点击项目右上角的【Fork】按钮，把alibaba/ackdistro放到自己的仓库中 如：yourname/ackdistro
 
 ### 2) CLONE
-把fork后的项目clone到自己本地，如：git clone https://github.com/yourname/ackdistro
+把fork后的项目clone到本地
 
 ### 3) Set Remote upstream
 把alibaba/ackdistro的代码更新到自己的仓库中：
+
 ```bash
 git remote add upstream https://github.com/AliyunContainerService/ackdistro.git git remote set-url --push upstream no-pushing
 ```
 
 更新主分支代码到自己的仓库可以用：
+
 ```bash
 git pull upstream main # git pull <remote name> <branch name> git push
 ```
+
 ​
 代码先提交到自己的仓库中，然后在仓库里点击【pull request】申请合并代码，之后在pull request中可以看到一个【signed the CLA】黄色按钮，点击【签署CLA】直至按钮变绿.
 
