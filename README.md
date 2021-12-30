@@ -54,7 +54,7 @@ For more information, please refer to: [User-guide].
 Including:Inapiserver/scheduler/kcm/kubelet/kube-proxy/coredns/metrics-server/kubectl/kubeadm,etc.
 
 #### Container during runtime
-Including docker、containerd、nvidia-docker ,etc.
+Including docker, containerd, nvidia-docker, etc.
 
 #### Cluster Installation Tools
 [sealer](https://github.com/alibaba/sealer?spm=5176.25695502.J_6725771560.1.67f754edVGlgxa),open source
