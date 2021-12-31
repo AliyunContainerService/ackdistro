@@ -1,11 +1,12 @@
 # Deployment Requirements
 
-To successfully build ACK Distro, you need to ensure that the following configuration requirements are met.
+To successfully install ACK Distro, you need to ensure that the following requirements are met.
+
 ## Terminology Description
 
-- Master node: Kubernetes cluster control node, which is responsible for managing the whole cluster, including cluster metadata database (etcd), which is generally a 3-node high availability mode and also supports single-node deployment.
-- Master 0 node: The first Master node in the configuration file.
-- Worker node: the working node of Kubernetes cluster, which is responsible for running applications, and the number can range from 0~N
+- Master: Kubernetes cluster control node, which is responsible for managing the whole cluster, including cluster metadata database (etcd), which is generally a 3-node high availability mode and also supports single-node deployment.
+- Master0: The first Master node in the configuration file.
+- Worker: the working node of Kubernetes cluster, which is responsible for running applications, and the number can range from 0~N
 
 ## System requirements
 #### os：
@@ -15,15 +16,18 @@ To successfully build ACK Distro, you need to ensure that the following configur
 - Ubuntu 18.04
 - Anolis 8.2
 - Kylin V10
+
 #### Architecture：
 
 - amd64/x86_64
 - arm64
+
 #### Kernel：
 
 - 4.18.*
 - 4.19.*
 - 3.10.*
+
 #### IaaS：
 
 - Bare mental
@@ -35,6 +39,7 @@ To successfully build ACK Distro, you need to ensure that the following configur
 - ZStack
 
 #### Linux System Configuration:
+
 | **Configuration items** | **Will it be automatically configured during deployment?** |
 | --- | --- |
 | Root user rights of all nodes (ssh password or key)  | No |
@@ -48,8 +53,11 @@ To successfully build ACK Distro, you need to ensure that the following configur
 ## Network requirements
 
 #### Ports open
+
 Please access all ports in the cluster.
+
 #### Container network requirements
+
 Overlay mode:
 
 - Each node needs to open 8472 udp port and 11021 tcp port.
