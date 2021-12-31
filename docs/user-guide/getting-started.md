@@ -1,6 +1,6 @@
 # Getting started
 
-With the following commands, you can quickly install an ACK Distro cluster in an offline environment and experience the same user experience as ACK without reaching the public cloud. You can also check out  [Sealer Get-Started] (https://github.com/alibaba/sealer/blob/main/docs/user-guide/get-started.md) for a more comprehensive guide on how to use the cluster.
+With the following commands, you can quickly install an ACK Distro cluster in an offline environment and experience the same user experience as ACK without reaching the public cloud. You can also check out  [Sealer Get-Started](https://github.com/alibaba/sealer/blob/main/docs/user-guide/get-started.md) for a more comprehensive guide on how to use the cluster.
 
 ## Create cluster
 Get the latest version of sealer：
