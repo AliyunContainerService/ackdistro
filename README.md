@@ -33,9 +33,9 @@ ACK Distro, as a downstream of ACK, will keep up with ACK's release. ACK Distro 
 - Multi-cluster network capacity support
 
 #### Local Storage Management
-- Support local storage pool management, dynamic volume provisioning, storage volume expansion and volume snapshot
-- Support for extended scheduler
-- Support for volume metrics
+- Support local storage pool management, dynamic volume provisioning, volume expansion and volume snapshot
+- Support extended scheduler
+- Support volume metrics
 
 ## Qucik start
 ```bash
