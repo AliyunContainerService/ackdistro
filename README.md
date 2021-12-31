@@ -27,10 +27,10 @@ ACK Distro, as a downstream of ACK, will keep up with ACK's release. ACK Distro 
 - Support for backup/restore (under planning), Kubernetes version upgrade (under planning)
 
 #### High performance network
-- Support mixed deployment of underlay and overlay containers, with the advantages of "complete decoupling from the underlying network environment through tunneled networks" and "flexible interfacing with the underlying network through non-tunneled high-performance networks"
-- Flexible IP management policies, free segment dynamic expansion and contraction, and rich IP designation features
-- An intuitive and comprehensive audit of network resources
-- Multi-cluster network capacity support
+- Providing both overlay and underlay networking for containers in one or more clusters. Overlay and underlay containers can run on the same node and have cluster-wide bidirectional network connectivity
+- Flexible IP/Subnet management policies
+- Intuitive and comprehensive statistics of network resources
+- Multi-cluster networking
 
 #### Local Storage Management
 - Support local storage pool management, dynamic volume provisioning, volume expansion and volume snapshot
