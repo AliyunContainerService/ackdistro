@@ -9,7 +9,7 @@ As a complete Kubernetes distribution, ACK Distro can be delivered to offline en
 The main difference between ACK Distro and online ACK clusters is that online ACK clusters are deployed on AliCloud Elastic Compute servers and managed by AliCloud ACK service, while ACK Distro clusters are managed by yourself and can be deployed on offline environments, other cloud service providers or even your own PCs.
 ​
 
-ACK Distro, as a downstream of ACK, will keep up with ACK's release. ACK Distro will release the same version within one month after ACK releases a new version, and ACK keeps updating the major version of Kubernetes once every six months in principle. Please refer to the [Appendix](docs/FAQ.md)for the specific release strategy.
+ACK Distro, as a downstream of ACK, will keep up with ACK's release. ACK Distro will release the same version within one month after ACK releases a new version, and ACK keeps updating the major version of Kubernetes once every six months in principle. Please refer to the [Appendix](docs/FAQ.md) for the specific release strategy.
 
 ## Features
 
