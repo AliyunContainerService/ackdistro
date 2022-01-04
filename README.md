@@ -13,31 +13,36 @@ ACK Distro, as a downstream of ACK, will keep up with ACK's release. ACK Distro 
 
 ## Features
 
-#### Cluster installation
+### Cluster installation
+
 - Support multiple deployment topologys including single-node, three-node, etcd/apiserver separation (under planning)
 - Support preflight and post-check for cluster
 - Support deployment on various IaaS such as ECS, VMware, VirtualBox, ZStack, OpenStack and bare metal
 - Support deployment on various OS such as Redhat, Debian, Open Anolis, Kylin, Windows (under planning)
 - Support deployment on various architectures such as x86, arm64 (under planning), etc.
 
-#### Cluster operation and maintenance
+### Cluster operation and maintenance
+
 - Support node scale, node replacement
 - Support for being managed by CNStack Community Edition (under planning)
 - Support cluster health check during runtime  (under planning)
 - Support for backup/restore (under planning), Kubernetes version upgrade (under planning)
 
-#### High performance network
+### High performance network
+
 - Providing both overlay and underlay networking for containers in one or more clusters. Overlay and underlay containers can run on the same node and have cluster-  wide bidirectional network connectivity
 - Flexible IP/Subnet management policies
 - Intuitive and comprehensive statistics of network resources
 - Multi-cluster networking
 
-#### Local Storage Management
+### Cloud-native local storage management system
+
 - Support local storage pool management, dynamic volume provisioning, volume expansion and volume snapshot
-- Support extended scheduler
-- Support volume metrics
+- Support extended scheduler, Raw block volume
+- Support volume metrics, IO Throttling
 
 ## Qucik start
+
 ```bash
 wget -c http://sealer.oss-cn-beijing.aliyuncs.com/sealers/sealer-v0.5.2-linux-amd64.tar.gz && \\
         tar -xvf sealer-v0.5.2-linux-amd64.tar.gz -C /usr/bin
@@ -46,23 +51,24 @@ sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistr
 
 kubectl get cs
 ```
+
 For more information, please refer to: [User-guide](https://github.com/tamerga/ackdistro/tree/main/docs).
 
 ## Component Introduction
 
-#### Basic Components
+### Basic Components
 Including:Apiserver/scheduler/controller-manager/kubelet/kube-proxy/coredns/metrics-server/kubectl/kubeadm, etc.
 
-#### Container during runtime
+### Container during runtime
 Including docker, containerd, nvidia-docker, etc.
 
-#### Cluster Installation Tools
+### Cluster Installation Tools
 [sealer](https://github.com/alibaba/sealer), open source
 
-#### Network plugin
+### Network plugin
 [hybridnet](https://github.com/alibaba/hybridnet)，support underlay and overlay, open source
 
-#### Local storage plugin
+### Local storage plugin
 [open-local](https://github.com/alibaba/open-local), Support local disk scheduling,open source
 
 ## Community
