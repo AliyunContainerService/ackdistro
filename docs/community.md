@@ -11,25 +11,23 @@ You can give us feedback on your experience by submitting Issue. Before submitti
 In addition to feedback, we also welcome Feature/BugFix code contributions of all types to help improve ACK Distro. As with other open source projects, any developer can contribute code through fork & pull requests.
 
 ### 1) FORK
-
 Click the 【Fork】button, in the top right corner, put alibaba/ackdistro in your own repository, such as yourname/ackdistro
-
 ### 2) CLONE
 
 Clone the fork project to the local
 
 ### 3) Set Remote upstream
-  Update the alibaba/ackdistro code, and put in your repository:
+Update the alibaba/ackdistro code, and put in your repository:
  
- ```bash
-  git remote add upstream https://github.com/alibaba/ackdistro.git git remote set-url --push upstream no-pushing
-  ```
+```bash
+git remote add upstream https://github.com/alibaba/ackdistro.git git remote set-url --push upstream no-pushing
+```
 
-  Update the master branch code to your repository for using:
+Update the master branch code to your repository for using:
   
-  ```bash
-  git pull upstream main # git pull <remote name> <branch name> git push
-  ```
+```bash
+git pull upstream main # git pull <remote name> <branch name> git push
+```
   
 The code is first submitted to the warehouse, and then click【pull request】to apply for consolidation of the code. Then you can see a yellow button 【signed the CLA】in PR, click it until the button turns green.
 
