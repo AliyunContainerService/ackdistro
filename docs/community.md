@@ -19,19 +19,15 @@ Clone the fork project to the local
 ### 3) Set Remote upstream
 Update the alibaba/ackdistro code, and put in your repository:
 
-
 ```bash
 git remote add upstream https://github.com/alibaba/ackdistro.git git remote set-url --push upstream no-pushing
 ```
 
-
 Update the master branch code to your repository for using:
-
 
 ```bash
 git pull upstream main # git pull <remote name> <branch name> git push
 ```
-
 
 The code is first submitted to the warehouse, and then click【pull request】to apply for consolidation of the code. Then you can see a yellow button 【signed the CLA】in PR, click it until the button turns green.
 
