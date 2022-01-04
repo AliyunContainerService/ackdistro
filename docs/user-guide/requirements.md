@@ -9,7 +9,7 @@ To successfully install ACK Distro, you need to ensure that the following requir
 - Worker: the working node of Kubernetes cluster, which is responsible for running applications, and the number can range from 0~N
 
 ## System requirements
-#### os：
+### os：
 
 - CentOS 7.5/7.6/7.7/7.8/7.9/8.0
 - RHEL 7.8
@@ -17,18 +17,18 @@ To successfully install ACK Distro, you need to ensure that the following requir
 - Anolis 8.2
 - Kylin V10
 
-#### Architecture：
+### Architecture：
 
 - amd64/x86_64
 - arm64
 
-#### Kernel：
+### Kernel：
 
 - 4.18.*
 - 4.19.*
 - 3.10.*
 
-#### IaaS：
+### IaaS：
 
 - Bare mental
 - Alicloud
@@ -38,7 +38,7 @@ To successfully install ACK Distro, you need to ensure that the following requir
 - VMWare
 - ZStack
 
-#### Linux System Configuration:
+### Linux System Configuration:
 
 | **Configuration items** | **Will it be automatically configured during deployment?** |
 | --- | --- |
@@ -52,11 +52,11 @@ To successfully install ACK Distro, you need to ensure that the following requir
 
 ## Network requirements
 
-#### Ports open
+### Ports open
 
 Please access all ports in the cluster.
 
-#### Container network requirements
+### Container network requirements
 
 Overlay mode:
 
