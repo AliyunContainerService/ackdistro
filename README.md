@@ -46,7 +46,7 @@ sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistr
 
 kubectl get cs
 ```
-For more information, please refer to: [User-guide].
+For more information, please refer to: [User-guide](https://github.com/tamerga/ackdistro/tree/main/docs).
 
 ## Component Introduction
 
