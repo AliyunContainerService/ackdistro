@@ -4,35 +4,45 @@ With the following commands, you can quickly install an ACK Distro cluster in an
 
 ## Create cluster
 Get the latest version of sealer：
+
 ```bash
-wget "https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/tmp/sealer" -O /usr/bin/sealer && chmod +x /usr/bin/sealer 
+wget "https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/tmp/sealer" -O /usr/bin/sealer && chmod +x /usr/bin/sealer
 ```
+
 Use sealer to get ACK Distro artifacts and create clusters:
+
 ```bash
 sealer run registry.cn-hangzhou.aliyuncs.com/oecp/ack-distro:v1.20.4-aliyun.1-alpha5 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
 ```
+
 View cluster status:
+
 ```bash
 kubectl get cs
 ```
 
 ## Operation and maintenance cluster
 Expansion node:
+
 ```bash
 sealer join -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...]
 ```
+
 Capacity reduction node：
+
 ```bash
 sealer delete -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...]
 ```
 
 ## Cleanup cluster
+
 ```bash
 sealer delete -a
 ```
 
 ## Instruction
 Please refer to Alibaba Help Center and Kubernetes community for the usage of standard Kubernetes:
+
 - [https://help.aliyun.com/document_detail/309552.html](https://help.aliyun.com/document_detail/309552.html)
 - [https://kubernetes.io/#](https://kubernetes.io/#)
 
