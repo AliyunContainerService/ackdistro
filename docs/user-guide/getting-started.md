@@ -6,13 +6,14 @@ With the following commands, you can quickly install an ACK Distro cluster in an
 Get the latest version of sealer：
 
 ```bash
-wget "https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/tmp/sealer" -O /usr/bin/sealer && chmod +x /usr/bin/sealer
+wget -c http://sealer.oss-cn-beijing.aliyuncs.com/sealers/sealer-v0.5.2-linux-amd64.tar.gz && \
+        tar -xvf sealer-v0.5.2-linux-amd64.tar.gz -C /usr/bin
 ```
 
 Use sealer to get ACK Distro artifacts and create clusters:
 
 ```bash
-sealer run registry.cn-hangzhou.aliyuncs.com/oecp/ack-distro:v1.20.4-aliyun.1-alpha5 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1.20.4-aliyun.1-alpha6 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
 ```
 
 View cluster status:

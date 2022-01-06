@@ -9,7 +9,7 @@
 获取最新版sealer：
 
 ```bash
-wget -c http://sealer.oss-cn-beijing.aliyuncs.com/sealers/sealer-v0.5.2-linux-amd64.tar.gz && \\
+wget -c http://sealer.oss-cn-beijing.aliyuncs.com/sealers/sealer-v0.5.2-linux-amd64.tar.gz && \
         tar -xvf sealer-v0.5.2-linux-amd64.tar.gz -C /usr/bin
 ```
 
