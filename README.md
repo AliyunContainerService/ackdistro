@@ -1,24 +1,23 @@
 # Home
 
-Alibaba ACK Distro (ACK distribution) is the Kubernetes distribution released by Alibaba for heterogeneous IaaS environment. Users can get complete content and long-term support for free through Alicloud ACR. Its components have been verified and security checked by Alicloud ACK service and Alibaba Group's core business scenarios in large-scale production environment, with industry-leading security and reliability.
-​
+Alibaba ACK Distro is a Kubernetes distribution based on Alibaba Container Service for Kubernetes to support production ready Kubernetes deployment for heterogeneous IaaS environment. Users can get complete content and long-term support for free through Alibaba Cloud. Its components have been verified and security checked by Alibaba Cloud Container Service for Kubernetes (ACK) and Alibaba Group's core business scenarios in large-scale production environment, with industry-leading security and reliability.
 
-As a complete Kubernetes distribution, ACK Distro can be delivered to offline environment simply and quickly through [sealer](https://github.com/alibaba/sealer), an open source application packaging delivery tool of Alibaba, helping users to manage their clusters more simply and flexibly. The components support both X86 and ARM hardware architectures, and include a high-performance network plugin [hybridnet](https://github.com/alibaba/hybridnet), which ensures that ACK Distro can run smoothly over a diverse infrastructure. At the same time, ACK Distro can be registered on the Alicloud ACK service to achieve consistent resource management, policy compliance and traffic control, so that users can obtain the same user experience as the online ACK cluster.
+As a complete Kubernetes distribution, ACK Distro can be delivered to on-premise environment simply and quickly through [sealer](https://github.com/alibaba/sealer), an open-source application packaging delivery tool of Alibaba, helping users to manage their clusters more simply and flexibly. The components support both x86 and ARM hardware architectures, and include a high-performance network plugin [hybridnet](https://github.com/alibaba/hybridnet), which ensures that ACK Distro can run smoothly over a diverse infrastructure. At the same time, ACK Distro can be registered on the ACK service to achieve consistent resource management, policy compliance and traffic control, so that users can obtain the same user experience as the online ACK cluster.
 
 ## The difference between ACK Distro and ACK
-The main difference between ACK Distro and online ACK clusters is that online ACK clusters are deployed on AliCloud Elastic Compute servers and managed by AliCloud ACK service, while ACK Distro clusters are managed by yourself and can be deployed on offline environments, other cloud service providers or even your own PCs.
-​
 
-ACK Distro, as a downstream of ACK, will keep up with ACK's release. ACK Distro will release the same version within one month after ACK releases a new version, and ACK keeps updating the minor version of Kubernetes once every six months in principle. Please refer to the [Appendix](docs/FAQ.md) for the specific release strategy.
+The main difference between ACK Distro and ACK clusters is that ACK clusters are deployed on and managed by Alibaba Cloud, while ACK Distro clusters are managed by yourself and can be deployed on on-premise environments, other cloud service providers or even your own PCs.
+
+ACK Distro, as a downstream of ACK, will keep up-to-date with ACK's release. ACK Distro will release the same version within one month after ACK releases a new version, and ACK keeps updating the minor version of Kubernetes once every six months in principle. Please refer to the [Appendix](docs/FAQ.md) for the specific release strategy.
 
 ## Features
 
 ### Cluster installation
 
-- Support multiple deployment topologys including single-node, three-node, etcd/apiserver separation (under planning)
+- Support multiple deployment topologies including single-node, three-node, etcd/apiserver separation (under planning)
 - Support preflight and post-check for cluster
 - Support deployment on various IaaS such as ECS, VMware, VirtualBox, ZStack, OpenStack and bare metal
-- Support deployment on various OS such as Redhat, Debian, Open Anolis, Kylin, Windows (under planning)
+- Support deployment on various OS such as Red Hat, Debian, Open Anolis, Kylin, Windows (under planning)
 - Support deployment on various architectures such as x86, arm64 (under planning), etc.
 
 ### Cluster operation and maintenance
@@ -41,7 +40,7 @@ ACK Distro, as a downstream of ACK, will keep up with ACK's release. ACK Distro 
 - Support extended scheduler, Raw block volume
 - Support volume metrics, IO Throttling
 
-## Qucik start
+## Quick start
 
 ```bash
 wget -c http://sealer.oss-cn-beijing.aliyuncs.com/sealers/sealer-v0.5.2-linux-amd64.tar.gz && \
