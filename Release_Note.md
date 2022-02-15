@@ -2,6 +2,7 @@
 
 ## v1.20.4-ack-2
 Features:
+
 - Support multiple deployment topologies including single-node, three-node
 - Support deployment on various IaaS such as ECS, VMware, VirtualBox, ZStack, OpenStack and bare metal
 - Support deployment on various OS such as Red Hat, Debian, Open Anolis, Kylin
