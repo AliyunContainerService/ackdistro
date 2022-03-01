@@ -1,0 +1,54 @@
+apiVersion: trident.apsara-stack.alibaba-inc.com/v1alpha1
+kind: OpsTask
+metadata:
+  annotations:
+    ark.alibaba-inc.com/name_cn: "k8s\u6838\u5FC3\u7EC4\u4EF6\u68C0\u6D4B"
+  labels:
+    bizType: checkTask
+    check_appset: k8s
+    check_product: k8s
+  name: check-k8s-cs
+  namespace: '{{.Values.k8s_namespace}}'
+spec:
+  broadcast: false
+  description: "\u68C0\u67E5k8s\u6838\u5FC3\u7EC4\u4EF6\u662F\u5426\u5065\u5EB7"
+  period: 1900
+  podSpec:
+    containers:
+    - command:
+      - bash
+      - -c
+      - "#!/usr/bin/env bash\n\nsource /l0/utils/l0-utils.sh\n\nerrMsg=\"\"\ncheck_k8s_cs()\
+        \ {\n    items=$(kubectl get cs | grep -v STATUS | awk '{print $1\";\"$2\"\
+        ;\"$3}')\n    for item in ${items}; do\n        arr=(${item//;/ })\n     \
+        \   name=${arr[0]}\n        status=${arr[1]}\n        message=${arr[2]}\n\
+        \        if [[ ${status} != \"Healthy\" ]]; then\n          errMsg=${errMsg}\"\
+        ; \u7EC4\u4EF6 [$name] \u5904\u4E8E\u4E0D\u5065\u5EB7\u72B6\u6001: status\"\
+        \n        fi\n    done\n}\n\ncheck_master_pods() {\n    items=$(kubectl get\
+        \ pod -n kube-system | egrep 'kube-(apiserver|scheduler|controller-manager)'\
+        \ | awk '{print $1\";\"$2\";\"$3}')\n    for item in ${items}; do\n      \
+        \  arr=(${item//;/ })\n        name=${arr[0]}\n        status=${arr[2]}\n\
+        \        if [[ ${status} != \"Running\" ]]; then\n            kubectl get\
+        \ pod $name -n kube-system\n            errMsg=${errMsg}\"; pod [$name] \u5904\
+        \u4E8E\u5F02\u5E38\u72B6\u6001: $status\"\n        fi\n    done\n}\n\nret=\"\
+        \"\ncheck_k8s_cs\nif [[ \"$errMsg\" == \"\" ]];then\n    Record \"K8S_CS_CHECK\"\
+        \ \"k8s-core\" \"pass\" \"all k8s componentstatus are healthy.\" \"\u68C0\u67E5\
+        K8s Components\"\nelse\n    Record \"K8S_CS_CHECK\" \"k8s-core\" \"fail\"\
+        \ \"$errMsg\" \"\u68C0\u67E5K8s Components\"\nfi\n\nerrMsg=\"\"\ncheck_master_pods\n\
+        if [[ \"$errMsg\" == \"\" ]];then\n    Record \"MASTER_POD_CHECK\" \"k8s-core\"\
+        \ \"pass\" \"all master pods are healthy\" \"\u68C0\u67E5K8s Master Pods\"\
+        \nelse\n    Record \"MASTER_POD_CHECK\" \"k8s-core\" \"fail\" \"$errMsg\"\
+        \ \"\u68C0\u67E5K8s Master Pods\"\nfi\n\nReturn \"${TestResults}\""
+      image: '{{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}'
+      imagePullPolicy: IfNotPresent
+      name: main
+    dnsPolicy: ClusterFirstWithHostNet
+    hostNetwork: true
+    tolerations:
+    - effect: NoSchedule
+      key: alibabacloud.com/system
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+  privilegeLevel: Cluster
+  suspend: {{ .Values.globalconfig.SuspendPeriodHealthCheck }}
+  timeout: 180

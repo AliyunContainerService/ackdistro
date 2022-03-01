@@ -1,0 +1,80 @@
+apiVersion: trident.apsara-stack.alibaba-inc.com/v1alpha1
+kind: OpsTask
+metadata:
+  annotations:
+    ark.alibaba-inc.com/name_cn: "coredns\u5065\u5EB7\u68C0\u67E5"
+  labels:
+    bizType: checkTask
+    check_appinstance: coredns
+    check_appset: k8s
+    check_product: k8s
+  name: check-k8s-dns-hostnet
+  namespace: '{{.Values.k8s_namespace}}'
+spec:
+  broadcast: true
+  description: "\u68C0\u67E5coredns\u662F\u5426\u6B63\u5E38\uFF0Cservice\u80FD\u8C03\
+    \u7528"
+  period: 3000
+  podSpec:
+    containers:
+    - command:
+      - bash
+      - -c
+      - "#!/bin/bash\n\nsource /l0/utils/l0-utils.sh\n# This script check the 'kube-dns'\
+        \ service and dns pods connection from pod\n\nmyip=$POD_IP\nkube_dns_service_name=\"\
+        kube-dns.kube-system.svc\"\nkube_dns_service_ip=`kubectl -n kube-system get\
+        \ svc kube-dns -ojsonpath='{.spec.clusterIP}'`\nkube_dns_endpoints_ips=`kubectl\
+        \ -n kube-system get ep kube-dns -ojsonpath='{.subsets[0].addresses[*].ip}'`\n\
+        \n\ncount=0\nwhile [[ true ]]; do\n    curl \"$kube_dns_service_name:53\"\
+        \ -k --connect-timeout 15 > /dev/null 2>&1\n    error_code=`echo $?`\n   \
+        \ if [ $error_code -ne 0 ] && [ $error_code -ne 52 ]; then\n        count=$[${count}+1]\n\
+        \        if [[ ${count} -eq 4 ]]; then\n            curl \"$kube_dns_service_name:53\"\
+        \ -k --connect-timeout 15\n            errMsg=\"Curl from src:node($myip)\
+        \ to dest:dns_service_domain($kube_dns_service_name:53) failed\"\n       \
+        \     echo $errMsg\n            Record \"CURL_DNS_SERVER_NAME\" \"kube_dns\"\
+        \ \"fail\" \"$errMsg\" \"Node\u4E2D\u4F7F\u7528\u57DF\u540D\u8BBF\u95EEDNS\u670D\
+        \u52A1\"\n            break\n        fi\n        sleep 2\n    else\n     \
+        \   errMsg=\"Curl from src:node($myip) to dest:dns_service_domain($kube_dns_service_name:53)\
+        \ success\"\n        echo $errMsg\n        Record \"CURL_DNS_SERVER_NAME\"\
+        \ \"kube_dns\" \"pass\" \"$errMsg\" \"Node\u4E2D\u4F7F\u7528\u57DF\u540D\u8BBF\
+        \u95EEDNS\u670D\u52A1\"\n        break\n    fi\ndone\n\n\ncount=0\nwhile [[\
+        \ true ]]; do\n    curl \"$kube_dns_service_ip:53\" -k --connect-timeout 15\
+        \ > /dev/null 2>&1\n    error_code=`echo $?`\n    if [ $error_code -ne 0 ]\
+        \ && [ $error_code -ne 52 ]; then\n        count=$[${count}+1]\n        if\
+        \ [[ ${count} -eq 4 ]]; then\n            curl \"$kube_dns_service_ip:53\"\
+        \ -k --connect-timeout 15\n            errMsg=\"Curl from src:node($myip)\
+        \ to dest:dns_service($kube_dns_service_ip:53) failed\"\n            echo\
+        \ $errMsg\n            Record \"CURL_DNS_SERVER_IP\" \"kube_dns\" \"fail\"\
+        \ \"$errMsg\" \"Node\u4E2D\u4F7F\u7528ClusterIP\u8BBF\u95EEDNS\u670D\u52A1\
+        \"\n            break\n        fi\n        sleep 2\n    else\n        errMsg=\"\
+        Curl from src:node($myip) to dest:dns_service($kube_dns_service_ip:53) success\"\
+        \n        echo $errMsg\n        Record \"CURL_DNS_SERVER_IP\" \"kube_dns\"\
+        \ \"pass\" \"$errMsg\" \"Node\u4E2D\u4F7F\u7528ClusterIP\u8BBF\u95EEDNS\u670D\
+        \u52A1\"\n        break\n    fi\ndone\n\n\nerrMsg=\"\"\nfor pod in `echo \"\
+        $kube_dns_endpoints_ips\"`\ndo\n    count=0\n    while [[ true ]]; do\n  \
+        \      curl \"$pod:53\" -k --connect-timeout 15 > /dev/null 2>&1\n       \
+        \ error_code=`echo $?`\n        if [ $error_code -ne 0 ] && [ $error_code\
+        \ -ne 52 ]; then\n            count=$[${count}+1]\n            if [[ ${count}\
+        \ -eq 4 ]]; then\n                curl \"$pod:53\" -k --connect-timeout 15\n\
+        \                errMsg=\"Curl from src:node($myip) to dest:dns_endpoint($pod:53)\
+        \ failed\"\n                echo $errMsg\n                Record \"CURL_DNS_ENDPOINT\"\
+        \ \"kube_dns\" \"fail\" \"$errMsg\" \"Node\u4E2D\u4F7F\u7528\u540E\u7AEFPodIP\u8BBF\
+        \u95EEDNS\u670D\u52A1\"\n                break\n            fi\n         \
+        \   sleep 2\n        else\n            errMsg=\"Curl from src:node($myip)\
+        \ to dest:dns_endpoint($pod:53) success\"\n            echo $errMsg\n    \
+        \        Record \"CURL_DNS_ENDPOINT\" \"kube_dns\" \"pass\" \"$errMsg\" \"\
+        \u4F7F\u7528\u540E\u7AEFPodIP\u8BBF\u95EEDNS\u670D\u52A1\"\n            break\n\
+        \        fi\n    done\ndone\n\nReturn \"${TestResults}\""
+      image: '{{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}'
+      imagePullPolicy: IfNotPresent
+      name: main
+    dnsPolicy: ClusterFirstWithHostNet
+    hostNetwork: true
+    tolerations:
+    - effect: NoSchedule
+      key: alibabacloud.com/system
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+  privilegeLevel: Cluster
+  suspend: {{ .Values.globalconfig.SuspendPeriodHealthCheck }}
+  timeout: 300

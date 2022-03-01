@@ -1,0 +1,16 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+images:
+  lzero:
+    image: oecp/l-zero
+    tag: v1.0-36c0baf566728a0c6ee10d8bd9506a51d372f6e7
+  nginxdemos:
+    image: oecp/nginxdemos
+    tag: 0.2
+  opsbasealpine:
+    image: oecp/opsbase-alpine
+    tag: v0.1
+k8s_namespace: kube-system
+domain: "l-zero-ingress.paas.com"
+globalconfig:
+  RegistryURL: registry.cn-hangzhou.aliyuncs.com

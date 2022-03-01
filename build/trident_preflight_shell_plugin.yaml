@@ -1,0 +1,9 @@
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: MyShell # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: PreInit # PreInit PreInstall PostInstall
+  data: |
+    /root/trident preflight run -f /root/.sealer/my-cluster/Clusterfile --sealer
