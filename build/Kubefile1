@@ -1,0 +1,3 @@
+FROM ack-distro:${TAG}
+COPY charts/l-zero charts
+CMD helm -n kube-system install l-zero charts/l-zero

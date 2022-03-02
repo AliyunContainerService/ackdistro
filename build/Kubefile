@@ -9,17 +9,13 @@ COPY Metadata .
 COPY charts/kube-core chart
 COPY charts/hybridnet charts
 COPY charts/open-local charts
-COPY charts/l-zero charts
-COPY charts/l-zero-library charts
 COPY yamls ack-distro-yamls
 CMD helm -n kube-system install kube-core chart/kube-core
 CMD kubectl apply -f ack-distro-yamls/*
 CMD helm -n kube-system install hybridnet charts/hybridnet
 CMD helm -n kube-system install open-local charts/open-local
-CMD helm -n kube-system install l-zero charts/l-zero
-CMD helm -n kube-system install l-zero-library charts/l-zero-library
 COPY disk_init.sh scripts
 COPY disk_init_shell_plugin.yaml plugin
 COPY disk_init_rollback.sh scripts
 COPY disk_init_rollback_shell_plugin.yaml plugin
-COPY test_init_shell_plugin.yaml plugin
+COPY trident_preflight_shell_plugin.yaml plugin
