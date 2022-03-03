@@ -1,8 +1,0 @@
-registry.cn-hangzhou.aliyuncs.com/oecp/pause:3.2
-registry.cn-hangzhou.aliyuncs.com/oecp/kube-apiserver:v1.20.4-aliyun.1
-registry.cn-hangzhou.aliyuncs.com/oecp/kube-controller-manager:v1.20.4-aliyun.1
-registry.cn-hangzhou.aliyuncs.com/oecp/kube-scheduler:v1.20.4-aliyun.1
-registry.cn-hangzhou.aliyuncs.com/oecp/etcd:3.4.3-0
-registry.cn-hangzhou.aliyuncs.com/oecp/metrics-server:v0.3.8.5-307cf45-aliyun
-registry.cn-hangzhou.aliyuncs.com/oecp/kube-proxy:v1.20.4-aliyun.1
-registry.cn-hangzhou.aliyuncs.com/oecp/coredns:1.7.0

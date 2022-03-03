@@ -32,7 +32,7 @@ images:
     image: oecp/coredns
     tag: 1.7.0
 globalconfig:
-  RegistryURL: sea.hub:5000
+  RegistryURL: registry.cn-hangzhou.aliyuncs.com
   CoreDnsIP: 10.96.0.10
   PodCIDR: 100.64.0.0/16
   DNSDomain: cluster.local

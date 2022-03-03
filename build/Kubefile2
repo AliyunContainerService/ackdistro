@@ -1,3 +1,0 @@
-FROM ack-distro:${TAG}
-COPY charts/l-zero-library charts
-CMD helm -n acs-system install l-zero charts/l-zero-library
