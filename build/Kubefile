@@ -3,16 +3,19 @@ COPY kubectl ./bin
 COPY kubeadm ./bin
 COPY kubelet ./bin
 COPY helm ./bin
+COPY kubeadm.yml ./etc
 COPY imageList manifests
 COPY Metadata .
-COPY kubeadm-cluster-config.yaml.tmpl ./etc
-COPY kubeadm-init.yaml.tmpl ./etc
-COPY kubeadm-join-config.yaml.tmpl ./etc
-COPY charts/kube-core charts
+COPY charts/kube-core chart
 COPY charts/hybridnet charts
 COPY charts/open-local charts
 COPY yamls ack-distro-yamls
-CMD helm -n kube-system install kube-core charts/kube-core
+CMD helm -n kube-system install kube-core chart/kube-core
 CMD kubectl apply -f ack-distro-yamls/*
 CMD helm -n kube-system install hybridnet charts/hybridnet
 CMD helm -n kube-system install open-local charts/open-local
+COPY disk_init.sh scripts
+COPY disk_init_shell_plugin.yaml plugin
+COPY disk_init_rollback.sh scripts
+COPY disk_init_rollback_shell_plugin.yaml plugin
+COPY trident_preflight_shell_plugin.yaml plugin

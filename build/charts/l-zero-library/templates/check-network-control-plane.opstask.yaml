@@ -1,0 +1,79 @@
+apiVersion: trident.apsara-stack.alibaba-inc.com/v1alpha1
+kind: OpsTask
+metadata:
+  annotations:
+    ark.alibaba-inc.com/name_cn: "\u7F51\u7EDC\u63D2\u4EF6\u7BA1\u63A7\u5065\u5EB7"
+  labels:
+    bizType: checkTask
+    check_appset: k8s
+    check_product: k8s
+  name: check-network-control-plane
+  namespace: '{{.Values.k8s_namespace}}'
+spec:
+  broadcast: false
+  description: "\u68C0\u67E5\u7F51\u7EDC\u63D2\u4EF6\u7BA1\u63A7\u662F\u5426\u5065\
+    \u5EB7"
+  period: 1800
+  podSpec:
+    containers:
+    - command:
+      - bash
+      - -c
+      - "#!/usr/bin/env bash\n\nsource /l0/utils/l0-utils.sh\n\nerrMsg=\"\"\nret=0\n\
+        check_k8s_network() {\n    network_ds=\"\"\n    network_pods=\"\"\n\n    cnt=$(kubectl\
+        \ get ds -n kube-system | grep calico | wc -l)\n    if [[ ${cnt} != \"0\"\
+        \ ]]; then\n        echo \"> \u68C0\u67E5k8s\u96C6\u7FA4\u7684calico\u7F51\
+        \u7EDC\u72B6\u6001\"\n        network_ds=$(kubectl get ds -n kube-system |\
+        \ grep calico | awk '{print $1\";\"$2\";\"$3\";\"$4}')\n        network_pods=$(kubectl\
+        \ get pod -n kube-system | grep calico | awk '{print $1\";\"$2\";\"$3\";\"\
+        $4}')\n    fi\n\n    cnt=$(kubectl get ds -n kube-system | grep flannel |\
+        \ wc -l)\n    if [[ ${cnt} != \"0\" ]]; then\n        echo \"> \u68C0\u67E5\
+        k8s\u96C6\u7FA4\u7684flannel\u7F51\u7EDC\u72B6\u6001\"\n        network_ds=$(kubectl\
+        \ get ds -n kube-system | grep flannel | awk '{print $1\";\"$2\";\"$3\";\"\
+        $4}')\n        network_pods=$(kubectl get pod -n kube-system | grep flannel\
+        \ | awk '{print $1\";\"$2\";\"$3\";\"$4}')\n    fi\n\n    cnt=$(kubectl get\
+        \ ds -n kube-system | grep terway-vlan | wc -l)\n    if [[ ${cnt} != \"0\"\
+        \ ]]; then\n        echo \"> \u68C0\u67E5k8s\u96C6\u7FA4\u7684terway-vlan\u7F51\
+        \u7EDC\u72B6\u6001\"\n        network_ds=$(kubectl get ds -n kube-system |\
+        \ grep terway-vlan | awk '{print $1\";\"$2\";\"$3\";\"$4}')\n        network_pods=$(kubectl\
+        \ get pod -n kube-system | grep terway-vlan | awk '{print $1\";\"$2\";\"$3\"\
+        ;\"$4}')\n    fi\n\n    cnt=$(kubectl get ds -n kube-system | grep rama-daemon\
+        \ | wc -l)\n    if [[ ${cnt} != \"0\" ]]; then\n        echo \"> \u68C0\u67E5\
+        k8s\u96C6\u7FA4\u7684rama\u7F51\u7EDC\u72B6\u6001\"\n        network_ds=$(kubectl\
+        \ get ds -n kube-system | grep rama-daemon | awk '{print $1\";\"$2\";\"$3\"\
+        ;\"$4}')\n        network_pods=$(kubectl get pod -n kube-system | grep rama-daemon\
+        \ | awk '{print $1\";\"$2\";\"$3\";\"$4}')\n    fi\n\n    cnt=$(kubectl get\
+        \ ds -n kube-system | grep nimitz | wc -l)\n    if [[ ${cnt} != \"0\" ]];\
+        \ then\n        echo \"> \u68C0\u67E5k8s\u96C6\u7FA4\u7684nimitz\u7F51\u7EDC\
+        \u72B6\u6001\"\n        network_ds=$(kubectl get ds -n kube-system | grep\
+        \ nimitz | awk '{print $1\";\"$2\";\"$3\";\"$4}')\n        network_pods=$(kubectl\
+        \ get pod -n kube-system | grep nimitz | awk '{print $1\";\"$2\";\"$3\";\"\
+        $4}')\n    fi\n\n    # check daemonset\n    for item in ${network_ds}; do\n\
+        \        arr=(${item//;/ })\n        ds=${arr[0]}\n        desired=${arr[1]}\n\
+        \        ready=${arr[3]}\n        if [[ ${desired} != ${ready} ]]; then\n\
+        \            echo \"daemonset[$ds] \u672A\u8FBE\u5230\u7EC8\u6001pod\u6570\
+        \u76EE\uFF0C\u671F\u671B\u6570\u76EE[$desired]\uFF0C\u5B9E\u9645\u6570\u76EE\
+        [$ready]\"\n            ret=1\n        fi\n    done\n    # check pods\n  \
+        \  for item in ${network_pods}; do\n        arr=(${item//;/ })\n        name=${arr[0]}\n\
+        \        status=${arr[2]}\n        if [[ ${status} != \"Running\" ]]; then\n\
+        \            echo \"network pod [$name] \u5904\u4E8E\u5F02\u5E38\u72B6\u6001\
+        : $status\"\n            ret=1\n        fi\n    done\n}\n\ncheck_k8s_network\n\
+        if [[ \"$ret\" == \"0\" ]];then\n    Record \"NETWORK_CONTROL_PLANE_CHECK\"\
+        \ \"network\" \"pass\" \"basic network check succeeded, network pods are all\
+        \ healthy.\" \"\u68C0\u67E5\u7F51\u7EDC\u63D2\u4EF6\u7BA1\u63A7\u9762\"\n\
+        else\n    Record \"NETWORK_CONTROL_PLANE_CHECK\" \"network\" \"fail\" \"$errMsg\"\
+        \ \"\u68C0\u67E5\u7F51\u7EDC\u63D2\u4EF6\u7BA1\u63A7\u9762\"\nfi\n\nReturn\
+        \ \"${TestResults}\""
+      image: '{{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}'
+      imagePullPolicy: IfNotPresent
+      name: main
+    dnsPolicy: ClusterFirstWithHostNet
+    hostNetwork: true
+    tolerations:
+    - effect: NoSchedule
+      key: alibabacloud.com/system
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+  privilegeLevel: Cluster
+  suspend: {{ .Values.globalconfig.SuspendPeriodHealthCheck }}
+  timeout: 180

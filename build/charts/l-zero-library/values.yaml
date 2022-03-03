@@ -1,0 +1,8 @@
+images:
+  opsbasealpine:
+    image: oecp/opsbase-alpine
+    tag: v0.1
+k8s_namespace: kube-system
+globalconfig:
+  RegistryURL: registry.cn-hangzhou.aliyuncs.com
+  SuspendPeriodHealthCheck: false

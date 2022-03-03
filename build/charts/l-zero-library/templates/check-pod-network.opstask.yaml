@@ -1,0 +1,138 @@
+apiVersion: trident.apsara-stack.alibaba-inc.com/v1alpha1
+kind: OpsTask
+metadata:
+  annotations:
+    ark.alibaba-inc.com/name_cn: "\u5BB9\u5668\u7F51\u7EDC\u8FDE\u901A\u6027"
+  labels:
+    bizType: checkTask
+    check_appset: k8s
+    check_product: k8s
+  name: check-pod-network
+  namespace: '{{.Values.k8s_namespace}}'
+spec:
+  broadcast: true
+  description: "\u68C0\u67E5\u5BB9\u5668\u7F51\u7EDC\u662F\u5426\u8054\u901A"
+  period: 3000
+  podSpec:
+    containers:
+    - command:
+      - bash
+      - -c
+      - "#!/usr/bin/env bash\n\n# Please retain this line\nsource /l0/utils/l0-utils.sh\n\
+        \nmyip=$POD_IP\n\n###################################################\nerrMsg=\"\
+        \"\n# check pod ping nodes\nfor node_ip in ${NODE_IP_LIST[*]}\ndo\n    # L3\
+        \ network\n    count=0\n    while [[ true ]]; do\n        ping -c 1 $node_ip\
+        \ >> /dev/null\n        if [ `echo $?` -eq 0 ]; then\n            # echo \"\
+        Ping from src:pod($myip)/node($HOST_IP) to dest:node($node_ip) success\"\n\
+        \            break\n        else\n            count=$[${count}+1]\n      \
+        \      if [[ ${count} -eq 2 ]]; then\n                errMsg=$errMsg\";Ping\
+        \ from src:pod($myip)/node($HOST_IP) to dest:node($node_ip) failed.\"\n  \
+        \              echo $errMsg\n                break\n            fi\n     \
+        \       sleep 1\n        fi\n    done\ndone\n\nif [[ \"$errMsg\" != \"\" ]];then\n\
+        \    Record \"CHECK_POD_TO_NODE\" \"network\" \"fail\" \"$errMsg\" \"\u68C0\
+        \u67E5\u5BB9\u5668\u5230\u8282\u70B9\u7F51\u7EDC\"\nelse\n    Record \"CHECK_POD_TO_NODE\"\
+        \ \"network\" \"pass\" \"check pod to node success\" \"\u68C0\u67E5\u5BB9\u5668\
+        \u5230\u8282\u70B9\u7F51\u7EDC\"\nfi\n\n###################################################\n\
+        # check pod ping pods\nerrMsg=\"\"\nfor pod_node_ip_pair in ${POD_NODE_IP_PAIR_LIST[*]}\n\
+        do\n    pod_ip=`GetPodIp $pod_node_ip_pair`\n    if [[ \"$pod_ip\" != \"$myip\"\
+        \ ]]; then\n        count=0\n        while [[ true ]]; do\n            ping\
+        \ -c 1 $pod_ip >> /dev/null\n            if [ `echo $?` -eq 0 ]; then\n  \
+        \              #echo \"Ping from src:pod($myip)/node($HOST_IP) to dest:pod($pod_ip)\
+        \ success\"\n                break\n            else\n                count=$[${count}+1]\n\
+        \                if [[ ${count} -eq 2 ]]; then\n                    #ping\
+        \ -c 1 $pod_ip\n                    errMsg=$errMsg\";Ping from src:pod($myip)/node($HOST_IP)\
+        \ to dest:pod($pod_ip) failed\"\n                    echo $errMsg\n      \
+        \              break\n                fi\n                sleep 1\n      \
+        \      fi\n        done\n    fi\ndone\n\nif [[ \"$errMsg\" != \"\" ]];then\n\
+        \    Record \"CHECK_POD_TO_POD\" \"network\" \"fail\" \"$errMsg\" \"\u68C0\
+        \u67E5\u5BB9\u5668\u5230\u5BB9\u5668\u7F51\u7EDC\"\nelse\n    Record \"CHECK_POD_TO_POD\"\
+        \ \"network\" \"pass\" \"check pod to pod success\" \"\u68C0\u67E5\u5BB9\u5668\
+        \u5230\u5BB9\u5668\u7F51\u7EDC\"\nfi\n\n###################################################\n\
+        # create target pod\nerrMsg=\"\"\nCreatePodWithService\nif [[ `echo $?` -ne\
+        \ 0 ]];then\n    Record \"CREATE_CHECK_POD\" \"network\" \"fail\" \"$errMsg\"\
+        \ \"\u521B\u5EFA\u9776Pod\"\nfi\n\n###################################################\n\
+        # check pod ping cluster ip service\nerrMsg=\"\"\nTIME_LIMIT=5\n\ncount=0\n\
+        flag=0\nwhile [[ true ]]; do\n    curl $TARGET_SVC_URL --max-time ${TIME_LIMIT}\
+        \ >> /dev/null\n    if [[ `echo $?` -eq 0 ]]; then\n        #echo \"Curl from\
+        \ src:pod($myip)/node($HOST_IP) to dest:service(${TARGET_SVC_URL}) success\"\
+        \n        Record \"CHECK_POD_TO_CLUSTER_IP\" \"network\" \"pass\" \"check\
+        \ pod to cluster ip service success\" \"\u68C0\u67E5\u5BB9\u5668\u5230Svc\u7F51\
+        \u7EDC\"\n        break\n    else\n        count=$[${count}+1]\n        if\
+        \ [[ ${count} -eq 6 ]]; then\n            errMsg=\"Curl from src:pod($myip)/node($HOST_IP)\
+        \ to dest:service(${TARGET_SVC_URL}) failed\"\n            echo $errMsg\n\
+        \            Record \"CHECK_POD_TO_CLUSTER_IP\" \"network\" \"fail\" \"$errMsg\"\
+        \ \"\u68C0\u67E5\u5BB9\u5668\u5230Svc\u7F51\u7EDC\"\n            break\n \
+        \       fi\n        sleep 1\n    fi\ndone\n\n###################################################\n\
+        # check pod ping nodeport service\nerrMsg=\"\"\nfor node_ip in $NODE_IP_LIST\n\
+        do\n    # L3 network\n    count=0\n    while [[ true ]]; do\n        curl\
+        \ ${node_ip}:$TARGET_NODEPORT --max-time ${TIME_LIMIT} > /dev/null 2>&1\n\
+        \        if [ `echo $?` -eq 0 ]; then\n            #echo \"Curl from src:pod($myip)/node($HOST_IP)\
+        \ to dest:nodeport_service(${node_ip}:${TARGET_NODEPORT}) success\"\n    \
+        \        break\n        else\n            count=$[${count}+1]\n          \
+        \  if [[ ${count} -eq 4 ]]; then\n                errMsg=$errMsg\";Curl from\
+        \ src:pod($myip)/node($HOST_IP) to dest:nodeport_service(${node_ip}:${TARGET_NODEPORT})\
+        \ failed\"\n                echo ${errMsg}\n                break\n      \
+        \      fi\n            sleep 1\n        fi\n    done\ndone\n\nif [[ \"$errMsg\"\
+        \ != \"\" ]];then\n    Record \"CHECK_POD_TO_NODEPORT\" \"network\" \"fail\"\
+        \ \"$errMsg\" \"\u68C0\u67E5\u5BB9\u5668\u5230NodePort\u7F51\u7EDC\"\nelse\n\
+        \    Record \"CHECK_POD_TO_NODEPORT\" \"network\" \"pass\" \"check pod to\
+        \ nodeport service success\" \"\u68C0\u67E5\u5BB9\u5668\u5230NodePort\u7F51\
+        \u7EDC\"\nfi\n\n\nkube_dns_service_name=\"kube-dns.kube-system.svc\"\n\n###################################################\n\
+        # check ping dns endpoint pods\nerrMsg=\"\"\nkube_dns_endpoints_ips=`kubectl\
+        \ -n kube-system get ep kube-dns -ojsonpath='{.subsets[0].addresses[*].ip}'`\n\
+        for pod in `echo \"$kube_dns_endpoints_ips\"`\ndo\n    count=0\n    while\
+        \ [[ true ]]; do\n        curl \"$pod:53\" -k --connect-timeout 15 > /dev/null\
+        \ 2>&1\n        error_code=`echo $?`\n        if [ $error_code -ne 0 ] &&\
+        \ [ $error_code -ne 52 ]; then\n            count=$[${count}+1]\n        \
+        \    if [[ ${count} -eq 4 ]]; then\n                #curl \"$pod:53\" -k --connect-timeout\
+        \ 15\n                errMsg=$errMsg\";Curl from src:pod($myip)/node($HOST_IP)\
+        \ to dest:dns_endpoint($pod:53) failed\"\n                echo $errMsg\n \
+        \               break\n            fi\n            sleep 1\n        else\n\
+        \            #errMsg=\"Curl from src:pod($myip)/node($HOST_IP) to dest:dns_endpoint($pod:53)\
+        \ success\"\n            break\n        fi\n    done\ndone\n\nif [[ \"$errMsg\"\
+        \ != \"\" ]];then\n    Record \"CHECK_POD_TO_DNS_ENDPOINT\" \"network\" \"\
+        fail\" \"$errMsg\" \"\u68C0\u67E5\u5BB9\u5668\u5230DNS\u540E\u7AEFIP\"\nelse\n\
+        \    Record \"CHECK_POD_TO_DNS_ENDPOINT\" \"network\" \"pass\" \"check pod\
+        \ to dns endpoint success\" \"\u68C0\u67E5\u5BB9\u5668\u5230DNS\u540E\u7AEF\
+        IP\"\nfi\n\n###################################################\n# check ping\
+        \ dns cluster ip\nerrMsg=\"\"\nkube_dns_service_ip=`kubectl -n kube-system\
+        \ get svc kube-dns -ojsonpath='{.spec.clusterIP}'`\n\ncount=0\nwhile [[ true\
+        \ ]]; do\n    curl \"$kube_dns_service_ip:53\" -k --connect-timeout 15 > /dev/null\
+        \ 2>&1\n    error_code=`echo $?`\n    if [ $error_code -ne 0 ] && [ $error_code\
+        \ -ne 52 ]; then\n        count=$[${count}+1]\n        if [[ ${count} -eq\
+        \ 4 ]]; then\n            #curl \"$kube_dns_service_ip:53\" -k --connect-timeout\
+        \ 15\n            errMsg=\"Curl from src:pod($myip)/node($HOST_IP) to dest:dns_service($kube_dns_service_ip:53)\
+        \ failed\"\n            echo $errMsg\n            break\n        fi\n    \
+        \    sleep 1\n    else\n        #echo \"Curl from src:pod($myip)/node($HOST_IP)\
+        \ to dest:dns_service($kube_dns_service_ip:53) success\"\n        break\n\
+        \    fi\ndone\n\nif [[ \"$errMsg\" != \"\" ]];then\n    Record \"CHECK_POD_TO_DNS_CLUSTERIP\"\
+        \ \"network\" \"fail\" \"$errMsg\" \"\u68C0\u67E5\u5BB9\u5668\u5230DNS\u670D\
+        \u52A1IP\"\nelse\n    Record \"CHECK_POD_TO_DNS_CLUSTERIP\" \"network\" \"\
+        pass\" \"check pod to dns cluseter ip success\" \"\u68C0\u67E5\u5BB9\u5668\
+        \u5230DNS\u670D\u52A1IP\"\nfi\n\n###################################################\n\
+        # check ping dns service name\ncount=0\nwhile [[ true ]]; do\n    curl \"\
+        $kube_dns_service_name:53\" -k --connect-timeout 15 > /dev/null 2>&1\n   \
+        \ error_code=`echo $?`\n    if [ $error_code -ne 0 ] && [ $error_code -ne\
+        \ 52 ]; then\n        count=$[${count}+1]\n        if [[ ${count} -eq 4 ]];\
+        \ then\n            #curl \"$kube_dns_service_name:53\" -k --connect-timeout\
+        \ 15\n            errMsg=\"Curl from src:pod($myip)/node($HOST_IP) to dest:dns_service_domain($kube_dns_service_name:53)\
+        \ failed\"\n            echo $errMsg\n            break\n        fi\n    \
+        \    sleep 1\n    else\n        #echo \"Curl probe for pod($myip) -> kubernetes\
+        \ service($kube_dns_service_name:53) success\"\n        break\n    fi\ndone\n\
+        \nif [[ \"$errMsg\" != \"\" ]];then\n    Record \"CHECK_POD_TO_DNS_NAME\"\
+        \ \"network\" \"fail\" \"$errMsg\" \"\u68C0\u67E5\u5BB9\u5668\u5230DNS\u57DF\
+        \u540D\"\nelse\n    Record \"CHECK_POD_TO_DNS_NAME\" \"network\" \"pass\"\
+        \ \"check pod to dns service name success\" \"\u68C0\u67E5\u5BB9\u5668\u5230\
+        DNS\u57DF\u540D\"\nfi\n\nReturn \"${TestResults}\""
+      image: '{{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}'
+      imagePullPolicy: IfNotPresent
+      name: main
+    hostNetwork: false
+    tolerations:
+    - effect: NoSchedule
+      key: alibabacloud.com/system
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+  privilegeLevel: Cluster
+  suspend: {{ .Values.globalconfig.SuspendPeriodHealthCheck }}
+  timeout: 600

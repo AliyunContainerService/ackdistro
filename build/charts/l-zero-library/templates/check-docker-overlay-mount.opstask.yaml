@@ -1,0 +1,57 @@
+apiVersion: trident.apsara-stack.alibaba-inc.com/v1alpha1
+kind: OpsTask
+metadata:
+  annotations:
+    ark.alibaba-inc.com/name_cn: "docker\u5065\u5EB7\u68C0\u67E5"
+  labels:
+    bizType: checkTask
+    check_appinstance: docker
+    check_appset: k8s
+    check_product: k8s
+  name: check-docker-overlay-mount
+  namespace: '{{.Values.k8s_namespace}}'
+spec:
+  broadcast: false
+  description: "\u68C0\u67E5docker overlay\u6587\u4EF6\u7CFB\u7EDF\u662F\u5426\u53EF\
+    \u4EE5\u6B63\u5E38mount"
+  period: 3400
+  podSpec:
+    containers:
+    - command:
+      - bash
+      - -c
+      - "#!/usr/bin/env bash\n\nsource /l0/utils/l0-utils.sh\n\ncheck_has_pod_create_container_error()\
+        \ {\n    if kubectl get pod --all-namespaces=true | grep CreateContainerError\
+        \ &>/dev/null;then\n        return 0\n    fi\n    return 1\n}\n\ncheck_docker_overlay_mount()\
+        \ {\n    rlt=\"\"\n    for ns in `kubectl get ns`;do\n        for pod in `kubectl\
+        \ -n $ns get pod | grep CreateContainerError | awk '{print $1}'`; do\n   \
+        \         kubectl -n $ns describe pod ${pod} | grep \"error creating overlay\
+        \ mount\" &>/dev/null\n            if [ $? -eq 0 ];then\n                rlt=${rlt}\"\
+        ,\"${ns}/${pod}\n            fi\n        done\n    done\n    [[ \"$rlt\" ==\
+        \ \"\" ]] && return 1\n    rlt=${rlt:1}\n    return 0\n}\n\nif ! check_has_pod_create_container_error;then\n\
+        \    Record \"CreateContainerError_Check\" \"docker\" \"pass\" \"Has no pod\
+        \ CreateContainerError, this case is OK.\" \"\u68C0\u67E5\u662F\u5426\u6709\
+        \u5BB9\u5668\u521B\u5EFA\u5931\u8D25\"\n    Return \"${TestResults}\"\nfi\n\
+        \nif check_docker_overlay_mount;then\n    Record \"CreateContainerError_Check\"\
+        \ \"docker\" \"fail\" \"pods[$rlt] are CreateContainerError, maybe because\
+        \ docker overlay mount on the node occur some error, please see doc:[https://work.aone.alibaba-inc.com/issue/29922094]\"\
+        \ \"\u68C0\u67E5\u662F\u5426\u6709\u5BB9\u5668\u521B\u5EFA\u5931\u8D25\"\n\
+        \    Return \"${TestResults}\"\nfi\n\nRecord \"CreateContainerError_Check\"\
+        \ \"docker\" \"fail\" \"There are some pods[$rlt] are CreateContainerError\
+        \ in your cluster, but we can't find the reason, please ask [\u4E13\u6709\u4E91\
+        \u654F\u6377PaaS\u5BB9\u5668\u6280\u672F\u652F\u6301\u7FA4] for help.\" \"\
+        \u68C0\u67E5\u662F\u5426\u6709\u5BB9\u5668\u521B\u5EFA\u5931\u8D25\"\nReturn\
+        \ \"${TestResults}\""
+      image: '{{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}'
+      imagePullPolicy: IfNotPresent
+      name: main
+    dnsPolicy: ClusterFirstWithHostNet
+    hostNetwork: true
+    tolerations:
+    - effect: NoSchedule
+      key: alibabacloud.com/system
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+  privilegeLevel: Cluster
+  suspend: {{ .Values.globalconfig.SuspendPeriodHealthCheck }}
+  timeout: 180

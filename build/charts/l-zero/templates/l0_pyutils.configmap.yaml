@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: l0-pyutils
+  namespace: {{ .Values.k8s_namespace }}
+  labels:
+    trident-app: l-zero
+data:
+  content: |
+    # -*- coding: utf-8 -*-
+
+    import os
+    import requests
+    import time
+    import json
+
+    lastTime = time.time()
+    testResults = []
+
+    while True:
+      ret=os.system("kubectl get node >> /dev/null")
+      if ret == 0:
+        break
+      else:
+        time.sleep(5)
+
+    def send_request(url, data):
+      r = requests.post(url, data)
+      if r.status_code != 200:
+        print("send request error. %s" % r.content)
+        return False
+
+    def return_result():
+      global testResults
+      serverAddr = os.getenv('SERVER_ADDR')
+      serverIpAddr = os.getenv('SERVER_IP_ADDR')
+
+      controlType = os.getenv('CONTROLLER_TYPE')
+      podName = os.getenv('POD_NAME')
+      namespace = os.getenv('POD_NAMESPACE')
+      authoritativeInstance = os.getenv('INSTANCE_NAME')
+      triggerType = os.getenv('TRIGGER_TYPE')
+
+      data = {'namespace': namespace, 'podName': podName,
+                             'authoritativeInstance': authoritativeInstance,
+                             'triggerType': triggerType, 'controllerType': controlType, 'message': json.dumps(testResults)}
+
+      res = send_request("http://%s/api/checkCallBack" % serverAddr, data)
+
+      if controlType == "daemonset":
+        time.sleep(600)
+      return res
+
+
+    def record_result(testName, testSuite, status, message, testNameCN=None, level="critical",targetType=None, target=None, solution=None):
+      global lastTime
+      global testResults
+      nowTime = time.time()
+      resultTime = int(nowTime - lastTime)
+      lastTime = nowTime
+
+      if not testNameCN:
+        testNameCN = testName
+      testResults.append({"testName": testName, "testSuite": testSuite, "status": status,
+                          "message": message, "testNameCN": testNameCN, "level": level,
+                          "time": resultTime, "targetType":targetType, "target": target, "solution": solution})
