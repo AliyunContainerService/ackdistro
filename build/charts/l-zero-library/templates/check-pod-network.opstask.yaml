@@ -8,7 +8,7 @@ metadata:
     check_appset: k8s
     check_product: k8s
   name: check-pod-network
-  namespace: '{{.Values.k8s_namespace}}'
+  namespace: 'kube-system'
 spec:
   broadcast: true
   description: "\u68C0\u67E5\u5BB9\u5668\u7F51\u7EDC\u662F\u5426\u8054\u901A"

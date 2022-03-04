@@ -7,7 +7,7 @@ metadata:
     bizType: checkTask
     check_product: global
   name: check-k8s-pod
-  namespace: '{{.Values.k8s_namespace}}'
+  namespace: 'kube-system'
 spec:
   broadcast: false
   description: "\u68C0\u67E5k8s pod\u662F\u5426\u6B63\u5E38"

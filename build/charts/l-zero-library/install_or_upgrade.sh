@@ -31,7 +31,7 @@ sedi "s#reg.docker.alibaba-inc.com#$REGISTRY#g" ./values.yaml
 
 ns=ark-ops-library
 kubectl get ns $ns &>/dev/null || kubectl create ns $ns
-ns=acs-system
+ns=kube-system
 kubectl get ns $ns &>/dev/null || kubectl create ns $ns
 
 if helmv3 status $app;then

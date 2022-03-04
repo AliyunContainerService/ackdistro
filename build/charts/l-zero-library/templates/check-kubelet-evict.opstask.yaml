@@ -9,7 +9,7 @@ metadata:
     check_appset: k8s
     check_product: k8s
   name: check-kubelet-evict
-  namespace: '{{.Values.k8s_namespace}}'
+  namespace: 'kube-system'
 spec:
   broadcast: false
   description: "kubelet\u5065\u5EB7\u68C0\u67E5\uFF0C nodecondition\u72B6\u6001"
