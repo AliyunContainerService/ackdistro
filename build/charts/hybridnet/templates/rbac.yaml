@@ -22,6 +22,11 @@ rules:
       - subnets/status
       - ipinstances
       - ipinstances/status
+    verbs:
+      - "*"
+  - apiGroups:
+      - "multicluster.alibaba.com"
+    resources:
       - remoteclusters
       - remoteclusters/status
       - remotesubnets
@@ -40,6 +45,7 @@ rules:
       - configmaps
       - services
       - endpoints
+      - serviceaccounts
     verbs:
       - create
       - get
@@ -83,6 +89,29 @@ rules:
       - "*"
     verbs:
       - "*"
+  - apiGroups:
+      - "crd.projectcalico.org"
+    resources:
+      - "*"
+    verbs:
+      - "*"
+  - apiGroups:
+      - "discovery.k8s.io"
+    resources:
+      - endpointslices
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+     - "coordination.k8s.io"
+    resources:
+      - leases
+    verbs:
+      - create
+      - get
+      - list
+      - update
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
