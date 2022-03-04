@@ -57,7 +57,7 @@ spec:
         - --kubeconfig=/var/lib/kube-proxy/kubeconfig.conf
         - --hostname-override=$(NODE_NAME)
         - --metrics-bind-address=0.0.0.0
-        image: "sea.hub:5000/oecp/kube-proxy:v1.20.4-aliyun.1"
+        image: "registry.cn-hangzhou.aliyuncs.com/oecp/kube-proxy:v1.20.4-aliyun.1"
         imagePullPolicy: IfNotPresent
         name: kube-proxy-worker
         resources: {}
@@ -169,7 +169,7 @@ spec:
         - --kubeconfig=/var/lib/kube-proxy/kubeconfig.conf
         - --hostname-override=$(NODE_NAME)
         - --metrics-bind-address=0.0.0.0
-        image: "sea.hub:5000/oecp/kube-proxy:v1.20.4-aliyun.1"
+        image: "registry.cn-hangzhou.aliyuncs.com/oecp/kube-proxy:v1.20.4-aliyun.1"
         imagePullPolicy: IfNotPresent
         name: kube-proxy-master
         resources: {}
