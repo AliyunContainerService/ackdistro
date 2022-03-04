@@ -19,7 +19,7 @@ CMD helm -n kube-system install open-local charts/open-local
 CMD helm -n kube-system install l-zero charts/l-zero
 CMD helm -n kube-system install l-zero-library charts/l-zero-library
 COPY plugins/disk_init.sh scripts
-COPY plugins/disk_init_shell_plugin.yaml plugin
+COPY plugins/disk_init_shell_plugin.yaml plugins
 COPY plugins/disk_init_rollback.sh scripts
-COPY plugins/disk_init_rollback_shell_plugin.yaml plugin
-#COPY plugins/trident_preflight_shell_plugin.yaml plugin
+COPY plugins/disk_init_rollback_shell_plugin.yaml plugins
+COPY plugins/trident_preflight_shell_plugin.yaml plugins
