@@ -1,25 +1,32 @@
 FROM registry.cn-qingdao.aliyuncs.com/sealer-io/ack:genesis
+
+COPY Metadata .
+
+COPY trident ./bin
 COPY kubectl ./bin
 COPY kubeadm ./bin
 COPY kubelet ./bin
 COPY helm ./bin
-COPY kubeadm.yml ./etc
-COPY imageList manifests
-COPY Metadata .
+
+COPY scripts/disk_init.sh scripts
+COPY scripts/disk_init_rollback.sh scripts
+
+COPY plugins/disk_init_shell_plugin.yaml plugin
+COPY plugins/disk_init_rollback_shell_plugin.yaml plugin
+COPY plugins/trident_preflight_shell_plugin.yaml plugin
+
+COPY kubeadm.yaml ./etc
+
 COPY charts/kube-core chart
 COPY charts/hybridnet charts
 COPY charts/open-local charts
 COPY charts/l-zero charts
 COPY charts/l-zero-library charts
 COPY yamls ack-distro-yamls
-CMD helm -n kube-system install kube-core chart/kube-core
+
+CMD helm -n kube-system upgrade -i kube-core chart/kube-core
 CMD kubectl apply -f ack-distro-yamls/*
-CMD helm -n kube-system install hybridnet charts/hybridnet
-CMD helm -n kube-system install open-local charts/open-local
-CMD helm -n kube-system install l-zero charts/l-zero
-CMD helm -n kube-system install l-zero-library charts/l-zero-library
-COPY plugins/disk_init.sh scripts
-COPY plugins/disk_init_shell_plugin.yaml plugin
-COPY plugins/disk_init_rollback.sh scripts
-COPY plugins/disk_init_rollback_shell_plugin.yaml plugin
-#COPY plugins/trident_preflight_shell_plugin.yaml plugin
+CMD helm -n kube-system upgrade -i hybridnet charts/hybridnet
+CMD helm -n kube-system upgrade -i open-local charts/open-local
+CMD helm -n kube-system upgrade -i l-zero charts/l-zero
+CMD helm -n acs-system upgrade -i l-zero-library charts/l-zero-library
