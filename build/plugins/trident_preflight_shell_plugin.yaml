@@ -6,4 +6,4 @@ spec:
   type: SHELL
   action: PreInit # PreInit PreInstall PostInstall
   data: |
-    /root/trident preflight run -f /root/.sealer/my-cluster/Clusterfile --sealer
+    trident preflight run -f /root/.sealer/my-cluster/Clusterfile --sealer
