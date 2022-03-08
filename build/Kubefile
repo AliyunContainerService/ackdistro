@@ -11,21 +11,22 @@ COPY helm ./bin
 COPY scripts/disk_init.sh scripts
 COPY scripts/disk_init_rollback.sh scripts
 
-COPY plugins/disk_init_shell_plugin.yaml plugin
-COPY plugins/disk_init_rollback_shell_plugin.yaml plugin
-COPY plugins/trident_preflight_shell_plugin.yaml plugin
+COPY plugins/disk_init_shell_plugin.yaml plugins
+COPY plugins/disk_init_rollback_shell_plugin.yaml plugins
+COPY plugins/trident_preflight_shell_plugin.yaml plugins
 
+COPY imageList manifests
 COPY kubeadm.yaml ./etc
 COPY statics/audit-policy.yml ./statics
 
-COPY charts/kube-core chart
+COPY charts/kube-core charts
 COPY charts/hybridnet charts
 COPY charts/open-local charts
 COPY charts/l-zero charts
 COPY charts/l-zero-library charts
 COPY yamls ack-distro-yamls
 
-CMD helm -n kube-system upgrade -i kube-core chart/kube-core
+CMD helm -n kube-system upgrade -i kube-core charts/kube-core
 CMD kubectl apply -f ack-distro-yamls/*
 CMD helm -n kube-system upgrade -i hybridnet charts/hybridnet
 CMD helm -n kube-system upgrade -i open-local charts/open-local
