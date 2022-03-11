@@ -3,7 +3,7 @@
 images:
   hybridnet:
     image: hybridnetdev/hybridnet
-    tag: v0.4.0
+    tag: v0.4.1
 globalconfig:
   RegistryURL: "docker.io"
   PodCIDR: 100.64.0.0/16

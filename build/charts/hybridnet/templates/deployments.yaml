@@ -38,6 +38,8 @@ spec:
           imagePullPolicy: IfNotPresent
           command:
             - /hybridnet/hybridnet-manager
+          args:
+            - --controller-concurrency=Pod=100,IPAM=10
           env:
             - name: DEFAULT_NETWORK_TYPE
               value: Overlay
