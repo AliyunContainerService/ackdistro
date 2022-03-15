@@ -13,4 +13,4 @@ images:
 k8s_namespace: kube-system
 domain: "l-zero-ingress.paas.com"
 globalconfig:
-  RegistryURL: registry.cn-hangzhou.aliyuncs.com
+  RegistryURL: sea.hub:5000
