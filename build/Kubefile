@@ -16,7 +16,7 @@ COPY plugins/disk_init_rollback_shell_plugin.yaml plugins
 COPY plugins/trident_preflight_shell_plugin.yaml plugins
 
 COPY imageList manifests
-COPY kubeadm.yaml ./etc
+COPY kubeadm.yml ./etc
 COPY statics/audit-policy.yml ./statics
 
 COPY charts/kube-core charts
