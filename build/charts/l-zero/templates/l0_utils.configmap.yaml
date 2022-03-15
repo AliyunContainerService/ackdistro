@@ -208,7 +208,7 @@ data:
         uid: ${POD_UID}
     spec:
       containers:
-      - image: registry.cn-hangzhou.aliyuncs.com/oecp/nginxdemos:0.2
+      - image: ${REGISTRY_URL}/oecp/nginxdemos:0.2
         imagePullPolicy: IfNotPresent
         name: main
       dnsPolicy: ClusterFirst
