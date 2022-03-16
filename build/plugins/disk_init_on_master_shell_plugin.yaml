@@ -5,6 +5,6 @@ metadata:
 spec:
   type: SHELL
   action: PreInit # PreInit PreInstall PostInstall
-  on: node
+  on: master
   data: |
-    bash scripts/disk_init.sh -d"${StorageDevice}" -a"${DockerRunDiskSize}" -b"${KubeletRunDiskSize}"
+    bash scripts/disk_init.sh -e"${EtcdDevice}" -d"${StorageDevice}" -a"${DockerRunDiskSize}" -b"${KubeletRunDiskSize}"

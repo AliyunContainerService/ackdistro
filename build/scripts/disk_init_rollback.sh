@@ -15,6 +15,13 @@ info()
     echo -e "\033[1;32m$@\033[0m"
 }
 
+shouldMkFs() {
+    if [ "$1" != "" ] && [ "$1" != "/" ] && [ "$1" != "\"/\"" ];then
+        return 0
+    fi
+    return 1
+}
+
 clean_yoda_pool()
 {
     # step 1: get yoda pvlist and vglist
@@ -51,10 +58,15 @@ info "disk_init_rollback.sh lsblk result:"
 lsblk
 
 # Step 1: get device
+etcdDev=""
 dev=""
-container_runtime=""
+container_runtime="docker"
 while getopts "d:c:" opt; do
   case $opt in
+    e)
+      etcdDev=$OPTARG
+      info "The target etcd device: $OPTARG"
+      ;;
     d)
       dev=$OPTARG
       info "The target device: $OPTARG"
@@ -74,6 +86,7 @@ done
 clean_yoda_pool
 
 # Step 3: clean mount info in /etc/fstab
+sed -i "/\\/var\\/lib\\/etcd/d"  /etc/fstab
 sed -i "/\\/var\\/lib\\/kubelet/d"  /etc/fstab
 sed -i "/\\/var\\/lib\\/${container_runtime}/d"  /etc/fstab
 sed -i "/\\/var\\/lib\\/${container_runtime}\\/logs/d"  /etc/fstab
@@ -85,9 +98,13 @@ for i in `seq 1 10`;do
     for km in `mount -l |grep "/var/lib/kubelet/pods" |awk '{print $3}'`;do
       umount $km;
     done
+    umount /var/lib/etcd
     umount /var/lib/kubelet
     umount /var/lib/${container_runtime}/logs
     umount /var/lib/${container_runtime}
+    if findmnt /var/lib/etcd;then
+        continue
+    fi
     if findmnt /var/lib/kubelet;then
         continue
     fi
@@ -107,7 +124,7 @@ fi
 info "umount done!"
 
 # Step 5: wipefs
-if [ -z "$dev" ]; then
+if ! shouldMkFs $dev; then
     info "target device is empty!"
 else
     info "wipefs $dev"
@@ -116,7 +133,19 @@ else
         error "failed to exec [wipefs -a $dev]: $output"
         exit 1
     fi
-    info "wipefs done!"
+    info "wipefs $dev done!"
+fi
+
+if ! shouldMkFs $etcdDev; then
+    info "target etcd device is empty!"
+else
+    info "wipefs $etcdDev"
+    output=$(wipefs -a $etcdDev)
+    if [ "$?" != "0" ]; then
+        error "failed to exec [wipefs -a $etcdDev]: $output"
+        exit 1
+    fi
+    info "wipefs $etcdDev done!"
 fi
 
 info "disk_init_rollback success!"

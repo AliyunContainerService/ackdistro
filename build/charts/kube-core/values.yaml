@@ -2,34 +2,34 @@
 # Declare variables to be passed into your templates.
 images:
   pause:
-    image: oecp/pause
+    image: ecp_builder/pause
     tag: 3.2
   apiserver:
-    image: oecp/kube-apiserver
+    image: ecp_builder/kube-apiserver
     tag: v1.20.4-aliyun.1
   controllermanager:
-    image: oecp/kube-controller-manager
+    image: ecp_builder/kube-controller-manager
     tag: v1.20.4-aliyun.1
   scheduler:
-    image: oecp/kube-scheduler
+    image: ecp_builder/kube-scheduler
     tag: v1.20.4-aliyun.1
   etcd:
-    image: oecp/etcd
+    image: ecp_builder/etcd
     tag: 3.4.3-0
   lvscare:
-    image: oecp/lvscare
+    image: ecp_builder/lvscare
     tag: v1.1.1
   k8sdeviceplugin:
-    image: oecp/k8s-device-plugin
+    image: ecp_builder/k8s-device-plugin
     tag: 1.11
   metricsserver:
-    image: oecp/metrics-server
+    image: ecp_builder/metrics-server
     tag: v0.3.8.5-307cf45-aliyun
   kubeproxy:
-    image: oecp/kube-proxy
+    image: ecp_builder/kube-proxy
     tag: v1.20.4-aliyun.1
   coredns:
-    image: oecp/coredns
+    image: ecp_builder/coredns
     tag: 1.7.0
 globalconfig:
   RegistryURL: sea.hub:5000

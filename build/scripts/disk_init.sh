@@ -15,13 +15,25 @@ info()
     echo -e "\033[1;32m$@\033[0m"
 }
 
+shouldMkFs() {
+    if [ "$1" != "" ] && [ "$1" != "/" ] && [ "$1" != "\"/\"" ];then
+        return 0
+    fi
+    return 1
+}
+
 # Step 0: get device and parts size
 dev=""
+etcdDev=""
 container_runtime_size=""
 kubelet_size=""
-container_runtime=""
+container_runtime="docker"
 while getopts "d:a:b:c:" opt; do
   case $opt in
+    e)
+      etcdDev=$OPTARG
+      info "The target etcd device: $OPTARG"
+      ;;
     d)
       dev=$OPTARG
       info "The target device: $OPTARG"
@@ -45,8 +57,22 @@ while getopts "d:a:b:c:" opt; do
   esac
 done
 
+# Step 0: init etcd device
+if shouldMkFs $etcdDev;then
+    set -e
+    umount /var/lib/etcd
+    mkfs.ext4 -F $etcdDev
+    mkdir -p /var/lib/etcd
+    mount $etcdDev /var/lib/etcd
+    now=`date +'%Y-%m-%d-%H-%M-%S'`
+    cp -r /var/lib/etcd/ /tmp/etcd-data-backup-${now}
+    rm -rf /var/lib/etcd/*
+    echo "$etcdDev /var/lib/etcd ext4 defaults 0 0" >> /etc/fstab
+    set +e
+fi
+
 # Step 1: check val
-if [ -z "$dev" ]; then
+if ! shouldMkFs $dev; then
     info "device is empty! exit..."
     exit 0
 fi
@@ -182,7 +208,7 @@ else
     exit 0
 fi
 
-# Step 2.5: sleep a little while
+# sleep a little while
 sleep 1s
 
 # Step 3: umount before mkfs

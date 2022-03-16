@@ -1,0 +1,10 @@
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: install-addons # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: PostInstall # PreInit PreInstall PostInstall
+  on: master0
+  data: |
+    bash install_addons.sh "${Network}" "${Addons}"

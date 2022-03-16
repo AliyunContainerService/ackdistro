@@ -1,0 +1,62 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ .Values.name }}-dependency-installer
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.name }}-dependency-installer
+    component: {{ .Values.name }}-dependency-installer
+spec:
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}-dependency-installer
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}-dependency-installer
+    spec:
+      hostNetwork: true
+      hostPID: true
+      hostIPC: true
+      tolerations:
+        - operator: Exists
+      containers:
+        - name: main
+          image: "ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/open-local-rpms:v0.1"
+          command:
+            - sh
+            - "-c"
+            - |
+              cp -r /root/rpm /host-dir/tmp/
+              cd /host-dir/tmp/rpm
+              export YODA_RPMS=`ls yoda/*.rpm | xargs`
+              export YODA_RPMS_C8=`ls yoda-centos8/*.rpm | xargs`
+              chroot /host-dir /bin/bash <<EOF
+              set -x
+              cd /tmp/rpm
+              if bash yoda/should-install.sh;then
+                if rpm -ivh --force --nodeps $YODA_RPMS;then
+                  echo "failed to install rpm, maybe your rpm db was broken, please see https://cloudlinux.zendesk.com/hc/en-us/articles/115004075294-Fix-rpmdb-Thread-died-in-Berkeley-DB-library for help"
+                fi
+              fi
+              if bash yoda-centos8/should-install.sh;then
+                if rpm -ivh --force --nodeps $YODA_RPMS_C8;then
+                  echo "failed to install rpm, maybe your rpm db was broken, please see https://cloudlinux.zendesk.com/hc/en-us/articles/115004075294-Fix-rpmdb-Thread-died-in-Berkeley-DB-library for help"
+                fi
+              fi
+              EOF
+              sleep 99999999
+          securityContext:
+            runAsUser: 0
+            privileged: true
+          volumeMounts:
+            - name: host-dir
+              mountPath: /host-dir
+      volumes:
+        - name: host-dir
+          hostPath:
+            path: /
+            type: DirectoryOrCreate
