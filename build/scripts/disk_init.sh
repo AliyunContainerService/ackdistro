@@ -5,7 +5,7 @@ set -x
 error()
 {
     set +x
-    echo "##TRIDENT_EXEC_RESULT_BEGIN##"$@"##TRIDENT_EXEC_RESULT_END##"
+    echo "On node: `hostname -i`"
     echo -e "\033[1;31m$@\033[0m"
     set -x
 }

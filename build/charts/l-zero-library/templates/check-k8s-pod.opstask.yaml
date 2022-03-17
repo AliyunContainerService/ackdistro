@@ -28,7 +28,7 @@ spec:
         Pod\" \"warning\"\nelse\n    Record \"CHECK_K8S_POD\" \"k8s-basic\" \"fail\"\
         \ \"$errMsg\" \"\u68C0\u67E5\u5F02\u5E38Pod\" \"warning\"\nfi\n\nReturn \"\
         ${TestResults}\""
-      image: '{{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}'
+      image: {{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}
       imagePullPolicy: IfNotPresent
       name: main
     dnsPolicy: ClusterFirstWithHostNet

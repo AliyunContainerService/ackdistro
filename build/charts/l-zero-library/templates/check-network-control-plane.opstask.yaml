@@ -64,7 +64,7 @@ spec:
         else\n    Record \"NETWORK_CONTROL_PLANE_CHECK\" \"network\" \"fail\" \"$errMsg\"\
         \ \"\u68C0\u67E5\u7F51\u7EDC\u63D2\u4EF6\u7BA1\u63A7\u9762\"\nfi\n\nReturn\
         \ \"${TestResults}\""
-      image: '{{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}'
+      image: {{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}
       imagePullPolicy: IfNotPresent
       name: main
     dnsPolicy: ClusterFirstWithHostNet

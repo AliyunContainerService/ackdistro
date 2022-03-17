@@ -5,7 +5,7 @@ images:
     image: hybridnetdev/hybridnet
     tag: v0.3.2
 globalconfig:
-  RegistryURL: "docker.io"
+  RegistryURL: "sea.hub:5000"
   PodCIDR: 100.64.0.0/16
   Gateway: 100.64.0.1
   IPVersion: "4"

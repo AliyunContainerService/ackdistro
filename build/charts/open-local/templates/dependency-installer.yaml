@@ -25,7 +25,7 @@ spec:
         - operator: Exists
       containers:
         - name: main
-          image: "ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/open-local-rpms:v0.1"
+          image: "sea.hub:5000/ecp_builder/open-local-rpms:v0.1"
           command:
             - sh
             - "-c"

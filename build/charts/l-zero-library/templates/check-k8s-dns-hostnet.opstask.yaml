@@ -65,7 +65,7 @@ spec:
         \        Record \"CURL_DNS_ENDPOINT\" \"kube_dns\" \"pass\" \"$errMsg\" \"\
         \u4F7F\u7528\u540E\u7AEFPodIP\u8BBF\u95EEDNS\u670D\u52A1\"\n            break\n\
         \        fi\n    done\ndone\n\nReturn \"${TestResults}\""
-      image: '{{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}'
+      image: {{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}
       imagePullPolicy: IfNotPresent
       name: main
     dnsPolicy: ClusterFirstWithHostNet

@@ -3,13 +3,13 @@
 images:
   lzero:
     image: ecp_builder/l-zero
-    tag: v1.0-36c0baf566728a0c6ee10d8bd9506a51d372f6e7
+    tag: v1.1.0-d18ee35
   nginxdemos:
     image: ecp_builder/nginxdemos
     tag: 0.2
   opsbasealpine:
     image: ecp_builder/opsbase-alpine
-    tag: v0.1
+    tag: v0.2
 k8s_namespace: kube-system
 domain: "l-zero-ingress.paas.com"
 globalconfig:
