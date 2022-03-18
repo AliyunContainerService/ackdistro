@@ -28,7 +28,7 @@ spec:
         \ \"all namespaces are healthy.\" \"\u68C0\u67E5\u547D\u540D\u7A7A\u95F4\"\
         \nelse\n    Record \"CHECK_K8S_NAMESPACE\" \"k8s-basic\" \"fail\" \"$errMsg\"\
         \ \"\u68C0\u67E5\u547D\u540D\u7A7A\u95F4\"\nfi\n\nReturn \"${TestResults}\""
-      image: '{{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}'
+      image: {{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}
       imagePullPolicy: IfNotPresent
       name: main
     dnsPolicy: ClusterFirstWithHostNet

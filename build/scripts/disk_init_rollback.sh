@@ -61,7 +61,7 @@ lsblk
 etcdDev=""
 dev=""
 container_runtime="docker"
-while getopts "d:c:" opt; do
+while getopts "d:c:e:" opt; do
   case $opt in
     e)
       etcdDev=$OPTARG

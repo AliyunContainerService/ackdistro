@@ -39,7 +39,7 @@ spec:
         \ pod[$rlt] crash in your cluster, but we can't find the reason, please ask\
         \ [\u4E13\u6709\u4E91\u654F\u6377PaaS\u5BB9\u5668\u6280\u672F\u652F\u6301\u7FA4\
         ] for help.\" \"\u68C0\u67E5K8s Apiserver\"\nReturn \"${TestResults}\""
-      image: '{{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}'
+      image: {{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}
       imagePullPolicy: IfNotPresent
       name: main
     dnsPolicy: ClusterFirstWithHostNet

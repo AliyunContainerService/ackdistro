@@ -11,7 +11,7 @@ apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
 kubernetesVersion: 1.20.4-aliyun.1
 #controlPlaneEndpoint: "apiserver.cluster.local:6443"
-imageRepository: sea.hub:5000/oecp
+imageRepository: sea.hub:5000/ecp_builder
 networking:
   # dnsDomain: cluster.local
   podSubnet: 100.64.0.0/10
@@ -40,7 +40,7 @@ apiServer:
       pathType: DirectoryOrCreate
     - name: "audit-log"
       hostPath: "/var/log/kubernetes"
-mountPath: "/var/log/kubernetes"
+      mountPath: "/var/log/kubernetes"
       pathType: DirectoryOrCreate
     - name: localtime
       hostPath: /etc/localtime
@@ -70,7 +70,7 @@ etcd:
   local:
     extraArgs:
       listen-metrics-urls: http://0.0.0.0:2381
-    imageRepository: sea.hub:5000/oecp
+    imageRepository: sea.hub:5000/ecp_builder
     imageTag: 3.4.3-0
 
 ---

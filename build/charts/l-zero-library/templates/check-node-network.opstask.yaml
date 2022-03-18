@@ -32,7 +32,7 @@ spec:
         \ \"$errMsg\" \"\u68C0\u67E5\u8282\u70B9\u7F51\u7EDC\"\nelse\n    Record \"\
         NODE_NETWORK_CHECK\" \"network\" \"pass\" \"check node network success\" \"\
         \u68C0\u67E5\u8282\u70B9\u7F51\u7EDC\"\nfi\n\nReturn \"${TestResults}\""
-      image: '{{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}'
+      image: {{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}
       imagePullPolicy: IfNotPresent
       name: main
     dnsPolicy: ClusterFirstWithHostNet

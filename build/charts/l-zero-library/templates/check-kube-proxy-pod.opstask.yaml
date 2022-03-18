@@ -38,7 +38,7 @@ spec:
         \ \"kube-proxy\" \"pass\" \"kube proxy basic check succeeded.\" \"\u68C0\u67E5\
         K8s Proxy\"\nelse\n    Record \"KUBE_PROXY_CHECK\" \"kube-proxy\" \"fail\"\
         \ \"$errMsg\" \"\u68C0\u67E5K8s Proxy\"\nfi\n\nReturn \"${TestResults}\""
-      image: '{{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}'
+      image: {{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}
       imagePullPolicy: IfNotPresent
       name: main
     dnsPolicy: ClusterFirstWithHostNet

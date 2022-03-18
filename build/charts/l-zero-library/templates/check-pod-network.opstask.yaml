@@ -124,7 +124,7 @@ spec:
         \u540D\"\nelse\n    Record \"CHECK_POD_TO_DNS_NAME\" \"network\" \"pass\"\
         \ \"check pod to dns service name success\" \"\u68C0\u67E5\u5BB9\u5668\u5230\
         DNS\u57DF\u540D\"\nfi\n\nReturn \"${TestResults}\""
-      image: '{{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}'
+      image: {{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}
       imagePullPolicy: IfNotPresent
       name: main
     hostNetwork: false

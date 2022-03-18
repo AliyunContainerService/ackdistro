@@ -1,4 +1,4 @@
-FROM registry.cn-qingdao.aliyuncs.com/sealer-io/ack:genesis
+FROM registry.cn-qingdao.aliyuncs.com/sealer-io/ackdistro:genesis
 
 COPY Metadata .
 
@@ -12,25 +12,25 @@ COPY scripts/disk_init.sh scripts
 COPY scripts/disk_init_rollback.sh scripts
 COPY scripts/install_addons.sh scripts
 
-COPY plugins/disk_init_shell_plugin.yaml plugins
-COPY plugins/disk_init_on_master_shell_plugin.yaml plugins
-COPY plugins/disk_init_rollback_shell_plugin.yaml plugins
-COPY plugins/disk_init_rollback_on_master_shell_plugin.yaml plugins
-COPY plugins/preflight_shell_plugin.yaml plugins
-COPY plugins/install_addons_shell_plugin.yaml plugins
-COPY plugins/health_check_shell_plugin.yaml plugins
-
 COPY imageList manifests
 COPY kubeadm.yml ./etc
 COPY statics/audit-policy.yml ./statics
 
-COPY charts/kube-core charts
-COPY charts/hybridnet charts
-COPY charts/open-local charts
-COPY charts/l-zero charts
-COPY charts/l-zero-library charts
+COPY charts/kube-core chart
+COPY charts/hybridnet chart
+COPY charts/open-local chart
+COPY charts/l-zero chart
+COPY charts/l-zero-library chart
+COPY charts/calico chart
 COPY yamls ack-distro-yamls
 
 CMD helm -n kube-system upgrade -i kube-core charts/kube-core
 CMD kubectl create ns acs-system || true
 CMD kubectl apply -f ack-distro-yamls/*
+
+CMD helm -n kube-system upgrade -i calico chart/calico
+CMD helm -n kube-system upgrade -i hybridnet chart/hybridnet
+CMD helm -n kube-system upgrade -i open-local chart/open-local
+CMD helm -n kube-system upgrade -i l-zero chart/l-zero
+CMD helm -n kube-system upgrade -i l-zero-library chart/l-zero-library
+

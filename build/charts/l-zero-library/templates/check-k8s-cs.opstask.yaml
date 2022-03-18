@@ -39,7 +39,7 @@ spec:
         \ \"pass\" \"all master pods are healthy\" \"\u68C0\u67E5K8s Master Pods\"\
         \nelse\n    Record \"MASTER_POD_CHECK\" \"k8s-core\" \"fail\" \"$errMsg\"\
         \ \"\u68C0\u67E5K8s Master Pods\"\nfi\n\nReturn \"${TestResults}\""
-      image: '{{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}'
+      image: {{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}
       imagePullPolicy: IfNotPresent
       name: main
     dnsPolicy: ClusterFirstWithHostNet

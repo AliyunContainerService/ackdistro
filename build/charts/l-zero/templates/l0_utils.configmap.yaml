@@ -208,7 +208,7 @@ data:
         uid: ${POD_UID}
     spec:
       containers:
-      - image: ${REGISTRY_URL}/oecp/nginxdemos:0.2
+      - image: sea.hub:5000/ecp_builder/nginxdemos:0.2
         imagePullPolicy: IfNotPresent
         name: main
       dnsPolicy: ClusterFirst
