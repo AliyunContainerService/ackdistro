@@ -28,7 +28,7 @@ etcdDev=""
 container_runtime_size=""
 kubelet_size=""
 container_runtime="docker"
-while getopts "d:a:b:c:" opt; do
+while getopts "d:a:b:c:e:" opt; do
   case $opt in
     e)
       etcdDev=$OPTARG
@@ -60,7 +60,7 @@ done
 # Step 0: init etcd device
 if shouldMkFs $etcdDev;then
     set -e
-    umount /var/lib/etcd
+    umount /var/lib/etcd || true
     mkfs.ext4 -F $etcdDev
     mkdir -p /var/lib/etcd
     mount $etcdDev /var/lib/etcd
