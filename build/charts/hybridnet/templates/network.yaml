@@ -1,9 +1,0 @@
----
-apiVersion: networking.alibaba.com/v1
-kind: Network
-metadata:
-  name: network-0
-spec:
-  netID: 4
-  type: Overlay
-  switchID: "virtual-switch"
