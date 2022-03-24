@@ -1,10 +1,14 @@
 apiVersion: sealer.aliyun.com/v1alpha1
 kind: Plugin
 metadata:
-  name: disk-init # Specify this plugin name,will dump in $rootfs/plugin dir.
+  name: node_disk-init # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
   action: PreInit # PreInit PreInstall PostInstall
   'on': node
   data: |
-    bash scripts/disk_init.sh -d"${StorageDevice}" a"${DockerRunDiskSize}" b"${KubeletRunDiskSize}"
+    bash scripts/disk_init.sh -d"${StorageDevice}" a"${DockerRunDiskSize}" b"${KubeletRunDiskSize}" &&
+    chmod a+x /var/lib/sealer/data/my-cluster/rootfs/scripts/docker.sh &&
+    sh /var/lib/sealer/data/my-cluster/rootfs/scripts/docker.sh &&
+    chmod a+x /var/lib/sealer/data/my-cluster/rootfs/scripts/init-kube.sh &&
+    sh /var/lib/sealer/data/my-cluster/rootfs/scripts/init-kube.sh
