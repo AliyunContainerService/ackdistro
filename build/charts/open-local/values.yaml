@@ -49,6 +49,8 @@ storageclass:
     name: open-local-mountpoint-ssd
   mountpoint_hdd:
     name: open-local-mountpoint-hdd
+globalconfig:
+  RegistryURL: sea.hub:5000
 monitor:
   # install grafana dashboard
   enabled: false

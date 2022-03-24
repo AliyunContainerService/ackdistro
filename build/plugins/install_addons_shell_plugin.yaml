@@ -5,6 +5,17 @@ metadata:
 spec:
   type: SHELL
   action: PostInstall # PreInit PreInstall PostInstall
-  on: master0
+  'on': master0
   data: |
-    bash install_addons.sh "${Network}" "${Addons}"
+    bash install_addons.sh "${Network}"
+    if [ $? -ne 0 ];then
+      exit 1
+    fi
+    sleep 30
+    trident health-check
+    if [ $? -eq 0 ];then
+      exit 0
+    fi
+    echo "First time health check fail, try again"
+    trident health-check --trigger-mode All
+    exit $?

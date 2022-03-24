@@ -2,6 +2,24 @@
 # how to use: `sh disk_init_rollback.sh -d${deviceName}`
 set -x
 
+# remove the containers and images
+docker ps -aq | xargs -I '{}' docker stop {}
+docker ps -aq | xargs -I '{}' docker rm {}
+docker image ls -aq | xargs -I '{}' docker image rm {}
+
+# kill dockerd process and related processes
+for pid in $(ps aux | awk '{ if ($11 == "dockerd" || $11 == "containerd" || $11 == "containerd-shim") print $2 }')
+do
+  kill -9 ${pid}
+done
+for pid in $(ps aux | awk '{ if (match($11, ".*/dockerd$$") || match($11, ".*/containerd$$") || match($11, ".*/containerd-shim$$")) print $2 }')
+do
+  kill -9 ${pid}
+done
+
+# umount and clean the docker related directories
+rm -rf /var/lib/docker/*
+
 error()
 {
     set +x
@@ -61,7 +79,7 @@ lsblk
 etcdDev=""
 dev=""
 container_runtime="docker"
-while getopts "d:c:" opt; do
+while getopts "d:c:e:" opt; do
   case $opt in
     e)
       etcdDev=$OPTARG

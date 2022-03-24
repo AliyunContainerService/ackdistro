@@ -28,7 +28,7 @@ etcdDev=""
 container_runtime_size=""
 kubelet_size=""
 container_runtime="docker"
-while getopts "d:a:b:c:" opt; do
+while getopts "d:a:b:c:e:" opt; do
   case $opt in
     e)
       etcdDev=$OPTARG
