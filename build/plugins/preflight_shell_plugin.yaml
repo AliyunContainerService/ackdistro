@@ -5,6 +5,6 @@ metadata:
 spec:
   type: SHELL
   action: PreInit # PreInit PreInstall PostInstall
-  on: master0
+  'on': master0
   data: |
     trident preflight run -f /root/.sealer/my-cluster/Clusterfile --sealer
