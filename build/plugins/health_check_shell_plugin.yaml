@@ -4,7 +4,7 @@ metadata:
   name: preflight # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: PreInit # PreInit PreInstall PostInstall
+  action: PostInstall # PreInit PreInstall PostInstall
   on: master0
   data: |
     trident health-check

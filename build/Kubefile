@@ -28,9 +28,4 @@ CMD helm -n kube-system upgrade -i kube-core charts/kube-core
 CMD kubectl create ns acs-system || true
 CMD kubectl apply -f ack-distro-yamls/*
 
-CMD helm -n kube-system upgrade -i calico chart/calico
-CMD helm -n kube-system upgrade -i hybridnet chart/hybridnet
-CMD helm -n kube-system upgrade -i open-local chart/open-local
-CMD helm -n kube-system upgrade -i l-zero chart/l-zero
-CMD helm -n kube-system upgrade -i l-zero-library chart/l-zero-library
 
