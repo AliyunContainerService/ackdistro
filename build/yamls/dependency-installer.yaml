@@ -2,21 +2,21 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: {{ .Values.name }}-dependency-installer
-  namespace: {{ .Values.namespace }}
+  name: ack-distro-dependency-installer
+  namespace: kube-system
   labels:
-    app: {{ .Values.name }}-dependency-installer
-    component: {{ .Values.name }}-dependency-installer
+    app: ack-distro-dependency-installer
+    component: ack-distro-dependency-installer
 spec:
   updateStrategy:
     type: RollingUpdate
   selector:
     matchLabels:
-      app: {{ .Values.name }}-dependency-installer
+      app: ack-distro-dependency-installer
   template:
     metadata:
       labels:
-        app: {{ .Values.name }}-dependency-installer
+        app: ack-distro-dependency-installer
     spec:
       hostNetwork: true
       hostPID: true
@@ -25,7 +25,7 @@ spec:
         - operator: Exists
       containers:
         - name: main
-          image: "ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/open-local-rpms:v0.1"
+          image: "sea.hub:5000/ecp_builder/open-local-rpms:v0.1"
           command:
             - sh
             - "-c"

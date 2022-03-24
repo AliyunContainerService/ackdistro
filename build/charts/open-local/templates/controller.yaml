@@ -1,24 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.name }}-scheduler-extender
+  name: {{ .Values.name }}-controller
   namespace: {{ .Values.namespace }}
   labels:
     app: {{ .Values.name }}
-    component: {{ .Values.name }}-scheduler-extender
+    component: {{ .Values.name }}-controller
 spec:
+  replicas: 2
   selector:
     matchLabels:
       app: {{ .Values.name }}
-      component: {{ .Values.name }}-scheduler-extender
+      component: {{ .Values.name }}-controller
   template:
     metadata:
       labels:
         app: {{ .Values.name }}
-        component: {{ .Values.name }}-scheduler-extender
+        component: {{ .Values.name }}-controller
     spec:
-      hostNetwork: true
-      dnsPolicy: ClusterFirstWithHostNet
       priorityClassName: system-cluster-critical
       tolerations:
       - operator: Exists
@@ -38,42 +37,22 @@ spec:
               - key: app
                 operator: In
                 values:
-                - {{ .Values.name }}-scheduler-extender
+                - {{ .Values.name }}-controller
             topologyKey: kubernetes.io/hostname
       containers:
       - args:
-        - scheduler
-        - --port={{ .Values.extender.port }}
-        - --scheduler-strategy={{ .Values.extender.strategy }}
+        - controller
         image: {{ .Values.images.local.image }}:{{ .Values.images.local.tag }}
         imagePullPolicy: Always
-        name: {{ .Values.name }}-scheduler-extender
+        name: {{ .Values.name }}-controller
         resources:
           limits:
-            cpu: 500m
-            memory: 512Mi
+            cpu: 200m
+            memory: 256Mi
           requests:
-            cpu: 100m
-            memory: 128Mi
+            cpu: 50m
+            memory: 64Mi
         env:
         - name: TZ
           value: Asia/Shanghai
       serviceAccount: {{ .Values.name }}
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: {{ .Values.name }}
-    component: {{ .Values.name }}-scheduler-extender
-  name: {{ .Values.name }}-scheduler-extender
-  namespace: {{ .Values.namespace }}
-spec:
-  selector:
-    app: {{ .Values.name }}
-    component: {{ .Values.name }}-scheduler-extender
-  ports:
-  - protocol: TCP
-    port: {{ .Values.extender.port }}
-    targetPort: {{ .Values.extender.port }}
-    name: http-port

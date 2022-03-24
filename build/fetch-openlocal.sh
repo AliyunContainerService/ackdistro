@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-exit 0
 tag=$1
 
 if [[ "$tag" == "" ]];then
