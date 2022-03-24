@@ -11,6 +11,12 @@ COPY helm ./bin
 COPY scripts/disk_init.sh scripts
 COPY scripts/disk_init_rollback.sh scripts
 COPY scripts/install_addons.sh scripts
+COPY plugins/disk_init_on_master_shell_plugin.yaml plugins
+COPY plugins/disk_init_rollback_on_master_shell_plugin.yaml plugins
+COPY plugins/disk_init_rollback_shell_plugin.yaml plugins
+COPY plugins/disk_init_shell_plugin.yaml plugins
+COPY plugins/preflight_shell_plugin.yaml plugins
+COPY plugins/install_addons_shell_plugin.yaml plugins
 
 COPY imageList manifests
 COPY kubeadm.yml ./etc

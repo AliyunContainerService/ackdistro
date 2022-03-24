@@ -7,7 +7,8 @@ spec:
   action: PostInstall # PreInit PreInstall PostInstall
   'on': master0
   data: |
-    bash install_addons.sh "${Network}" "${Addons}" &&
+    bash install_addons.sh "${Network}" &&
+    sleep 60 &&
     trident health-check
     if [ $? -eq 0 ];then
       exit 0
