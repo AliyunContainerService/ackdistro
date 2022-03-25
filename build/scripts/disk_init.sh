@@ -57,10 +57,22 @@ while getopts "d:a:b:c:e:" opt; do
   esac
 done
 
-# Step 0: init etcd device
-if shouldMkFs $etcdDev;then
+mountEtcd() {
+    if [[ $etcdDev == *"nvme"* ]]; then
+        mount |grep ^$etcdDev[p0-9]*|grep /var/lib/etcd
+        if [ "$?" == "0" ]; then
+            info "$etcdDev has been mounted already, and in correct way~"
+            return
+        fi
+    else
+        mount |grep ^$etcdDev[0-9]*|grep /var/lib/etcd
+        if [ "$?" == "0" ]; then
+            info "$etcdDev has been mounted already, and in correct way~"
+            return
+        fi
+    fi
+
     set -e
-    umount /var/lib/etcd || true
     mkfs.ext4 -F $etcdDev
     mkdir -p /var/lib/etcd
     mount $etcdDev /var/lib/etcd
@@ -69,6 +81,11 @@ if shouldMkFs $etcdDev;then
     rm -rf /var/lib/etcd/*
     echo "$etcdDev /var/lib/etcd ext4 defaults 0 0" >> /etc/fstab
     set +e
+}
+
+# Step 0: init etcd device
+if shouldMkFs $etcdDev;then
+    mountEtcd
 fi
 
 # Step 1: check val

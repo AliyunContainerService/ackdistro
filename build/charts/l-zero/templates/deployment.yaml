@@ -28,6 +28,7 @@ spec:
       hostNetwork: true
       priorityClassName: system-cluster-critical
       dnsPolicy: ClusterFirstWithHostNet
+      {{- if not .Values.globalconfig.DisableFailureDomain }}
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -35,6 +36,7 @@ spec:
                 matchLabels:
                   trident-app: l-zero
               topologyKey: failure-domain.beta.kubernetes.io/zone
+      {{- end }}
       containers:
         - image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.lzero.image }}:{{ .Values.images.lzero.tag }}"
           imagePullPolicy: IfNotPresent

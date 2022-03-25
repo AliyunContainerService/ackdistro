@@ -1,0 +1,17 @@
+opsTask:
+- taskType: shell_script  # shell_script/python_script/http_get/custom
+  namespace: acs-system   # the namespace your check pod will run
+  timeout: 180             # timeout for one time check
+  period: 1800            # period of cron check
+  suspend: false          # if true, check will not auto run
+  broadcast: false        # if false, only create one pod to run your check, if true, will create pods on all node
+  hostNetwork: true       # if true, will create hostNetwork pod to run your check, default is false
+  script: content.sh      # your core check shell, must at the same dir with this file
+  privilegeLevel: Cluster # when Normal, you can only get resource at your namespace;
+                          # when Cluster, you can get cluster scope resources;
+                          # when Permissive, you can access host filesystem.
+  description: "检查网络插件管控是否健康"
+  name: check-network-control-plane
+  name_cn: "网络插件管控健康"
+  labels: check_product=k8s,check_appset=k8s
+  tolerateMaster: true

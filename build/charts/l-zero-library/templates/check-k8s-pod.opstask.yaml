@@ -1,33 +1,22 @@
 apiVersion: trident.apsara-stack.alibaba-inc.com/v1alpha1
 kind: OpsTask
 metadata:
-  annotations:
-    ark.alibaba-inc.com/name_cn: "pod\u72B6\u6001"
   labels:
     bizType: checkTask
     check_product: global
   name: check-k8s-pod
-  namespace: '{{.Values.k8s_namespace}}'
+  namespace: {{.Values.k8s_namespace}}
 spec:
   broadcast: false
-  description: "\u68C0\u67E5k8s pod\u662F\u5426\u6B63\u5E38"
+  description: "检查k8s pod是否正常"
   period: 1800
   podSpec:
     containers:
     - command:
       - bash
       - -c
-      - "#!/usr/bin/env bash\n\nsource /l0/utils/l0-utils.sh\n\nerrMsg=\"\"\nitems=$(kubectl\
-        \ get pod -n kube-system -l trident.apsara-stack.alibaba-inc.com/task-generated!=true\
-        \ | grep -v STATUS | egrep -v '(Completed|Running)' | awk '{print $1\";\"\
-        $2\";\"$3\";\"$4}')\nfor item in ${items}; do\n    arr=(${item//;/ })\n  \
-        \  ns=kube-system\n    name=${arr[0]}\n    status=${arr[2]}\n    errMsg=${errMsg}\"\
-        ; pod[$name] in namespace[$ns] \u5904\u4E8E\u5F02\u5E38\u72B6\u6001: $status\"\
-        \ndone\n\nif [[ \"$errMsg\" == \"\" ]];then\n    Record \"CHECK_K8S_POD\"\
-        \ \"k8s-basic\" \"pass\" \"all pods are healthy.\" \"\u68C0\u67E5\u5F02\u5E38\
-        Pod\" \"warning\"\nelse\n    Record \"CHECK_K8S_POD\" \"k8s-basic\" \"fail\"\
-        \ \"$errMsg\" \"\u68C0\u67E5\u5F02\u5E38Pod\" \"warning\"\nfi\n\nReturn \"\
-        ${TestResults}\""
+      - |
+        {{- .Files.Get "files/paas-basic/check-k8s-pod/content.sh" | nindent 8}}
       image: {{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}
       imagePullPolicy: IfNotPresent
       name: main

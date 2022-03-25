@@ -30,6 +30,6 @@ COPY charts/l-zero-library chart
 COPY charts/calico chart
 COPY yamls ack-distro-yamls
 
-CMD helm -n kube-system upgrade -i kube-core charts/kube-core
+CMD helm -n kube-system upgrade -i kube-core chart/kube-core
 CMD kubectl create ns acs-system || true
 CMD kubectl apply -f ack-distro-yamls/*

@@ -1,8 +1,12 @@
 images:
   opsbasealpine:
     image: ecp_builder/opsbase-alpine
-    tag: v0.1
+    tag: v0.2
+  trident:
+    image: ecp_builder/debug
+    tag: ubuntu
 k8s_namespace: acs-system
 globalconfig:
   RegistryURL: sea.hub:5000
   SuspendPeriodHealthCheck: false
+  SuspendPeriodBroadcastHealthCheck: false

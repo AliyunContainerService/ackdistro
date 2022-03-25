@@ -12,9 +12,11 @@ spec:
     type: boolean
   - JSONPath: .spec.broadcast
     name: Broadcast
+    priority: 1
     type: boolean
   - JSONPath: .spec.period
     name: Period
+    priority: 1
     type: integer
   - JSONPath: .status.counts.succeeded
     name: Succeeded
@@ -28,6 +30,12 @@ spec:
   - JSONPath: .status.lastProbeTime
     name: Last_Probe
     type: date
+  - JSONPath: .status.lastSuccess
+    name: Last_Success
+    type: date
+  - JSONPath: .status.lastFailure
+    name: Last_Failure
+    type: date
   - JSONPath: .status.lastInstanceStatus.phase
     name: Last_Phase
     type: string
@@ -35,7 +43,9 @@ spec:
   names:
     kind: OpsTask
     plural: opstasks
-  scope: ""
+    shortNames:
+    - opst
+  scope: Namespaced
   subresources: {}
   validation:
     openAPIV3Schema:
@@ -5967,6 +5977,9 @@ spec:
               type: object
             error:
               type: string
+            lastFailure:
+              format: date-time
+              type: string
             lastInstanceStatus:
               properties:
                 completion:
@@ -6032,17 +6045,6 @@ spec:
                       time:
                         format: int64
                         type: integer
-                    required:
-                    - level
-                    - message
-                    - solution
-                    - status
-                    - target
-                    - targetType
-                    - testName
-                    - testNameCN
-                    - testSuite
-                    - time
                     type: object
                   type: array
                 triggerType:
@@ -6053,6 +6055,9 @@ spec:
               format: date-time
               type: string
             lastSchedule:
+              format: date-time
+              type: string
+            lastSuccess:
               format: date-time
               type: string
           type: object

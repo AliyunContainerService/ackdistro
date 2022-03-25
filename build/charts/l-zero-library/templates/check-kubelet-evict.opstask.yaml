@@ -1,64 +1,24 @@
 apiVersion: trident.apsara-stack.alibaba-inc.com/v1alpha1
 kind: OpsTask
 metadata:
-  annotations:
-    ark.alibaba-inc.com/name_cn: "kubelet\u5065\u5EB7"
   labels:
     bizType: checkTask
     check_appinstance: kubelet
     check_appset: k8s
     check_product: k8s
   name: check-kubelet-evict
-  namespace: '{{.Values.k8s_namespace}}'
+  namespace: {{.Values.k8s_namespace}}
 spec:
   broadcast: false
-  description: "kubelet\u5065\u5EB7\u68C0\u67E5\uFF0C nodecondition\u72B6\u6001"
+  description: "kubelet健康检查， nodecondition状态"
   period: 1800
   podSpec:
     containers:
     - command:
       - bash
       - -c
-      - "#!/usr/bin/env bash\n\nsource /l0/utils/l0-utils.sh\n\ncheck_has_evicted_pod()\
-        \ {\n    kubectl get pod --all-namespaces=true -owide | grep Evicted &>/dev/null\n\
-        \    return $?\n}\n\ncheck_has_node_disk_pressure() {\n    rlt=\"\"\n    nodes=$(kubectl\
-        \ get node | grep -v STATUS | awk '{print $1}')\n    for item in ${nodes};\
-        \ do\n        status=`kubectl get node ${item} -ojsonpath='{.status.conditions[?(@.type==\"\
-        DiskPressure\")].status}'`\n        if [[ \"$status\" == \"True\" ]];then\n\
-        \            rlt=${rlt}\",\"${item}\n        fi\n    done\n    [[ \"$rlt\"\
-        \ == \"\" ]] && return 1\n    rlt=${rlt:1}\n    return 0\n}\n\ncheck_has_node_pid_pressure()\
-        \ {\n    rlt=\"\"\n    nodes=$(kubectl get node | grep -v STATUS | awk '{print\
-        \ $1}')\n    for item in ${nodes}; do\n        status=`kubectl get node ${item}\
-        \ -ojsonpath='{.status.conditions[?(@.type==\"PIDPressure\")].status}'`\n\
-        \        if [[ \"$status\" == \"True\" ]];then\n            rlt=${rlt}\",\"\
-        ${item}\n        fi\n    done\n    [[ \"$rlt\" == \"\" ]] && return 1\n  \
-        \  rlt=${rlt:1}\n    return 0\n}\n\ncheck_has_node_memory_pressure() {\n \
-        \   rlt=\"\"\n    nodes=$(kubectl get node | grep -v STATUS | awk '{print\
-        \ $1}')\n    for item in ${nodes}; do\n        status=`kubectl get node ${item}\
-        \ -ojsonpath='{.status.conditions[?(@.type==\"MemoryPressure\")].status}'`\n\
-        \        if [[ \"$status\" == \"True\" ]];then\n            rlt=${rlt}\",\"\
-        ${item}\n        fi\n    done\n    [[ \"$rlt\" == \"\" ]] && return 1\n  \
-        \  rlt=${rlt:1}\n    return 0\n}\n\nif ! check_has_evicted_pod;then\n    Record\
-        \ \"EVICTED_POD_CHECK\" \"kubelet\" \"pass\" \"Has no evicted pod.\" \"\u68C0\
-        \u67E5\u662F\u5426\u5B58\u5728\u88AB\u9A71\u9010Pod\"\n    Return \"${TestResults}\"\
-        \nfi\n\n# there are some evicted pod, check reason\nif check_has_node_disk_pressure;then\n\
-        \    Record \"EVICTED_POD_CHECK\" \"kubelet\" \"fail\" \"Some node[${rlt}]\
-        \ has disk pressure, please see doc:[https://yuque.antfin-inc.com/optimalfleet/rgwy0x/emh6l2#a368422c]\
-        \ for help.\" \"\u68C0\u67E5\u662F\u5426\u5B58\u5728\u88AB\u9A71\u9010Pod\"\
-        \n    Return \"${TestResults}\"\nfi\n\nif check_has_node_pid_pressure;then\n\
-        \    Record \"EVICTED_POD_CHECK\" \"kubelet\" \"fail\" \"Some node[${rlt}]\
-        \ has pid pressure, please ask [\u4E13\u6709\u4E91\u654F\u6377PaaS\u5BB9\u5668\
-        \u6280\u672F\u652F\u6301\u7FA4] for help.\" \"\u68C0\u67E5\u662F\u5426\u5B58\
-        \u5728\u88AB\u9A71\u9010Pod\"\n    Return \"${TestResults}\"\nfi\n\nif check_has_node_memory_pressure;then\n\
-        \    Record \"EVICTED_POD_CHECK\" \"kubelet\" \"fail\" \"Some node[${rlt}]\
-        \ has memory pressure, please ask [\u4E13\u6709\u4E91\u654F\u6377PaaS\u5BB9\
-        \u5668\u6280\u672F\u652F\u6301\u7FA4] for help.\" \"\u68C0\u67E5\u662F\u5426\
-        \u5B58\u5728\u88AB\u9A71\u9010Pod\"\n    Return \"${TestResults}\"\nfi\n\n\
-        Record \"EVICTED_POD_CHECK\" \"kubelet\" \"fail\" \"There are some evicted\
-        \ pod in your cluster, but we can't find the reason, please ask [\u4E13\u6709\
-        \u4E91\u654F\u6377PaaS\u5BB9\u5668\u6280\u672F\u652F\u6301\u7FA4] for help.\"\
-        \ \"\u68C0\u67E5\u662F\u5426\u5B58\u5728\u88AB\u9A71\u9010Pod\"\nReturn \"\
-        ${TestResults}\""
+      - |
+        {{- .Files.Get "files/kubelet/check-kubelet-evict/content.sh" | nindent 8}}
       image: {{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}
       imagePullPolicy: IfNotPresent
       name: main

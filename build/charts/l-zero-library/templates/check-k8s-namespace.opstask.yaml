@@ -1,33 +1,23 @@
 apiVersion: trident.apsara-stack.alibaba-inc.com/v1alpha1
 kind: OpsTask
 metadata:
-  annotations:
-    ark.alibaba-inc.com/name_cn: "namespace\u72B6\u6001"
   labels:
     bizType: checkTask
     check_appset: k8s
     check_product: k8s
   name: check-k8s-namespace
-  namespace: '{{.Values.k8s_namespace}}'
+  namespace: {{.Values.k8s_namespace}}
 spec:
   broadcast: false
-  description: "\u68C0\u67E5k8s namespace\u662F\u5426\u6B63\u5E38"
+  description: "检查k8s namespace是否正常"
   period: 1800
   podSpec:
     containers:
     - command:
       - bash
       - -c
-      - "#!/usr/bin/env bash\n\nsource /l0/utils/l0-utils.sh\n\nerrMsg=\"\"\nitems=$(kubectl\
-        \ get ns | grep -v STATUS | awk '{print $1\";\"$2\";\"$3}')\nfor item in ${items};\
-        \ do\n    arr=(${item//;/ })\n    name=${arr[0]}\n    status=${arr[1]}\n \
-        \   if [[ ${status} != \"Active\" ]]; then\n        message=$(kubectl get\
-        \ ns $name)\n        errMsg=${errMsg}\"; \u547D\u540D\u7A7A\u95F4 [$name]\
-        \ \u5904\u4E8E\u5F02\u5E38\u72B6\u6001\"\n    fi\ndone\n\nif [[ \"$errMsg\"\
-        \ == \"\" ]];then\n    Record \"CHECK_K8S_NAMESPACE\" \"k8s-basic\" \"pass\"\
-        \ \"all namespaces are healthy.\" \"\u68C0\u67E5\u547D\u540D\u7A7A\u95F4\"\
-        \nelse\n    Record \"CHECK_K8S_NAMESPACE\" \"k8s-basic\" \"fail\" \"$errMsg\"\
-        \ \"\u68C0\u67E5\u547D\u540D\u7A7A\u95F4\"\nfi\n\nReturn \"${TestResults}\""
+      - |
+        {{- .Files.Get "files/paas-basic/check-k8s-namespace/content.sh" | nindent 8}}
       image: {{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}
       imagePullPolicy: IfNotPresent
       name: main

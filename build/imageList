@@ -9,13 +9,13 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/coredns:1.7.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/l-zero:v1.1.0-d18ee35
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/nginxdemos:0.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/opsbase-alpine:v0.2
-ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/opsbase-alpine:v0.1
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/open-local-rpms:v0.1
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-cni:v3.8.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-pod2daemon-flexvol:v3.9.1
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-node:v3.8.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-kube-controllers:v3.8.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/open-local-rpms:v0.1
+ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/debug:ubuntu
 docker.io/hybridnetdev/hybridnet:v0.3.2
 docker.io/thebeatles1994/open-local:v0.5.3
 docker.io/thebeatles1994/csi-node-driver-registrar:v2.3.0

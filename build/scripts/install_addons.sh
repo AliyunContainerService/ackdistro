@@ -11,12 +11,15 @@ else
 fi
 
 # must be installed addons
-helm -n kube-system upgrade -i open-local chart/open-local
 helm -n kube-system upgrade -i l-zero chart/l-zero
+helm -n kube-system upgrade -i open-local chart/open-local
+
+echo "sleep 15 for l-zero crds ready"
+sleep 15
 helm -n acs-system upgrade -i l-zero-library chart/l-zero-library
 
 # optional addons
 #IFS=,
 #for addon in ${Addons};do
-#  helm -n acs-system upgrade -i ${addon} ../charts/${addon}
+#  helm -n acs-system upgrade -i ${addon} ../chart/${addon}
 #done

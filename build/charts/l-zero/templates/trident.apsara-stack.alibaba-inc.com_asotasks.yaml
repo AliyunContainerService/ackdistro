@@ -5941,6 +5941,9 @@ spec:
               type: object
             error:
               type: string
+            lastFailure:
+              format: date-time
+              type: string
             lastInstanceStatus:
               properties:
                 completion:
@@ -6006,17 +6009,6 @@ spec:
                       time:
                         format: int64
                         type: integer
-                    required:
-                    - level
-                    - message
-                    - solution
-                    - status
-                    - target
-                    - targetType
-                    - testName
-                    - testNameCN
-                    - testSuite
-                    - time
                     type: object
                   type: array
                 triggerType:
@@ -6027,6 +6019,9 @@ spec:
               format: date-time
               type: string
             lastSchedule:
+              format: date-time
+              type: string
+            lastSuccess:
               format: date-time
               type: string
           type: object

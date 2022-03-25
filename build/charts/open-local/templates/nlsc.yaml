@@ -11,8 +11,3 @@ spec:
       vgs:
         include:
         - {{ .Values.name }}-pool-[0-9]+
-    resourceToBeInited:
-      vgs:
-      - devices:
-        - {{ .Values.agent.device }}
-        name: {{ .Values.name }}-pool-0

@@ -42,6 +42,7 @@ spec:
       containers:
       - args:
         - controller
+        - --feature-gates=UpdateNLS=false
         image: {{ .Values.images.local.image }}:{{ .Values.images.local.tag }}
         imagePullPolicy: Always
         name: {{ .Values.name }}-controller

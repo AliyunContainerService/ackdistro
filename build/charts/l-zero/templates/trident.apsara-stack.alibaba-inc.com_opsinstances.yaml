@@ -23,7 +23,9 @@ spec:
   names:
     kind: OpsInstance
     plural: opsinstances
-  scope: ""
+    shortNames:
+    - opsi
+  scope: Namespaced
   subresources: {}
   validation:
     openAPIV3Schema:
@@ -269,17 +271,6 @@ spec:
                   time:
                     format: int64
                     type: integer
-                required:
-                - level
-                - message
-                - solution
-                - status
-                - target
-                - targetType
-                - testName
-                - testNameCN
-                - testSuite
-                - time
                 type: object
               type: array
             triggerType:
