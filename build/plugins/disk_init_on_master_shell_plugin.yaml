@@ -8,3 +8,7 @@ spec:
   'on': master
   data: |
     bash scripts/disk_init.sh -e"${EtcdDevice}" -d"${StorageDevice}" a"${DockerRunDiskSize}" b"${KubeletRunDiskSize}"
+    chmod a+x /var/lib/sealer/data/my-cluster/rootfs/scripts/docker.sh &&
+    sh /var/lib/sealer/data/my-cluster/rootfs/scripts/docker.sh &&
+    chmod a+x /var/lib/sealer/data/my-cluster/rootfs/scripts/init-kube.sh &&
+    sh /var/lib/sealer/data/my-cluster/rootfs/scripts/init-kube.sh
