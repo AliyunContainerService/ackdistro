@@ -1,14 +1,10 @@
----
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hybridnet-manager
   namespace: kube-system
-  annotations:
-    kubernetes.io/description: "hybridnet manager"
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: hybridnet-manager
@@ -38,21 +34,23 @@ spec:
           imagePullPolicy: IfNotPresent
           command:
             - /hybridnet/hybridnet-manager
+            - --feature-gates=MultiCluster={{ .Values.advancedSettings.multiCluster }},DualStack={{ .Values.advancedSettings.dualStack }}
           env:
             - name: DEFAULT_NETWORK_TYPE
-              value: Overlay
+              value: {{ .Values.advancedSettings.defualtNetworkType }}
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
       nodeSelector:
         node-role.kubernetes.io/master: ""
 
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hybridnet-webhook
   namespace: kube-system
-  annotations:
-    kubernetes.io/description: "hybridnet webhook"
 spec:
   replicas: 3
   selector:
@@ -80,11 +78,12 @@ spec:
           imagePullPolicy: IfNotPresent
           command:
             - /hybridnet/hybridnet-webhook
+            - --feature-gates=MultiCluster={{ .Values.advancedSettings.multiCluster }},DualStack={{ .Values.advancedSettings.dualStack }}
           args:
             - --port=9898
           env:
             - name: DEFAULT_NETWORK_TYPE
-              value: Overlay
+              value: {{ .Values.advancedSettings.defualtNetworkType }}
           ports:
             - containerPort: 9898
               name: webhook-port

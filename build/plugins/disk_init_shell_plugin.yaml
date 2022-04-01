@@ -7,8 +7,9 @@ spec:
   action: PreInit # PreInit PreInstall PostInstall
   'on': node
   data: |
-    bash scripts/disk_init.sh -d"${StorageDevice}" a"${DockerRunDiskSize}" b"${KubeletRunDiskSize}" &&
-    chmod a+x /var/lib/sealer/data/my-cluster/rootfs/scripts/docker.sh &&
-    sh /var/lib/sealer/data/my-cluster/rootfs/scripts/docker.sh &&
-    chmod a+x /var/lib/sealer/data/my-cluster/rootfs/scripts/init-kube.sh &&
-    sh /var/lib/sealer/data/my-cluster/rootfs/scripts/init-kube.sh
+    export EtcdDevice=${EtcdDevice}
+    export StorageDevice=${StorageDevice}
+    export DockerRunDiskSize=${DockerRunDiskSize}
+    export KubeletRunDiskSize=${KubeletRunDiskSize}
+    bash scripts/disk_init.sh
+    sh scripts/docker.sh

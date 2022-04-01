@@ -1,5 +1,3 @@
----
-
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
@@ -21,14 +19,15 @@ webhooks:
         - key: webhook.hybridnet.io/ignore
           operator: NotIn
           values: ["TRUE", "true"]
-        - key: app
-          operator: NotIn
-          values: ["kube-proxy"]
     rules:
       - apiGroups: ["networking.alibaba.com"]
         apiVersions: ["v1"]
         operations: ["CREATE", "DELETE", "UPDATE"]
-        resources: ["networks", "subnets", "remoteclusters", "remotesubnets"]
+        resources: ["networks", "subnets"]
+      - apiGroups: ["multicluster.alibaba.com"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "DELETE", "UPDATE"]
+        resources: ["remoteclusters", "remotesubnets"]
     sideEffects: None
     timeoutSeconds: 10
   - admissionReviewVersions: ["v1beta1", "v1"]
@@ -47,9 +46,6 @@ webhooks:
         - key: webhook.hybridnet.io/ignore
           operator: NotIn
           values: ["TRUE", "true"]
-        - key: app
-          operator: NotIn
-          values: ["kube-proxy"]
     rules:
       - apiGroups: [""]
         apiVersions: ["v1"]
@@ -59,7 +55,6 @@ webhooks:
     timeoutSeconds: 10
 
 ---
-
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
@@ -81,9 +76,6 @@ webhooks:
         - key: webhook.hybridnet.io/ignore
           operator: NotIn
           values: ["TRUE", "true"]
-        - key: app
-          operator: NotIn
-          values: ["kube-proxy"]
     reinvocationPolicy: Never
     rules:
       - apiGroups: [""]

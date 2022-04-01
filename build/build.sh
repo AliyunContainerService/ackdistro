@@ -19,4 +19,5 @@ for bin in ${bins[@]};do
     [[ -f ${bin} ]] || wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/amd64/${bin} -O ${bin}
 done
 
+# Build sealer image
 sealer build -m lite -t ack-distro:${TAG} .

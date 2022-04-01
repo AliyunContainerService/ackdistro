@@ -6,9 +6,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
-  name: remotevteps.networking.alibaba.com
+  name: remotevteps.multicluster.alibaba.com
 spec:
-  group: networking.alibaba.com
+  group: multicluster.alibaba.com
   names:
     kind: RemoteVtep
     listKind: RemoteVtepList
@@ -17,11 +17,11 @@ spec:
   scope: Cluster
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.vtepMAC
-      name: VtepMAC
+    - jsonPath: .spec.mac
+      name: MAC
       type: string
-    - jsonPath: .spec.vtepIP
-      name: VtepIP
+    - jsonPath: .spec.ip
+      name: IP
       type: string
     - jsonPath: .spec.nodeName
       name: NodeName
@@ -35,7 +35,7 @@ spec:
     name: v1
     schema:
       openAPIV3Schema:
-        description: RemoteVtep is a specification for a RemoteVtep resource
+        description: RemoteVtep is the Schema for the remotevteps API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -50,35 +50,38 @@ spec:
           metadata:
             type: object
           spec:
-            description: RemoteVtepSpec is the spec for a RemoteVtep resource
+            description: RemoteVtepSpec defines the desired state of RemoteVtep
             properties:
               clusterName:
+                description: ClusterName is the name of parent cluster who owns this
+                  remote VTEP.
                 type: string
               endpointIPList:
+                description: EndpointIPList is the IP list of all local endpoints
+                  of this VTEP.
                 items:
                   type: string
                 type: array
+              ip:
+                description: IP is the IP address of this VTEP.
+                type: string
+              mac:
+                description: MAC is the MAC address of this VTEP.
+                type: string
               nodeName:
+                description: NodeName is the name of corresponding node in remote
+                  cluster.
                 type: string
-              vtepIP:
-                type: string
-              vtepMAC:
-                type: string
-            required:
-            - clusterName
-            - nodeName
-            - vtepIP
-            - vtepMAC
             type: object
           status:
-            description: RemoteVtepStatus is the status for a RemoteVtep resource
+            description: RemoteVtepStatus defines the observed state of RemoteVtep
             properties:
               lastModifyTime:
+                description: LastModifyTime shows the last timestamp when the remote
+                  VTEP was updated.
                 format: date-time
                 type: string
             type: object
-        required:
-        - spec
         type: object
     served: true
     storage: true

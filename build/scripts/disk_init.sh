@@ -23,39 +23,11 @@ shouldMkFs() {
 }
 
 # Step 0: get device and parts size
-dev=""
-etcdDev=""
-container_runtime_size=""
-kubelet_size=""
+dev=${StorageDevice}
+etcdDev=${EtcdDevice}
+container_runtime_size=${DockerRunDiskSize}
+kubelet_size=${KubeletRunDiskSize}
 container_runtime="docker"
-while getopts "d:a:b:c:e:" opt; do
-  case $opt in
-    e)
-      etcdDev=$OPTARG
-      info "The target etcd device: $OPTARG"
-      ;;
-    d)
-      dev=$OPTARG
-      info "The target device: $OPTARG"
-      ;;
-    a)
-      container_runtime_size=$OPTARG
-      info "Container runtime size: $OPTARG"
-      ;;
-    b)
-      kubelet_size=$OPTARG
-      info "Kubelet size: $OPTARG"
-      ;;
-    c)
-      container_runtime=$OPTARG
-      info "Container runtime: $OPTARG"
-      ;;
-    \?)
-      error "Invalid option: -$OPTARG"
-      exit 1
-      ;;
-  esac
-done
 
 mountEtcd() {
     if [[ $etcdDev == *"nvme"* ]]; then

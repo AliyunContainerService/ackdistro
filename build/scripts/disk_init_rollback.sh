@@ -76,29 +76,9 @@ info "disk_init_rollback.sh lsblk result:"
 lsblk
 
 # Step 1: get device
-etcdDev=""
-dev=""
+etcdDev=${EtcdDevice}
+dev=${StorageDevice}
 container_runtime="docker"
-while getopts "d:c:e:" opt; do
-  case $opt in
-    e)
-      etcdDev=$OPTARG
-      info "The target etcd device: $OPTARG"
-      ;;
-    d)
-      dev=$OPTARG
-      info "The target device: $OPTARG"
-      ;;
-    c):
-      container_runtime=$OPTARG
-      green "The container runtime: $OPTARG"
-      ;;
-    \?)
-      error "Invalid option: -$OPTARG"
-      exit 1
-      ;;
-  esac
-done
 
 # Step 2: clean yoda pools
 clean_yoda_pool
