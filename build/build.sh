@@ -24,6 +24,8 @@ done
 # Pull hybridnet helm charts
 export HYBRIDNET_CHART_VERSION=0.1.1
 
+helm repo add hybridnet https://alibaba.github.io/hybridnet/
+helm repo update
 helm pull hybridnet/hybridnet --version=$HYBRIDNET_CHART_VERSION
 tar -zxvf hybridnet-$HYBRIDNET_CHART_VERSION.tgz -C $CHART_DIR_PATH
 rm -f hybridnet-$HYBRIDNET_CHART_VERSION.tgz
