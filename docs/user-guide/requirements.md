@@ -9,7 +9,7 @@ To successfully install ACK Distro, you need to ensure that the following requir
 - Worker: the working node of Kubernetes cluster, which is responsible for running applications, and the number can range from 0~N
 
 ## System requirements
-### os：
+### OS：
 
 - CentOS 7.5/7.6/7.7/7.8/7.9/8.0
 - RHEL 7.8
@@ -31,7 +31,7 @@ To successfully install ACK Distro, you need to ensure that the following requir
 ### IaaS：
 
 - Bare mental
-- Alicloud
+- Alibaba Cloud
 - Hicloud
 - Telecom Cloud
 - EasyStack
@@ -75,6 +75,3 @@ Underlay network:
 | --- | --- | --- |
 | **CPU** |  2core | 1core |
 | **Memory** | 4GiB | 2GiB |
-
-
-
