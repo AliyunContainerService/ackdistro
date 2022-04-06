@@ -22,7 +22,7 @@ spec:
       hostPID: true
       initContainers:
         - name: install-cni
-          image: "{{ .Values.images.registryURL }}/{{ .Values.images.hybridnet.image }}:{{ .Values.images.hybridnet.tag }}"
+          image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.hybridnet.image }}:{{ .Values.images.hybridnet.tag }}"
           imagePullPolicy: IfNotPresent
           command: ["/hybridnet/install-cni.sh"]
           securityContext:

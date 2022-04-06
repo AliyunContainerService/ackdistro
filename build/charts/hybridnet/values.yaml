@@ -1,6 +1,6 @@
 images:
   hybridnet:
-    image: sea.hub:5000/hybridnetdev/hybridnet
+    image: sea.hub:5000/ecp_builder/hybridnet
     tag: v0.4.2
 globalconfig:
   RegistryURL: "sea.hub:5000"
