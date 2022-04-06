@@ -3,22 +3,22 @@ namespace: kube-system
 driver: local.csi.aliyun.com
 images:
   local:
-    image: sea.hub:5000/thebeatles1994/open-local
+    image: sea.hub:5000/ecp_builder/open-local
     tag: v0.5.3
   registrar:
-    image: sea.hub:5000/thebeatles1994/csi-node-driver-registrar
+    image: sea.hub:5000/ecp_builder/csi-node-driver-registrar
     tag: v2.3.0
   provisioner:
-    image: sea.hub:5000/thebeatles1994/csi-provisioner
+    image: sea.hub:5000/ecp_builder/csi-provisioner
     tag: v2.2.2
   resizer:
-    image: sea.hub:5000/thebeatles1994/csi-resizer
+    image: sea.hub:5000/ecp_builder/csi-resizer
     tag: v1.3.0
   snapshotter:
-    image: sea.hub:5000/thebeatles1994/csi-snapshotter
+    image: sea.hub:5000/ecp_builder/csi-snapshotter
     tag: v4.2.1
   snapshot_controller:
-    image: sea.hub:5000/thebeatles1994/snapshot-controller
+    image: sea.hub:5000/ecp_builder/snapshot-controller
     tag: v4.2.1
 agent:
   name: open-local-agent
