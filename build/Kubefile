@@ -1,4 +1,4 @@
-FROM registry.cn-qingdao.aliyuncs.com/sealer-io/ackdistro:genesis
+FROM ackdistro:genesis2
 
 COPY Metadata .
 
@@ -15,7 +15,7 @@ COPY plugins/disk_init_on_master_shell_plugin.yaml plugins
 COPY plugins/disk_init_rollback_on_master_shell_plugin.yaml plugins
 COPY plugins/disk_init_rollback_shell_plugin.yaml plugins
 COPY plugins/disk_init_shell_plugin.yaml plugins
-COPY plugins/preflight_shell_plugin.yaml plugins
+#COPY plugins/preflight_shell_plugin.yaml plugins
 COPY plugins/install_addons_shell_plugin.yaml plugins
 
 COPY imageList manifests
