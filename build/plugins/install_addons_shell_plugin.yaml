@@ -11,6 +11,13 @@ spec:
     if [ $? -ne 0 ];then
       exit 1
     fi
+
+    #TODO
+    exit 0
+
+    sleep 15
+    trident on-sealer -f /root/.sealer/my-cluster/Clusterfile --sealer
+
     sleep 15
     trident health-check
     if [ $? -eq 0 ];then

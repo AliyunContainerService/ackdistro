@@ -16,7 +16,7 @@ fi
 
 bins=(helm kubectl kubelet kubeadm trident)
 for bin in ${bins[@]};do
-    [[ -f ${bin} ]] || wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/amd64/${bin} -O ${bin}
+    wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/amd64/${bin} -O ${bin}
 done
 
 # Build sealer image
