@@ -12,9 +12,6 @@ spec:
       exit 1
     fi
 
-    #TODO
-    exit 0
-
     sleep 15
     trident on-sealer -f /root/.sealer/my-cluster/Clusterfile --sealer
 
