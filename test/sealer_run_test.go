@@ -6,9 +6,9 @@ import (
 
 	. "github.com/onsi/ginkgo"
 
-	"github.com/alibaba/sealer/test/suites/apply"
-	"github.com/alibaba/sealer/test/testhelper"
-	"github.com/alibaba/sealer/test/testhelper/settings"
+	"ackdistro/test/suites/apply"
+	"ackdistro/test/testhelper"
+	"ackdistro/test/testhelper/settings"
 )
 
 var _ = Describe("sealer run", func() {

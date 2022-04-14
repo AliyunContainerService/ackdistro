@@ -29,9 +29,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/yaml"
 
+	"ackdistro/test/testhelper"
+	"ackdistro/test/testhelper/settings"
 	"github.com/alibaba/sealer/pkg/infra"
-	"github.com/alibaba/sealer/test/testhelper"
-	"github.com/alibaba/sealer/test/testhelper/settings"
 	v1 "github.com/alibaba/sealer/types/api/v1"
 	"github.com/alibaba/sealer/utils"
 )
@@ -143,7 +143,7 @@ func SealerRunCmd(masters, nodes, passwd string, provider string) string {
 	if provider != "" {
 		provider = fmt.Sprintf("--provider %s", provider)
 	}
-	return fmt.Sprintf("%s run %s %s %s %s %s -d", settings.DefaultSealerBin, settings.TestImageName, masters, nodes, passwd, provider)
+	return fmt.Sprintf("%s run %s -e %s %s %s %s %s -d", settings.DefaultSealerBin, settings.TestImageName, settings.DefaultEnv, masters, nodes, passwd, provider)
 }
 
 func SealerRun(masters, nodes, passwd, provider string) {

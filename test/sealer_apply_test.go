@@ -15,13 +15,11 @@
 package test
 
 import (
-	"github.com/alibaba/sealer/test/suites/build"
-
 	. "github.com/onsi/ginkgo"
 
-	"github.com/alibaba/sealer/test/suites/apply"
-	"github.com/alibaba/sealer/test/testhelper"
-	"github.com/alibaba/sealer/test/testhelper/settings"
+	"ackdistro/test/suites/apply"
+	"ackdistro/test/testhelper"
+	"ackdistro/test/testhelper/settings"
 )
 
 var _ = Describe("sealer apply", func() {
@@ -46,11 +44,11 @@ var _ = Describe("sealer apply", func() {
 			AfterEach(func() {
 				testhelper.RemoveTempFile(tempFile)
 			})
-			It("init, scale up, scale down, clean up", func() {
+			It("init, clean up", func() {
 				By("start to prepare infra")
 				cluster := rawCluster.DeepCopy()
 				cluster.Spec.Provider = settings.AliCloud
-				cluster.Spec.Image = build.GetTestImageName()
+				cluster.Spec.Image = settings.TestImageName
 				cluster = apply.CreateAliCloudInfraAndSave(cluster, tempFile)
 				defer apply.CleanUpAliCloudInfra(cluster)
 				sshClient := testhelper.NewSSHClientByCluster(cluster)

@@ -22,7 +22,6 @@ github.com/alibaba/sealer/pkg/infra/container
 github.com/alibaba/sealer/pkg/infra/container/client
 github.com/alibaba/sealer/pkg/infra/container/client/docker
 github.com/alibaba/sealer/test/suites/apply
-github.com/alibaba/sealer/test/suites/build
 github.com/alibaba/sealer/test/testhelper
 github.com/alibaba/sealer/test/testhelper/settings
 github.com/alibaba/sealer/types/api/v1
