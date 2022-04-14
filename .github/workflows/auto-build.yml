@@ -26,11 +26,12 @@ jobs:
           git checkout feature/v1.20.4-ack-3
           cd build
           ls -R
-          sudo bash build.sh te
-          sudo sealer push ack-distro:te
+          sudo bash build.sh $tag
+          sudo sealer push ack-distro:$tag
+          echo "::set-output name=version::$version"
       - name: Auto build image
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            auto-build successfully!
+            Image ${{ steps.autobuild.outputs.version }} build successfully!

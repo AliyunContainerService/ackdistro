@@ -1,0 +1,5 @@
+FROM sealer-io/test:v1
+COPY test1 .
+COPY recommended.yaml .
+COPY test2 .
+COPY test3 .
