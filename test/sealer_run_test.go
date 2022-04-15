@@ -18,10 +18,10 @@ var _ = Describe("sealer run", func() {
 		})
 
 		It("exec sealer run", func() {
-			master := strconv.Itoa(3)
-			node := strconv.Itoa(3)
+			master := strconv.Itoa(1)
+			node := strconv.Itoa(1)
 			apply.SealerRun(master, node, "", settings.AliCloud)
-			apply.CheckNodeNumLocally(6)
+			apply.CheckNodeNumLocally(2)
 		})
 
 	})
@@ -54,7 +54,7 @@ var _ = Describe("sealer run", func() {
 				masters := strings.Join(usedCluster.Spec.Masters.IPList, ",")
 				nodes := strings.Join(usedCluster.Spec.Nodes.IPList, ",")
 				apply.SendAndRunCluster(sshClient, tempFile, masters, nodes, usedCluster.Spec.SSH.Passwd)
-				apply.CheckNodeNumWithSSH(sshClient, 6)
+				apply.CheckNodeNumWithSSH(sshClient, 2)
 			})
 
 		})
