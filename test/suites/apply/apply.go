@@ -85,7 +85,7 @@ func LoadPluginFromDisk(clusterFilePath string) []v1.Plugin {
 func GenerateClusterfile(clusterfile string) {
 	filepath := GetRawConfigPluginFilePath()
 	cluster := LoadClusterFileFromDisk(clusterfile)
-	cluster.Spec.Env = []string{"env=TestEnv"}
+	cluster.Spec.Env = []string{"env=PodCIDR=172.45.0.0/16,SvcCIDR=10.96.0.0/16,Network=calico,EtcdDevice=/dev/vdb,DockerRunDiskSize=200,KubeletRunDiskSize=200,StorageDevice=/dev/vdc,YodaDevice=/dev/vdc3"}
 	data, err := yaml.Marshal(cluster)
 	testhelper.CheckErr(err)
 	appendData := [][]byte{data}
