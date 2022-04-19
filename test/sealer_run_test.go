@@ -1,6 +1,7 @@
 package test
 
 import (
+	"ackdistro/test/suites/registry"
 	"strconv"
 	"strings"
 
@@ -13,7 +14,11 @@ import (
 
 var _ = Describe("sealer run", func() {
 	Context("run on ali cloud", func() {
+		BeforeEach(func() {
+			registry.Login()
+		})
 		AfterEach(func() {
+			registry.Logout()
 			apply.DeleteClusterByFile(settings.GetClusterWorkClusterfile(settings.ClusterNameForRun))
 		})
 

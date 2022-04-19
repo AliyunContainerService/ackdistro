@@ -15,6 +15,7 @@
 package test
 
 import (
+	"ackdistro/test/suites/registry"
 	. "github.com/onsi/ginkgo"
 
 	"ackdistro/test/suites/apply"
@@ -28,6 +29,7 @@ var _ = Describe("sealer apply", func() {
 		rawCluster := apply.LoadClusterFileFromDisk(rawClusterFilePath)
 		rawCluster.Spec.Image = settings.TestImageName
 		BeforeEach(func() {
+			registry.Login()
 			if rawCluster.Spec.Image != settings.TestImageName {
 				//rawCluster imageName updated to customImageName
 				rawCluster.Spec.Image = settings.TestImageName
@@ -42,6 +44,7 @@ var _ = Describe("sealer apply", func() {
 			})
 
 			AfterEach(func() {
+				registry.Logout()
 				testhelper.RemoveTempFile(tempFile)
 			})
 			It("init, clean up", func() {
