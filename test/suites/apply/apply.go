@@ -22,7 +22,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alibaba/sealer/pkg/checker"
 	"github.com/alibaba/sealer/utils/ssh"
 
 	"github.com/onsi/gomega"
@@ -53,12 +52,6 @@ func GetRawConfigPluginFilePath() string {
 
 func DeleteClusterByFile(clusterFile string) {
 	testhelper.RunCmdAndCheckResult(SealerDeleteCmd(clusterFile), 0)
-}
-
-func WriteClusterFileToDisk(cluster *v1.Cluster, clusterFilePath string) {
-	testhelper.CheckNotNil(cluster)
-	err := testhelper.MarshalYamlToFile(clusterFilePath, cluster)
-	testhelper.CheckErr(err)
 }
 
 func LoadClusterFileFromDisk(clusterFilePath string) *v1.Cluster {
@@ -160,24 +153,9 @@ func SealerJoinCmd(masters, nodes string) string {
 	return fmt.Sprintf("%s join %s %s -c my-test-cluster -d", settings.DefaultSealerBin, masters, nodes)
 }
 
-func SealerJoin(masters, nodes string) {
-	testhelper.RunCmdAndCheckResult(SealerJoinCmd(masters, nodes), 0)
-}
-
 func CreateAliCloudInfraAndSave(cluster *v1.Cluster, clusterFile string) *v1.Cluster {
 	CreateAliCloudInfra(cluster)
 	//save used cluster file
-	cluster.Spec.Provider = settings.BAREMETAL
-	MarshalClusterToFile(clusterFile, cluster)
-	cluster.Spec.Provider = settings.AliCloud
-	return cluster
-}
-
-func ChangeMasterOrderAndSave(cluster *v1.Cluster, clusterFile string) *v1.Cluster {
-	cluster.Spec.Masters.Count = strconv.Itoa(3)
-	CreateAliCloudInfra(cluster)
-	//change master order and save used cluster file
-	cluster.Spec.Masters.IPList[0], cluster.Spec.Masters.IPList[1] = cluster.Spec.Masters.IPList[1], cluster.Spec.Masters.IPList[0]
 	cluster.Spec.Provider = settings.BAREMETAL
 	MarshalClusterToFile(clusterFile, cluster)
 	cluster.Spec.Provider = settings.AliCloud
@@ -194,10 +172,6 @@ func CreateAliCloudInfra(cluster *v1.Cluster) {
 
 func SendAndApplyCluster(sshClient *testhelper.SSHClient, clusterFile string) {
 	SendAndRemoteExecCluster(sshClient, clusterFile, SealerApplyCmd(clusterFile))
-}
-
-func SendAndJoinCluster(sshClient *testhelper.SSHClient, clusterFile string, joinMasters, joinNodes string) {
-	SendAndRemoteExecCluster(sshClient, clusterFile, SealerJoinCmd(joinMasters, joinNodes))
 }
 
 func SendAndRunCluster(sshClient *testhelper.SSHClient, clusterFile string, joinMasters, joinNodes, passwd string) {
@@ -252,14 +226,6 @@ func CheckNodeNumLocally(expectNum int) {
 	testhelper.CheckEqual(num, expectNum+1)
 }
 
-func WaitAllNodeRunning() {
-	time.Sleep(30 * time.Second)
-	err := utils.Retry(10, 5*time.Second, func() error {
-		return checker.NewNodeChecker().Check(nil, checker.PhasePost)
-	})
-	testhelper.CheckErr(err)
-}
-
 func WaitAllNodeRunningBySSH(s ssh.Interface, masterIP string) {
 	time.Sleep(30 * time.Second)
 	err := utils.Retry(10, 5*time.Second, func() error {
@@ -279,11 +245,4 @@ func MarshalClusterToFile(ClusterFile string, cluster *v1.Cluster) {
 	err := testhelper.MarshalYamlToFile(ClusterFile, &cluster)
 	testhelper.CheckErr(err)
 	testhelper.CheckNotNil(cluster)
-}
-
-func CheckDockerAndSwapOff() {
-	_, err := utils.RunSimpleCmd("docker -v")
-	testhelper.CheckErr(err)
-	_, err = utils.RunSimpleCmd("swapoff -a")
-	testhelper.CheckErr(err)
 }

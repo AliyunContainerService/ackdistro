@@ -29,7 +29,6 @@ var _ = Describe("sealer apply", func() {
 		rawCluster := apply.LoadClusterFileFromDisk(rawClusterFilePath)
 		rawCluster.Spec.Image = settings.TestImageName
 		BeforeEach(func() {
-			registry.Login()
 			if rawCluster.Spec.Image != settings.TestImageName {
 				//rawCluster imageName updated to customImageName
 				rawCluster.Spec.Image = settings.TestImageName
@@ -40,6 +39,7 @@ var _ = Describe("sealer apply", func() {
 		Context("check regular scenario that provider is bare metal, executes machine is master0", func() {
 			var tempFile string
 			BeforeEach(func() {
+				registry.Login()
 				tempFile = testhelper.CreateTempFile()
 			})
 
