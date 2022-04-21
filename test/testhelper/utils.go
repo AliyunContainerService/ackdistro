@@ -22,13 +22,21 @@ import (
 	"time"
 
 	"github.com/onsi/gomega"
+	"github.com/onsi/gomega/gexec"
 	"sigs.k8s.io/yaml"
 
-	"github.com/alibaba/sealer/test/testhelper/settings"
+	"ackdistro/test/testhelper/settings"
 	v1 "github.com/alibaba/sealer/types/api/v1"
 	"github.com/alibaba/sealer/utils"
 	"github.com/alibaba/sealer/utils/ssh"
 )
+
+func GetPwd() string {
+	pwd, err := os.Getwd()
+	CheckErr(err)
+	return pwd
+}
+
 func CreateTempFile() string {
 	dir := os.TempDir()
 	file, err := ioutil.TempFile(dir, "tmpfile")
@@ -70,6 +78,20 @@ func NewSSHClientByCluster(usedCluster *v1.Cluster) *SSHClient {
 	}
 }
 
+func IsFileExist(filename string) bool {
+	_, err := os.Stat(filename)
+	return !os.IsNotExist(err)
+}
+
+func UnmarshalYamlFile(file string, obj interface{}) error {
+	data, err := ioutil.ReadFile(filepath.Clean(file))
+	if err != nil {
+		return err
+	}
+	err = yaml.Unmarshal(data, obj)
+	return err
+}
+
 func MarshalYamlToFile(file string, obj interface{}) error {
 	data, err := yaml.Marshal(obj)
 	if err != nil {
@@ -80,6 +102,15 @@ func MarshalYamlToFile(file string, obj interface{}) error {
 	}
 	return nil
 }
+
+// GetFileDataLocally get file data for cloud apply
+func GetFileDataLocally(filePath string) string {
+	cmd := fmt.Sprintf("sudo -E cat %s", filePath)
+	result, err := utils.RunSimpleCmd(cmd)
+	CheckErr(err)
+	return result
+}
+
 // DeleteFileLocally delete file for cloud apply
 func DeleteFileLocally(filePath string) {
 	cmd := fmt.Sprintf("sudo -E rm -rf %s", filePath)
@@ -99,6 +130,24 @@ func CheckEqual(obj1 interface{}, obj2 interface{}) {
 	gomega.Expect(obj1).To(gomega.Equal(obj2))
 }
 
+func CheckNotEqual(obj1 interface{}, obj2 interface{}) {
+	gomega.Expect(obj1).NotTo(gomega.Equal(obj2))
+}
+
+func CheckExit0(sess *gexec.Session, waitTime time.Duration) {
+	gomega.Eventually(sess, waitTime).Should(gexec.Exit(0))
+}
+func CheckNotExit0(sess *gexec.Session, waitTime time.Duration) {
+	gomega.Eventually(sess, waitTime).ShouldNot(gexec.Exit(0))
+}
+
 func CheckFuncBeTrue(f func() bool, t time.Duration) {
 	gomega.Eventually(f(), t).Should(gomega.BeTrue())
+}
+
+func CheckBeTrue(b bool) {
+	gomega.Eventually(b).Should(gomega.BeTrue())
+}
+func CheckNotBeTrue(b bool) {
+	gomega.Eventually(b).ShouldNot(gomega.BeTrue())
 }
