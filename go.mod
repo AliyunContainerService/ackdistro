@@ -1,4 +1,4 @@
-module blog
+module ackdistro
 
 go 1.17
 
