@@ -1,0 +1,107 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: backup-etcd
+  namespace: {{ .Values.cronJobInfo.namespace }}
+spec:
+  schedule: "{{ .Values.cronJobInfo.schedule }}"
+  concurrencyPolicy: Replace
+  successfulJobsHistoryLimit: {{ .Values.cronJobInfo.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.cronJobInfo.failedJobsHistoryLimit }}
+  jobTemplate:
+    metadata:
+      labels:
+        job: backup-etcd
+    spec:
+      {{- if .Values.globalconfig.SingleMasterMode }}
+      completions: 1
+      parallelism: 1
+      {{- else }}
+      completions: {{ .Values.cronJobInfo.completions }}
+      parallelism: {{ .Values.cronJobInfo.parallelism }}
+      {{- end }}
+      template:
+        metadata:
+          name: backup-etcd
+          labels:
+            job: backup-etcd
+        spec:
+          tolerations:
+          - operator: Exists
+          - key: node-role.kubernetes.io/master
+            effect: NoSchedule
+          affinity: 
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchExpressions:
+                  - key: job 
+                    operator: In
+                    values:
+                    - backup-etcd
+                topologyKey: kubernetes.io/hostname
+          # 强行要求在Trident master节点上执行备份任务
+          # 该Job会用到master节点上的kubectl & mc 工具
+          nodeSelector:
+            node-role.kubernetes.io/master: ""
+          hostNetwork: true
+          dnsPolicy: ClusterFirstWithHostNet
+          containers:
+          - name: backup-etcd
+            image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.etcd.image }}:{{ .Values.images.etcd.tag }}"
+            imagePullPolicy: {{ .Values.imagePullPolicy }}
+            # 充分保障资源，让etcd backup job稳定运行
+            resources:
+              limits:
+                cpu: 1000m
+                memory: 1024Mi
+              requests:
+                cpu: 100m
+                memory: 256Mi
+            env:
+            - name: ETCDCTL_ENDPOINTS
+              value: "https://127.0.0.1:2379"
+            - name: ETCDCTL_API
+              value: "3"
+            - name: ETCDCTL_DIAL_TIMEOUT
+              value: 3s
+            - name: ETCDCTL_CACERT
+              value: /cert/ca.pem
+            - name: ETCDCTL_CERT
+              value: /cert/etcd-client.pem
+            - name: ETCDCTL_KEY
+              value: /cert/etcd-client-key.pem
+            - name: TZ
+              value: Asia/Shanghai
+            command:
+            - /bin/sh
+            - "-c"
+            - |
+              set -x
+
+              # 0. sleep a little while
+              sleep 4s
+              
+              # 1. etcd backup
+              echo "start backup etcd";
+              baseDir="/data";
+              etcdctl snapshot save $baseDir/snapshot-latest.db
+              if [ "$?" != "0" ]; then
+                echo "etcd backup failed"
+                exit 1
+              fi
+            volumeMounts:
+            - name: etcd-backup-volume
+              mountPath: /data/
+            - name: etcd-ca
+              mountPath: /cert  
+              readOnly: true
+          restartPolicy: OnFailure
+          volumes:
+          - name: etcd-backup-volume
+            hostPath:
+              path: /backup/etcd/snapshots/ # 将etcd备份数据保存在master节点的/backup/etcd/snapshots/路径
+              type: DirectoryOrCreate
+          - name: etcd-ca
+            secret:
+              secretName: etcd-client-cert

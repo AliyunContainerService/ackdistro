@@ -28,6 +28,7 @@ COPY charts/open-local chart
 COPY charts/l-zero chart
 COPY charts/l-zero-library chart
 COPY charts/calico chart
+COPY charts/etcd-backup chart
 COPY yamls ack-distro-yamls
 
 CMD helm -n kube-system upgrade -i kube-core chart/kube-core

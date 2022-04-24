@@ -3,7 +3,7 @@
 source /l0/utils/l0-utils.sh
 
 errMsg=""
-items=$(kubectl get pod -n kube-system -l trident.apsara-stack.alibaba-inc.com/task-generated!=true | grep -v STATUS | egrep -v '(Completed|Running)' | awk '{print $1";"$2";"$3";"$4}')
+items=$(kubectl get pod -n kube-system -l trident.apsara-stack.alibaba-inc.com/task-generated!=true | grep -v STATUS | egrep -v '(Completed|Running|Pending)' | awk '{print $1";"$2";"$3";"$4}')
 for item in ${items}; do
     arr=(${item//;/ })
     ns=kube-system

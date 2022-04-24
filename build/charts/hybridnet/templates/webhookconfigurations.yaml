@@ -19,6 +19,9 @@ webhooks:
         - key: webhook.hybridnet.io/ignore
           operator: NotIn
           values: ["TRUE", "true"]
+        - key: app
+          operator: NotIn
+          values: ["kube-proxy"]
     rules:
       - apiGroups: ["networking.alibaba.com"]
         apiVersions: ["v1"]
@@ -46,6 +49,9 @@ webhooks:
         - key: webhook.hybridnet.io/ignore
           operator: NotIn
           values: ["TRUE", "true"]
+        - key: app
+          operator: NotIn
+          values: ["kube-proxy"]
     rules:
       - apiGroups: [""]
         apiVersions: ["v1"]
@@ -76,6 +82,9 @@ webhooks:
         - key: webhook.hybridnet.io/ignore
           operator: NotIn
           values: ["TRUE", "true"]
+        - key: app
+          operator: NotIn
+          values: ["kube-proxy"]
     reinvocationPolicy: Never
     rules:
       - apiGroups: [""]

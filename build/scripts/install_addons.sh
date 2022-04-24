@@ -13,6 +13,7 @@ fi
 # must be installed addons
 helm -n kube-system upgrade -i l-zero chart/l-zero
 helm -n kube-system upgrade -i open-local chart/open-local
+helm -n kube-system upgrade -i etcd-backup chart/etcd-backup
 
 echo "sleep 15 for l-zero crds ready"
 sleep 15

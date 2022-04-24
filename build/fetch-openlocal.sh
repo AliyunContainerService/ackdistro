@@ -17,5 +17,5 @@ echo "helm/" >> .git/info/sparse-checkout
 git pull origin ${tag}
 
 cd -
-rm -rf charts/open-local
-cp -r /tmp/open-local/helm charts/open-local
+rm -rf open-local
+cp -r /tmp/open-local/helm open-local

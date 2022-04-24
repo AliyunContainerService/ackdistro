@@ -5,7 +5,6 @@ metadata:
 spec:
   type: SHELL
   action: PostClean # PreInit PreInstall PostInstall
-  'on': node
   data: |
     export EtcdDevice=${EtcdDevice}
     export StorageDevice=${StorageDevice}
