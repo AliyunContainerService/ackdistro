@@ -3,7 +3,6 @@ package apply
 import (
 	"ackdistro/test/testhelper"
 	"ackdistro/test/testhelper/settings"
-	"bytes"
 	"fmt"
 	"github.com/alibaba/sealer/pkg/infra"
 	v1 "github.com/alibaba/sealer/types/api/v1"
@@ -144,65 +143,6 @@ func GenerateClusterfile1(clusterfile string) {
 	testhelper.CheckNotNil(data)
 }
 
-func GenerateClusterfile(clusterfile string) {
-	filepath := GetRawConfigPluginFilePath()
-	cluster := LoadClusterFileFromDisk(clusterfile)
-	cluster.Spec.Env = []string{"env=TestEnv"}
-	data, err := yaml.Marshal(cluster)
-	testhelper.CheckErr(err)
-	appendData := [][]byte{data}
-	plugins := LoadPluginFromDisk(filepath)
-	configs := LoadConfigFromDisk(filepath)
-	for _, plugin := range plugins {
-		if plugin.Spec.Type == "LABEL" {
-			pluginData := "\n"
-			for _, ip := range cluster.Spec.Masters.IPList {
-				pluginData += fmt.Sprintf(" %s sealer-test=true \n", ip)
-			}
-			plugin.Spec.Data = pluginData
-		}
-		if plugin.Spec.Type == "HOSTNAME" {
-			pluginData := "\n"
-			for i, ip := range cluster.Spec.Masters.IPList {
-				pluginData += fmt.Sprintf("%s master-%s\n", ip, strconv.Itoa(i))
-			}
-			for i, ip := range cluster.Spec.Nodes.IPList {
-				pluginData += fmt.Sprintf("%s node-%s\n", ip, strconv.Itoa(i))
-			}
-			plugin.Spec.Data = pluginData
-		}
-		data, err := yaml.Marshal(plugin)
-		testhelper.CheckErr(err)
-		appendData = append(appendData, []byte("---\n"), data)
-	}
-	for _, config := range configs {
-		data, err := yaml.Marshal(config)
-		testhelper.CheckErr(err)
-		appendData = append(appendData, []byte("---\n"), data)
-	}
-	err = utils.WriteFile(clusterfile, bytes.Join(appendData, []byte("")))
-	testhelper.CheckErr(err)
-}
-
-func GetRawConfigPluginFilePath() string {
-	fixtures := getFixtures()
-	return filepath.Join(fixtures, "config_plugin_for_test.yaml")
-}
-
-func LoadPluginFromDisk(clusterFilePath string)[]v1.Plugin  {
-	plugins, err := utils.DecodePlugins(clusterFilePath)
-	testhelper.CheckErr(err)
-	testhelper.CheckNotNil(plugins)
-	return plugins
-}
-
-func LoadConfigFromDisk(Clusterfilepath string)[]v1.Config  {
-	configs, err := utils.DecodeConfigs(Clusterfilepath)
-	testhelper.CheckErr(err)
-	testhelper.CheckNotNil(configs)
-	return configs
-}
-
 func SendAndApplyCluster(sshClient *testhelper.SSHClient, clusterFile string) {
 	SendAndRemoteExecCluster(sshClient, clusterFile, SealerApplyCmd(clusterFile))
 }
@@ -228,15 +168,4 @@ func WaitAllNodeRunningBySSH(s ssh.Interface, masterIp string) {
 
 func SealerDeleteCmd(clusterFile string) string {
 	return fmt.Sprintf("%s delete -f %s --force -d", settings.DefaultSealerBin,clusterFile)
-}
-
-func ChangeMasterOrderAndSave(cluster *v1.Cluster, clusterFile string) *v1.Cluster {
-	cluster.Spec.Masters.Count = strconv.Itoa(1)
-	CreateAliCloudInfra(cluster)
-	//change master order and save used cluster file
-	cluster.Spec.Masters.IPList[0], cluster.Spec.Masters.IPList[1] = cluster.Spec.Masters.IPList[1], cluster.Spec.Masters.IPList[0]
-	cluster.Spec.Provider = settings.BAREMETAL
-	MarshalClusterToFile(clusterFile, cluster)
-	cluster.Spec.Provider = settings.AliCloud
-	return cluster
 }
