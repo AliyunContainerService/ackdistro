@@ -15,9 +15,9 @@
 package test
 
 import (
-	"strings"
-
+	"fmt"
 	. "github.com/onsi/ginkgo"
+	"strings"
 
 	"ackdistro/test/suites/apply"
 	"ackdistro/test/testhelper"
@@ -25,6 +25,7 @@ import (
 )
 
 var _ = Describe("sealer run", func() {
+	fmt.Println("start to exec calico network cluster test")
 
 	Context("run on bareMetal", func() {
 		var tempFile string
@@ -56,7 +57,49 @@ var _ = Describe("sealer run", func() {
 				apply.SendAndRunCluster(sshClient, tempFile, masters, nodes, usedCluster.Spec.SSH.Passwd)
 				apply.CheckNodeNumWithSSH(sshClient, 2)
 			})
-
+			By("Wait for the cluster to be ready", func() {
+				apply.WaitAllNodeRunningBySSH(sshClient.SSH,sshClient.RemoteHostIP)
+			})
+			fmt.Println("calico network cluster test is ok")
 		})
 	})
+
+	fmt.Println("start to exec hybridnet network cluster test")
+	Context("run on bareMetal hybridnet", func() {
+		var tempFile string
+		BeforeEach(func() {
+			tempFile = testhelper.CreateTempFile()
+		})
+
+		AfterEach(func() {
+			testhelper.RemoveTempFile(tempFile)
+		})
+
+		It("bareMetal run", func() {
+			rawCluster := apply.LoadClusterFileFromDisk(apply.GetRawClusterFilePath())
+			By("start to prepare infra")
+			usedCluster := apply.CreateAliCloudInfraAndSave(rawCluster, tempFile)
+			//defer to delete cluster
+			defer func() {
+				apply.CleanUpAliCloudInfra(usedCluster)
+			}()
+			sshClient := testhelper.NewSSHClientByCluster(usedCluster)
+			testhelper.CheckFuncBeTrue(func() bool {
+				err := sshClient.SSH.Copy(sshClient.RemoteHostIP, settings.DefaultSealerBin, settings.DefaultSealerBin)
+				return err == nil
+			}, settings.MaxWaiteTime)
+
+			By("start to init cluster", func() {
+				masters := strings.Join(usedCluster.Spec.Masters.IPList, ",")
+				nodes := strings.Join(usedCluster.Spec.Nodes.IPList, ",")
+				apply.SendAndRunHybirdnetCluster(sshClient, tempFile, masters, nodes, usedCluster.Spec.SSH.Passwd)
+				apply.CheckNodeNumWithSSH(sshClient, 2)
+			})
+			By("Wait for the cluster to be ready", func() {
+				apply.WaitAllNodeRunningBySSH(sshClient.SSH,sshClient.RemoteHostIP)
+			})
+			fmt.Println("calico network cluster test is ok")
+		})
+	})
+
 })
