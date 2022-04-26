@@ -6,7 +6,7 @@ on:
 jobs:
   issue_comment:
     name: Auto build image
-    if: startswith(github.event.comment.body, '/bashbuild')
+    if: startswith(github.event.comment.body, '/imagebuild')
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -26,7 +26,7 @@ jobs:
           git checkout feature/v1.20.4-ack-3
           cd build
           ls -R
-          sudo bash build.sh $tag
+          sudo bash test-build.sh $tag
           sudo sealer push ack-distro:$tag
           echo "::set-output name=version::$version"
       - name: Auto build image
@@ -34,4 +34,4 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            Image ${{ steps.autobuild.outputs.version }} build successfully!
+            Image ack-distro:${{ steps.autobuild.outputs.version }} build successfully!

@@ -1,0 +1,28 @@
+FROM ackdistro:genesis2
+
+COPY Metadata .
+
+COPY trident ./bin
+COPY kubectl ./bin
+COPY kubeadm ./bin
+COPY kubelet ./bin
+COPY helm ./bin
+
+COPY scripts/install_addons.sh scripts
+COPY plugins/install_addons_shell_plugin.yaml plugins
+
+COPY imageList manifests
+COPY kubeadm.yml ./etc
+COPY statics/audit-policy.yml ./statics
+
+COPY charts/kube-core chart
+COPY charts/hybridnet chart
+COPY charts/open-local chart
+COPY charts/l-zero chart
+COPY charts/l-zero-library chart
+COPY charts/calico chart
+COPY yamls ack-distro-yamls
+
+CMD helm -n kube-system upgrade -i kube-core chart/kube-core
+CMD kubectl create ns acs-system || true
+CMD kubectl apply -f ack-distro-yamls/*
