@@ -10,9 +10,6 @@ github.com/Microsoft/go-winio/pkg/guid
 ## explicit; go 1.14
 github.com/alibaba/sealer/common
 github.com/alibaba/sealer/logger
-github.com/alibaba/sealer/pkg/image/reference
-github.com/alibaba/sealer/pkg/image/store
-github.com/alibaba/sealer/pkg/image/types
 github.com/alibaba/sealer/pkg/infra
 github.com/alibaba/sealer/pkg/infra/aliyun
 github.com/alibaba/sealer/pkg/infra/container
@@ -21,7 +18,6 @@ github.com/alibaba/sealer/pkg/infra/container/client/docker
 github.com/alibaba/sealer/types/api/v1
 github.com/alibaba/sealer/types/api/v2
 github.com/alibaba/sealer/utils
-github.com/alibaba/sealer/utils/archive
 github.com/alibaba/sealer/utils/platform
 github.com/alibaba/sealer/utils/ssh
 # github.com/aliyun/alibaba-cloud-sdk-go v1.61.985
@@ -48,10 +44,7 @@ github.com/containerd/containerd/platforms
 github.com/docker/cli/cli/streams
 # github.com/docker/distribution v2.7.1+incompatible
 ## explicit
-github.com/docker/distribution
 github.com/docker/distribution/digestset
-github.com/docker/distribution/manifest
-github.com/docker/distribution/manifest/schema2
 github.com/docker/distribution/reference
 github.com/docker/distribution/registry/api/errcode
 # github.com/docker/docker v20.10.7+incompatible
@@ -193,8 +186,6 @@ github.com/onsi/ginkgo/types
 ## explicit; go 1.18
 github.com/onsi/gomega
 github.com/onsi/gomega/format
-github.com/onsi/gomega/gbytes
-github.com/onsi/gomega/gexec
 github.com/onsi/gomega/internal
 github.com/onsi/gomega/internal/gutil
 github.com/onsi/gomega/matchers
@@ -241,11 +232,6 @@ github.com/spf13/viper
 # github.com/subosito/gotenv v1.2.0
 ## explicit
 github.com/subosito/gotenv
-# github.com/vbatts/tar-split v0.11.1
-## explicit
-github.com/vbatts/tar-split/archive/tar
-github.com/vbatts/tar-split/tar/asm
-github.com/vbatts/tar-split/tar/storage
 # github.com/vishvananda/netlink v1.1.1-0.20201029203352-d40f9887b852
 ## explicit; go 1.12
 github.com/vishvananda/netlink
