@@ -21,12 +21,6 @@ jobs:
           route: ${{ github.event.issue.pull_request.url }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Get PR informations
-        id: pr_data
-        run: |
-          echo "::set-output name=repo_name::${{ fromJson(steps.request.outputs.data).head.repo.full_name }}"
-          echo "::set-output name=repo_clone_url::${{ fromJson(steps.request.outputs.data).head.repo.clone_url }}"
-          echo "::set-output name=repo_ssh_url::${{ fromJson(steps.request.outputs.data).head.repo.ssh_url }}"
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
         with:
@@ -56,13 +50,10 @@ jobs:
         shell: bash
         working-directory: src/github.com/alibaba/sealer
         env:
-          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-          REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
           IMAGE_NAME: ${{ secrets.IMAGE_NAME}}
           ACCESSKEYID: ${{ secrets.ACCESSKEYID }}
           ACCESSKEYSECRET: ${{ secrets.ACCESSKEYSECRET }}
           RegionID: ${{ secrets.RegionID }}
         if: ${{ github.event.comment.body == '/test run' || github.event.comment.body == '/test all' || github.event_name == 'push' }}
         run: |
-          ginkgo -v --focus="sealer run" test
+          ginkgo -v --focus="sealer run calico" test

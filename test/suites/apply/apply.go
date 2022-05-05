@@ -135,9 +135,8 @@ func CheckNodeNumWithSSH(sshClient *testhelper.SSHClient, expectNum int) {
 	testhelper.CheckEqual(num, expectNum+1)
 }
 
-func GenerateClusterfile1(clusterfile string) {
+func GenerateClusterfile(clusterfile string) {
 	cluster := LoadClusterFileFromDisk(clusterfile)
-	cluster.Spec.Env = []string{"Network=calico"}
 	data, err := yaml.Marshal(cluster)
 	testhelper.CheckErr(err)
 	testhelper.CheckNotNil(data)
