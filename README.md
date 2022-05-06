@@ -43,10 +43,10 @@ ACK Distro, as a downstream of ACK, will keep up-to-date with ACK's release. ACK
 ## Quick start
 
 ```bash
-wget -c https://sealer.oss-cn-beijing.aliyuncs.com/sealers/sealer-v0.8.3-linux-amd64.tar.gz && \
-        tar -xvf sealer-v0.8.3-linux-amd64.tar.gz -C /usr/bin
+wget -c https://sealer.oss-cn-beijing.aliyuncs.com/sealers/sealer-v0.8.5-linux-amd64.tar.gz && \
+      tar -xvf sealer-v0.8.5-linux-amd64.tar.gz -C /usr/bin
 
-sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1.20.4-ack-2 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1.20.4-ack-3 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
 
 kubectl get cs
 ```

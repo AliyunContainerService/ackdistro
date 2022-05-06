@@ -4,8 +4,8 @@
 Features:
 
 - Upgrade sealer to [v0.8](https://github.com/sealerio/sealer/releases/tag/v0.8.0), which provides stronger cluster management capabilities and simpler API
-- Upgrade hybridnet to [v0.4.2](https://github.com/alibaba/hybridnet/releases/tag/v0.4.2)
-- Upgrade open-local to [v0.5.3](https://github.com/alibaba/open-local/releases/tag/v0.5.3)
+- Upgrade open-local v0.2.3 to v0.5.4, which support raw block volume, io-throttling, ephemeral local volumes etc. [CHANGELOG](https://github.com/alibaba/open-local/releases)
+- Upgrade hybridnet from v0.1.1 to v0.4.2, which support multicluster feature, BGP mode for an underlay network, introduce felix for NetworkPolicy etc. [CHANGELOG](https://github.com/alibaba/hybridnet/blob/main/CHANGELOG.md)
 - Support automatically manage disk capacity for k8s daemons, to avoid affecting the stability of the OS
 - Support etcd backup cronjob, which will run a backup every day at 02:00 by default
 - Support cluster auditing, which only record WRITE request and can use only 1GiB storage to save audit logs for the last 72h on a 3m+3w cluster
