@@ -19,6 +19,7 @@ spec:
     spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
+      priorityClassName: system-cluster-critical
       tolerations:
       - operator: Exists
         effect: NoSchedule
@@ -45,15 +46,15 @@ spec:
         - --port={{ .Values.extender.port }}
         - --scheduler-strategy={{ .Values.extender.strategy }}
         image: {{ .Values.images.local.image }}:{{ .Values.images.local.tag }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         name: {{ .Values.name }}-scheduler-extender
         resources:
           limits:
             cpu: 500m
-            memory: 500Mi
+            memory: 512Mi
           requests:
             cpu: 100m
-            memory: 100Mi
+            memory: 128Mi
         env:
         - name: TZ
           value: Asia/Shanghai

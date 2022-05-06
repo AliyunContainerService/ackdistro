@@ -1,0 +1,92 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    trident-app: l-zero
+    run: l-zero
+  name: l-zero
+  namespace: {{ .Values.k8s_namespace }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      run: l-zero
+  progressDeadlineSeconds: 20
+  strategy:
+    rollingUpdate:
+      maxSurge: 5
+      maxUnavailable: 5
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        trident-app: l-zero
+        run: l-zero
+    spec:
+      hostNetwork: true
+      priorityClassName: system-cluster-critical
+      dnsPolicy: ClusterFirstWithHostNet
+      {{- if not .Values.globalconfig.DisableFailureDomain }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  trident-app: l-zero
+              topologyKey: failure-domain.beta.kubernetes.io/zone
+      {{- end }}
+      containers:
+        - image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.lzero.image }}:{{ .Values.images.lzero.tag }}"
+          imagePullPolicy: IfNotPresent
+          name: l-zero
+          command:
+            - manager
+            - --v=3
+            - --logtostderr=true
+            - --server-addr=:16789
+            - --metrics-addr=:16790
+            - --registry-url={{ .Values.globalconfig.RegistryURL }}
+          resources:
+            requests:
+              cpu: 200m
+              memory: 200Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          ports:
+            - containerPort: 16789
+              hostPort: 16789
+              protocol: TCP
+            - containerPort: 16790
+              hostPort: 16790
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: localtime
+              readOnly: true
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+      restartPolicy: Always
+      serviceAccountName: l-zero

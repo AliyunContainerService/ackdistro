@@ -10,10 +10,9 @@
 ## 系统要求
 ### os：
 
-- CentOS 7.5/7.6/7.7/7.8/7.9/8.0
-- RHEL 7.8
+- CentOS/RHEL 7.5/7.6/7.7/7.8/7.9/8.0
 - Ubuntu 18.04
-- Anolis 8.2
+- Anolis 7.\*, 8.\*
 - 麒麟V10（Kylin V10）
 
 ### Architecture：

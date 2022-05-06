@@ -1,3 +1,4 @@
+{{- if .Values.extender.init_job }}
 kind: Job
 apiVersion: batch/v1
 metadata:
@@ -8,7 +9,7 @@ metadata:
     component: {{ .Values.name }}-init-job
 spec:
   completions: 3
-  parallelism: 1
+  parallelism: 3
   template:
     metadata:
       labels:
@@ -92,3 +93,4 @@ spec:
           hostPath:
             path: /etc/kubernetes/
             type: DirectoryOrCreate
+{{- end }}

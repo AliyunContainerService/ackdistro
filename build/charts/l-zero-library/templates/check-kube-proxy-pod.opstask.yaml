@@ -1,0 +1,34 @@
+apiVersion: trident.apsara-stack.alibaba-inc.com/v1alpha1
+kind: OpsTask
+metadata:
+  labels:
+    bizType: checkTask
+    check_appinstance: kube-proxy
+    check_appset: k8s
+    check_product: k8s
+  name: check-kube-proxy-pod
+  namespace: {{.Values.k8s_namespace}}
+spec:
+  broadcast: false
+  description: "检查kube proxy是否健康，Pod状态正常且数量正常"
+  period: 1800
+  podSpec:
+    containers:
+    - command:
+      - bash
+      - -c
+      - |
+        {{- .Files.Get "files/kube-proxy/check-kube-proxy-pod/content.sh" | nindent 8}}
+      image: {{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}
+      imagePullPolicy: IfNotPresent
+      name: main
+    dnsPolicy: ClusterFirstWithHostNet
+    hostNetwork: true
+    tolerations:
+    - effect: NoSchedule
+      key: alibabacloud.com/system
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+  privilegeLevel: Cluster
+  suspend: {{ .Values.globalconfig.SuspendPeriodHealthCheck }}
+  timeout: 180

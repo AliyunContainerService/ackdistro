@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: l-zero
+  namespace: {{ .Values.k8s_namespace }}
+  labels:
+    trident-app: l-zero
+spec:
+  type: NodePort
+  ports:
+    - port: 16789
+      targetPort: 16789
+      protocol: TCP
+      name: l-zero
+  selector:
+    run: l-zero
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: l-zero
+    trident-app: l-zero
+    chart: ack-prometheus-operator-5.7.0
+    heritage: Tiller
+    release: ack-prometheus-operator
+  name: l-zero-monitor-server
+  namespace: {{ .Values.k8s_namespace }}
+spec:
+  ports:
+    - name: metrics
+      port: 8888
+      protocol: TCP
+      targetPort: 16791
+  selector:
+    run: l-zero
+  sessionAffinity: None
+  type: ClusterIP

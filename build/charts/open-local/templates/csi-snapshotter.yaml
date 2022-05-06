@@ -21,7 +21,7 @@ spec:
       - operator: Exists
         effect: NoSchedule
         key: node-role.kubernetes.io/master
-      priorityClassName: system-node-critical
+      priorityClassName: system-cluster-critical
       serviceAccount: {{ .Values.name }}
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
@@ -39,19 +39,19 @@ spec:
               value: /var/lib/kubelet/plugins/{{ .Values.driver }}/csi.sock
             - name: TZ
               value: Asia/Shanghai
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           resources:
             limits:
               cpu: 500m
-              memory: 500Mi
+              memory: 512Mi
             requests:
-              cpu: 100m
-              memory: 100Mi
+              cpu: 50m
+              memory: 128Mi
           volumeMounts:
             - name: socket-dir
               mountPath: /var/lib/kubelet/plugins/{{ .Values.driver }}
       volumes:
         - name: socket-dir
           hostPath:
-            path: /var/lib/kubelet/plugins/{{ .Values.driver }}
+            path: {{ .Values.agent.kubelet_dir }}/plugins/{{ .Values.driver }}
             type: DirectoryOrCreate

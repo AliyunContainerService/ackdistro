@@ -1,0 +1,21 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+images:
+  calicocni:
+    image: ecp_builder/calico-cni
+    tag: v3.8.2
+  calicoflexvol:
+    image: ecp_builder/calico-pod2daemon-flexvol
+    tag: v3.9.1
+  caliconode:
+    image: ecp_builder/calico-node
+    tag: v3.8.2
+  calicocontrollers:
+    image: ecp_builder/calico-kube-controllers
+    tag: v3.8.2
+globalconfig:
+  RegistryURL: sea.hub:5000
+  MTU: "1440"
+  PodCIDR: 100.64.0.0/16
+  IPIP: Always
+  IPAutoDetectionMethod: can-reach=8.8.8.8

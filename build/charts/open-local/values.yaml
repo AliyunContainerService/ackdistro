@@ -3,39 +3,44 @@ namespace: kube-system
 driver: local.csi.aliyun.com
 images:
   local:
-    image: thebeatles1994/open-local
-    tag: v0.2.4-dev
+    image: sea.hub:5000/ecp_builder/open-local
+    tag: v0.5.4
   registrar:
-    image: thebeatles1994/csi-node-driver-registrar
+    image: sea.hub:5000/ecp_builder/csi-node-driver-registrar
     tag: v2.3.0
   provisioner:
-    image: thebeatles1994/csi-provisioner
+    image: sea.hub:5000/ecp_builder/csi-provisioner
     tag: v2.2.2
   resizer:
-    image: thebeatles1994/csi-resizer
+    image: sea.hub:5000/ecp_builder/csi-resizer
     tag: v1.3.0
   snapshotter:
-    image: thebeatles1994/csi-snapshotter
-    tag: v3.0.3
+    image: sea.hub:5000/ecp_builder/csi-snapshotter
+    tag: v4.2.1
   snapshot_controller:
-    image: thebeatles1994/snapshot-controller
-    tag: v3.0.3
+    image: sea.hub:5000/ecp_builder/snapshot-controller
+    tag: v4.2.1
 agent:
   name: open-local-agent
   # This block device will be used to create as a Volume Group in every node
   # Open-Local does nothing if the device has been formatted or mountted
   device: /dev/vdb
+  kubelet_dir: /var/lib/kubelet
 extender:
   name: open-local-scheduler-extender
   # scheduling strategy: binpack/spread
-  strategy: binpack
+  strategy: spread
   # scheduler extender http port
   port: 23000
+  # you can also configure your kube-scheduler manually, see docs/user-guide/kube-scheduler-configuration.md to get more details
+  init_job: true
 storageclass:
   lvm:
     name: open-local-lvm
   lvm_xfs:
     name: open-local-lvm-xfs
+  lvm_io:
+    name: open-local-lvm-io-throttling
   device_ssd:
     name: open-local-device-ssd
   device_hdd:
@@ -44,3 +49,10 @@ storageclass:
     name: open-local-mountpoint-ssd
   mountpoint_hdd:
     name: open-local-mountpoint-hdd
+globalconfig:
+  RegistryURL: sea.hub:5000
+monitor:
+  # install grafana dashboard
+  enabled: false
+  # grafana namespace
+  namespace: monitoring

@@ -1,0 +1,20 @@
+# values.yaml
+imagePullPolicy: IfNotPresent
+
+images:
+  etcd:
+    image: ecp_builder/etcd
+    tag: 3.4.3-0
+
+cronJobInfo:
+  namespace: acs-system
+  schedule: "0 2 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  completions: 3
+  parallelism: 3
+
+globalconfig:
+  RegistryURL: "sea.hub:5000"
+  # 单master模式
+  SingleMasterMode: false

@@ -1,7 +1,0 @@
-apiVersion: {{.KubeadmAPI}}
-kind: InitConfiguration
-localAPIEndpoint:
-  advertiseAddress: {{.Master0}}
-  bindPort: 6443
-nodeRegistration:
-  criSocket: /var/run/dockershim.sock
