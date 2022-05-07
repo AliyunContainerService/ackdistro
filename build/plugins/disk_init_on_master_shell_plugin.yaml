@@ -7,6 +7,7 @@ spec:
   action: PreInit|PreJoin # PreInit PreInstall PostInstall
   'on': master
   data: |
+    set -e; set -x
     export EtcdDevice=${EtcdDevice}
     export StorageDevice=${StorageDevice}
     export DockerRunDiskSize=${DockerRunDiskSize}

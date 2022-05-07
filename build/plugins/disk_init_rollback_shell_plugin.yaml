@@ -7,6 +7,7 @@ spec:
   action: PostClean # PreInit PreInstall PostInstall
   'on': node
   data: |
+    set -e; set -x
     export EtcdDevice=${EtcdDevice}
     export StorageDevice=${StorageDevice}
     bash scripts/disk_init_rollback.sh

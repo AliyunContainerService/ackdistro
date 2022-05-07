@@ -7,6 +7,7 @@ spec:
   action: PreInit # PreInit PreInstall PostInstall
   'on': master0
   data: |
+    set -e; set -x
     if [ "${IgnoreErrors}" != "" ];then
       IgnoreErrorsFlag="--ignore-errors ${IgnoreErrors}"
     fi
