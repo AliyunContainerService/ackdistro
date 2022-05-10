@@ -20,10 +20,12 @@ if [[ "$ARCH" == "" ]];then
     ARCH=amd64
 fi
 
-bins=(helm kubectl kubelet kubeadm trident)
-for bin in ${bins[@]};do
-    wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${ARCH}/${bin} -O ${bin}
-done
+if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
+    bins=(helm kubectl kubelet kubeadm trident)
+    for bin in ${bins[@]};do
+        wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${ARCH}/${bin} -O ${bin}
+    done
+fi
 
 # Build sealer image
 sealer build -m lite -t ack-distro:${TAG} --platform ${ARCH} .

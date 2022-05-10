@@ -73,7 +73,7 @@ spec:
       # rewrite ssh config if some node has different passwd...
       # ssh: 
       #  user: root
-      #  passwd: Seadent123
+      #  passwd: passwd
       #  port: "22"
     - ips:
         - 4.4.4.4

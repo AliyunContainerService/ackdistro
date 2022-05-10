@@ -5,8 +5,9 @@ metadata:
 spec:
   type: SHELL
   action: PreInit|PreJoin # PreInit PreInstall PostInstall
+  'on': node
   data: |
-    export EtcdDevice=${EtcdDevice}
+    set -e; set -x
     export StorageDevice=${StorageDevice}
     export DockerRunDiskSize=${DockerRunDiskSize}
     export KubeletRunDiskSize=${KubeletRunDiskSize}
