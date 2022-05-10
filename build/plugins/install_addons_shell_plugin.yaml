@@ -18,6 +18,10 @@ spec:
     # set default storageclass and snapshot
     kubectl annotate storageclass open-local-lvm snapshot.storage.kubernetes.io/is-default-class="true" --overwrite
     kubectl annotate storageclass open-local-lvm storageclass.kubernetes.io/is-default-class="true" --overwrite
+    
+    if [ "${RemoveMasterTaint}" == "true" ];then
+      kubectl taint node node-role.kubernetes.io/master- --all || true
+    fi
 
     sleep 15
     trident health-check
