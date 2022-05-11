@@ -27,15 +27,16 @@ kubectl get cs
 ### [Advanced] Install with production-level configuration
 
 ACK Distro has extensive production-level cluster management experience, and we currently provide the following production-level features:
-1. Support automatically manage disk capacity for k8s daemons, to avoid affecting the stability of the OS 
-2. Support preflight tool, which can determine whether it can be successful before cluster deployment 
-3. Support cluster health-check tool, which can check whether the cluster is healthy with one click 
-4. Support etcd backup cronjob, which will run a backup every day at 02:00 by default 
-5. Support cluster auditing, which only record WRITE request and can use only 1GiB storage to save audit logs for the last 72h on a 3m+3w cluster
 
+1. Support automatically manage disk capacity for k8s daemons, to avoid affecting the stability of the OS
+2. Support preflight tool, which can determine whether it can be successful before cluster deployment
+3. Support cluster health-check tool, which can check whether the cluster is healthy with one click
+4. Support etcd backup cronjob, which will run a backup every day at 02:00 by default
+5. Support cluster auditing, which only record WRITE request and can use only 1GiB storage to save audit logs for the last 72h on a 3m+3w cluster
 
 #### 1) automatically manage disk capacity for k8s daemons
 If you want ACK Distro to better manage the disks it uses, prepare raw data disks as needed (no partitioning and mounting required):
+
 - EtcdDevice: the disk allocated to etcd must be larger than 20GiB and IOPS>3300, only required by the Master node
 - StorageDevice: the disk allocated to docker and kubelet, the recommended capacity is greater than 100GiB
 
@@ -70,7 +71,7 @@ spec:
         - EtcdDevice=/dev/vdb
         - StorageDevice=/dev/vde
       # rewrite ssh config if some node has different passwd...
-      # ssh: 
+      # ssh:
       #  user: root
       #  passwd: passwd
       #  port: "22"
