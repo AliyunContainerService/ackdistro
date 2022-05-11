@@ -26,7 +26,7 @@ jobs:
           git checkout feature/v1.20.4-ack-3
           cd build
           ls -R
-          sudo bash test-build.sh $tag
+          sudo bash build.sh $tag
           sudo sealer push ack-distro:$tag
           echo "::set-output name=version::$version"
       - name: Auto build image
