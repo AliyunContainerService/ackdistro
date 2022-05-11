@@ -2,11 +2,11 @@ FROM registry.cn-qingdao.aliyuncs.com/sealer-io/ackdistro-multi:v0.1.0
 
 COPY Metadata .
 
-COPY trident ./bin
-COPY kubectl ./bin
-COPY kubeadm ./bin
-COPY kubelet ./bin
-COPY helm ./bin
+COPY ${ARCH}/trident ./bin
+COPY ${ARCH}/kubectl ./bin
+COPY ${ARCH}/kubeadm ./bin
+COPY ${ARCH}/kubelet ./bin
+COPY ${ARCH}/helm ./bin
 
 COPY scripts/disk_init.sh scripts
 COPY scripts/disk_init_rollback.sh scripts
