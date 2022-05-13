@@ -8,7 +8,7 @@ nodeRegistration:
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
-kubernetesVersion: v1.20.4-aliyun.1
+kubernetesVersion: v1.22.3-aliyun.1
 controlPlaneEndpoint: "apiserver.cluster.local:6443"
 imageRepository: sea.hub:5000/ecp_builder
 networking:
@@ -51,10 +51,8 @@ apiServer:
 controllerManager:
   extraArgs:
     feature-gates: TTLAfterFinished=true,EphemeralContainers=true
-    experimental-cluster-signing-duration: 876000h
+    cluster-signing-duration: 876000h
     bind-address: 0.0.0.0
-    address: 0.0.0.0
-    port: '10252'
     profiling: 'false'
   extraVolumes:
     - hostPath: /etc/localtime
@@ -80,7 +78,7 @@ etcd:
     extraArgs:
       listen-metrics-urls: http://0.0.0.0:2381
     imageRepository: sea.hub:5000/ecp_builder
-    imageTag: 3.4.3-0
+    imageTag: 3.5.0-0
 
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
