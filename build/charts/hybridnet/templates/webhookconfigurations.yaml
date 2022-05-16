@@ -49,9 +49,7 @@ webhooks:
         - key: webhook.hybridnet.io/ignore
           operator: NotIn
           values: ["TRUE", "true"]
-        - key: app
-          operator: NotIn
-          values: ["kube-proxy"]
+        {{ toYaml .Values.webhook.additionalPodMatchExpressions | nindent 8 }}
     rules:
       - apiGroups: [""]
         apiVersions: ["v1"]
@@ -82,9 +80,7 @@ webhooks:
         - key: webhook.hybridnet.io/ignore
           operator: NotIn
           values: ["TRUE", "true"]
-        - key: app
-          operator: NotIn
-          values: ["kube-proxy"]
+        {{ toYaml .Values.webhook.additionalPodMatchExpressions | nindent 8 }}
     reinvocationPolicy: Never
     rules:
       - apiGroups: [""]
