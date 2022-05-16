@@ -2,16 +2,16 @@
 # Declare variables to be passed into your templates.
 images:
   calicocni:
-    image: cni
+    image: ecp_builder/calico-cni
     tag: v3.23.0
   caliconode:
-    image: node
+    image: ecp_builder/calico-node
     tag: v3.23.0
   calicocontrollers:
-    image: kube-controllers
+    image: ecp_builder/calico-kube-controllers
     tag: v3.23.0
 globalconfig:
-  RegistryURL: docker.io/calico
+  RegistryURL: sea.hub:5000
   MTU: "1430"
   PodCIDR: 100.65.0.0/16
   IPIP: Always
