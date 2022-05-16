@@ -11,7 +11,7 @@ images:
     image: kube-controllers
     tag: v3.23.0
 globalconfig:
-  RegistryURL: docker.io/calico
+  RegistryURL: sea.hub:5000
   MTU: "1430"
   PodCIDR: 100.65.0.0/16
   IPIP: Always
