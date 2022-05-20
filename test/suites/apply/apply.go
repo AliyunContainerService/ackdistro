@@ -34,6 +34,20 @@ func GetRawClusterFilePath() string {
 	return filepath.Join(fixtures, "cluster_file_for_test.yaml")
 }
 
+func GetLoadFile() string {
+	path := settings.LoadPath
+	return filepath.Join(path, "load.sh")
+}
+
+func getLoadPath() string {
+	loadPath := settings.LoadPath
+	return filepath.Join(loadPath, "suites", "apply", "fixtures")
+}
+
+func GetSSHPass() string {
+	return fmt.Sprintf("yum -y install sshpass")
+}
+
 func CreateAliCloudInfraAndSave(cluster *v1.Cluster, clusterFile string) *v1.Cluster {
 	CreateAliCloudInfra(cluster)
 	//save used cluster file
@@ -73,7 +87,7 @@ func CleanUpAliCloudInfra(cluster *v1.Cluster) {
 }
 
 func SendAndRunCluster(sshClient *testhelper.SSHClient, clusterFile string, joinMasters, joinNodes, passwd string) {
-	SendAndRemoteExecCluster(sshClient, clusterFile, SealerRunCmd(joinMasters, joinNodes, passwd, ""))
+	SendAndRemoteExecCluster(sshClient, clusterFile, SealerRunCalicoCmd(joinMasters, joinNodes, passwd, ""))
 }
 
 func SendAndRunHybirdnetCluster(sshClient *testhelper.SSHClient, clusterFile string, joinMasters, joinNodes, passwd string) {
@@ -90,7 +104,7 @@ func SendAndRemoteExecCluster(sshClient *testhelper.SSHClient, clusterFile strin
 	testhelper.CheckErr(err)
 }
 
-func SealerRunCmd(masters, nodes, passwd string, provider string) string {
+func SealerRunCalicoCmd(masters, nodes, passwd string, provider string) string {
 	if masters != "" {
 		masters = fmt.Sprintf("-m %s", masters)
 	}
@@ -103,7 +117,7 @@ func SealerRunCmd(masters, nodes, passwd string, provider string) string {
 	if provider != "" {
 		provider = fmt.Sprintf("--provider %s", provider)
 	}
-	return fmt.Sprintf("%s run %s -e %s %s %s %s %s -d", settings.DefaultSealerBin, settings.TestImageName, settings.CustomCalicoEnv , masters, nodes, passwd, provider)
+	return fmt.Sprintf("%s run %s -e %s %s %s %s %s -d", settings.DefaultSealerBin, settings.TestImageName, settings.CustomCalicoEnv, masters, nodes, passwd, provider)
 }
 
 func SealerRunHybridnetCmd(masters, nodes, passwd string, provider string) string {
@@ -119,7 +133,23 @@ func SealerRunHybridnetCmd(masters, nodes, passwd string, provider string) strin
 	if provider != "" {
 		provider = fmt.Sprintf("--provider %s", provider)
 	}
-	return fmt.Sprintf("%s run %s -e %s %s %s %s %s -d", settings.DefaultSealerBin, settings.TestImageName, settings.CustomhybridnetEnv , masters, nodes, passwd, provider)
+	return fmt.Sprintf("%s run %s -e %s %s %s %s %s -d", settings.DefaultSealerBin, settings.TestImageName, settings.CustomhybridnetEnv, masters, nodes, passwd, provider)
+}
+
+func NodeRunCmd() string {
+	return fmt.Sprintf("wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/load.sh  && sudo bash load.sh")
+}
+
+func Permissions() string {
+	return fmt.Sprintf("cp .kube/config /tmp/kubeconfig && chmod +x /tmp/kubeconfig")
+}
+
+func GetE2eTestFile() string {
+	return fmt.Sprintf("wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/e2e.tar && tar -xvf e2e.tar")
+}
+
+func ExecE2eTestFile() string {
+	return fmt.Sprintf("sudo bash run.sh && sudo bash get-log.sh")
 }
 
 // CheckNodeNumWithSSH check node mum of remote cluster;for bare metal apply
@@ -146,15 +176,19 @@ func SendAndApplyCluster(sshClient *testhelper.SSHClient, clusterFile string) {
 	SendAndRemoteExecCluster(sshClient, clusterFile, SealerApplyCmd(clusterFile))
 }
 
+func SendAndLoad(sshClient *testhelper.SSHClient, clusterFile string) {
+	SendAndRemoteExecCluster(sshClient, clusterFile, SealerApplyCmd(clusterFile))
+}
+
 func SealerApplyCmd(clusterFile string) string {
 	return fmt.Sprintf("%s apply -f %s --force -d", settings.DefaultSealerBin, clusterFile)
 }
 
 func WaitAllNodeRunningBySSH(s ssh.Interface, masterIp string) {
 	time.Sleep(30 * time.Second)
-	err := utils.Retry(10,5 * time.Second, func() error {
+	err := utils.Retry(10, 5*time.Second, func() error {
 		result, err := s.CmdToString(masterIp, "kubectl get node", "")
-		if err != nil{
+		if err != nil {
 			return err
 		}
 		if strings.Contains(result, "NotReady") {
@@ -166,5 +200,13 @@ func WaitAllNodeRunningBySSH(s ssh.Interface, masterIp string) {
 }
 
 func SealerDeleteCmd(clusterFile string) string {
-	return fmt.Sprintf("%s delete -f %s --force -d", settings.DefaultSealerBin,clusterFile)
+	return fmt.Sprintf("%s delete -f %s --force -d", settings.DefaultSealerBin, clusterFile)
+}
+
+func SealerDelete() string {
+	return fmt.Sprintf("%s delete -a --force -d", settings.DefaultSealerBin)
+}
+
+func GetE2eTest() string {
+	return fmt.Sprintf("wget https://sealer.oss-cn-beijing.aliyuncs.com/kubernetes_e2e_images_v1.20.0.tar.gz")
 }
