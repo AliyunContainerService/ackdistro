@@ -7,14 +7,12 @@ import (
 	"github.com/alibaba/sealer/pkg/infra"
 	v1 "github.com/alibaba/sealer/types/api/v1"
 	"github.com/alibaba/sealer/utils"
-	"github.com/alibaba/sealer/utils/ssh"
 	"github.com/onsi/gomega"
 	"gopkg.in/yaml.v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 )
 
 func LoadClusterFileFromDisk(clusterFilePath string) *v1.Cluster {
@@ -32,20 +30,6 @@ func getFixtures() string {
 func GetRawClusterFilePath() string {
 	fixtures := getFixtures()
 	return filepath.Join(fixtures, "cluster_file_for_test.yaml")
-}
-
-func GetLoadFile() string {
-	path := settings.LoadPath
-	return filepath.Join(path, "load.sh")
-}
-
-func getLoadPath() string {
-	loadPath := settings.LoadPath
-	return filepath.Join(loadPath, "suites", "apply", "fixtures")
-}
-
-func GetSSHPass() string {
-	return fmt.Sprintf("yum -y install sshpass")
 }
 
 func CreateAliCloudInfraAndSave(cluster *v1.Cluster, clusterFile string) *v1.Cluster {
@@ -136,22 +120,6 @@ func SealerRunHybridnetCmd(masters, nodes, passwd string, provider string) strin
 	return fmt.Sprintf("%s run %s -e %s %s %s %s %s -d", settings.DefaultSealerBin, settings.TestImageName, settings.CustomhybridnetEnv, masters, nodes, passwd, provider)
 }
 
-func NodeRunCmd() string {
-	return fmt.Sprintf("wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/load.sh  && sudo bash load.sh")
-}
-
-func Permissions() string {
-	return fmt.Sprintf("cp .kube/config /tmp/kubeconfig && chmod +x /tmp/kubeconfig")
-}
-
-func GetE2eTestFile() string {
-	return fmt.Sprintf("wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/e2e.tar && tar -xvf e2e.tar")
-}
-
-func ExecE2eTestFile() string {
-	return fmt.Sprintf("sudo bash run.sh && sudo bash get-log.sh")
-}
-
 // CheckNodeNumWithSSH check node mum of remote cluster;for bare metal apply
 func CheckNodeNumWithSSH(sshClient *testhelper.SSHClient, expectNum int) {
 	if sshClient == nil {
@@ -176,37 +144,10 @@ func SendAndApplyCluster(sshClient *testhelper.SSHClient, clusterFile string) {
 	SendAndRemoteExecCluster(sshClient, clusterFile, SealerApplyCmd(clusterFile))
 }
 
-func SendAndLoad(sshClient *testhelper.SSHClient, clusterFile string) {
-	SendAndRemoteExecCluster(sshClient, clusterFile, SealerApplyCmd(clusterFile))
-}
-
 func SealerApplyCmd(clusterFile string) string {
 	return fmt.Sprintf("%s apply -f %s --force -d", settings.DefaultSealerBin, clusterFile)
 }
 
-func WaitAllNodeRunningBySSH(s ssh.Interface, masterIp string) {
-	time.Sleep(30 * time.Second)
-	err := utils.Retry(10, 5*time.Second, func() error {
-		result, err := s.CmdToString(masterIp, "kubectl get node", "")
-		if err != nil {
-			return err
-		}
-		if strings.Contains(result, "NotReady") {
-			return fmt.Errorf("node not ready: \n %s", result)
-		}
-		return nil
-	})
-	testhelper.CheckErr(err)
-}
-
 func SealerDeleteCmd(clusterFile string) string {
 	return fmt.Sprintf("%s delete -f %s --force -d", settings.DefaultSealerBin, clusterFile)
-}
-
-func SealerDelete() string {
-	return fmt.Sprintf("%s delete -a --force -d", settings.DefaultSealerBin)
-}
-
-func GetE2eTest() string {
-	return fmt.Sprintf("wget https://sealer.oss-cn-beijing.aliyuncs.com/kubernetes_e2e_images_v1.20.0.tar.gz")
 }
