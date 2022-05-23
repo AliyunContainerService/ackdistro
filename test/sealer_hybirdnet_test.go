@@ -1,17 +1,15 @@
 package test
 
 import (
+	"ackdistro/test/suites/apply"
 	"ackdistro/test/testhelper"
-	"fmt"
+	"ackdistro/test/testhelper/settings"
 	. "github.com/onsi/ginkgo"
 	"strings"
 	"time"
-
-	"ackdistro/test/suites/apply"
-	"ackdistro/test/testhelper/settings"
 )
 
-var _ = Describe("sealer run hybirdnet", func() {
+var _ = Describe("run hybirdnet", func() {
 	Context("start apply hybirdnet", func() {
 		rawClusterFilePath := apply.GetRawClusterFilePath()
 		rawCluster := apply.LoadClusterFileFromDisk(rawClusterFilePath)
@@ -24,7 +22,7 @@ var _ = Describe("sealer run hybirdnet", func() {
 			}
 		})
 
-		Context("check regular scenario that provider is bare metal, executes machine is master0", func() {
+		Context("executes machine is master0", func() {
 			var tempFile string
 			BeforeEach(func() {
 				tempFile = testhelper.CreateTempFile()
@@ -55,14 +53,38 @@ var _ = Describe("sealer run hybirdnet", func() {
 				testhelper.CheckErr(err)
 
 				By("apply.SealerDelete()")
-				time.Sleep(20 *time.Second)
+				time.Sleep(20 * time.Second)
 
-				By("sealer run calico")
+				By("sealer run hybirdnet")
 				masters := strings.Join(cluster.Spec.Masters.IPList, ",")
 				nodes := strings.Join(cluster.Spec.Nodes.IPList, ",")
 				apply.SendAndRunHybirdnetCluster(sshClient, tempFile, masters, nodes, cluster.Spec.SSH.Passwd)
 				apply.CheckNodeNumWithSSH(sshClient, 2)
-				fmt.Println("test finish")
+
+				By("exec e2e test")
+				//download e2e && sshcmd file，and give sshcmd exec permission.
+				err = sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/kubernetes_e2e_images_v1.20.0.tar.gz",
+					"wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/sshcmd", "chmod 777 sshcmd", "")
+				testhelper.CheckErr(err)
+
+				//get load.sh file
+				load := apply.GetLoadFile()
+				testhelper.CheckFuncBeTrue(func() bool {
+					err := sshClient.SSH.Copy(sshClient.RemoteHostIP, load, load)
+					return err == nil
+				}, settings.MaxWaiteTime)
+
+				//master0 exec load.sh,send e2e file to node，then, exec load.sh
+				err = sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "bash load.sh", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Nodes.IPList[0]+
+					" --mode 'scp' --local-path 'kubernetes_e2e_images_v1.20.0.tar.gz' --remote-path 'kubernetes_e2e_images_v1.20.0.tar.gz'", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Nodes.IPList[0]+
+					" --mode 'scp' --local-path 'load.sh' --remote-path 'load.sh'", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Nodes.IPList[0]+
+					" --cmd 'bash load.sh'")
+				testhelper.CheckErr(err)
+
+				//give permission && download and exec scripe
+				err = sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "sudo cp .kube/config /tmp/kubeconfig", "chmod 777 /tmp/kubeconfig",
+					"wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/run.sh", "wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/get-log.sh", "bash run.sh", "bash get-log.sh")
+				testhelper.CheckErr(err)
 			})
 		})
 	})

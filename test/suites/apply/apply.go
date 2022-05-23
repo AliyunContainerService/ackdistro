@@ -32,6 +32,11 @@ func GetRawClusterFilePath() string {
 	return filepath.Join(fixtures, "cluster_file_for_test.yaml")
 }
 
+func GetLoadFile() string {
+	path := settings.LoadPath
+	return filepath.Join(path,"load.sh")
+}
+
 func CreateAliCloudInfraAndSave(cluster *v1.Cluster, clusterFile string) *v1.Cluster {
 	CreateAliCloudInfra(cluster)
 	//save used cluster file
@@ -101,7 +106,7 @@ func SealerRunCalicoCmd(masters, nodes, passwd string, provider string) string {
 	if provider != "" {
 		provider = fmt.Sprintf("--provider %s", provider)
 	}
-	return fmt.Sprintf("%s run %s -e %s %s %s %s %s -d", settings.DefaultSealerBin, settings.TestImageName, settings.CustomCalicoEnv, masters, nodes, passwd, provider)
+	return fmt.Sprintf("%s run %s -e %s %s %s %s %s -d", settings.DefaultSealerBin, settings.TestImageName, settings.CustomCalicoEnv , masters, nodes, passwd, provider)
 }
 
 func SealerRunHybridnetCmd(masters, nodes, passwd string, provider string) string {
@@ -117,7 +122,7 @@ func SealerRunHybridnetCmd(masters, nodes, passwd string, provider string) strin
 	if provider != "" {
 		provider = fmt.Sprintf("--provider %s", provider)
 	}
-	return fmt.Sprintf("%s run %s -e %s %s %s %s %s -d", settings.DefaultSealerBin, settings.TestImageName, settings.CustomhybridnetEnv, masters, nodes, passwd, provider)
+	return fmt.Sprintf("%s run %s -e %s %s %s %s %s -d", settings.DefaultSealerBin, settings.TestImageName, settings.CustomhybridnetEnv , masters, nodes, passwd, provider)
 }
 
 // CheckNodeNumWithSSH check node mum of remote cluster;for bare metal apply
@@ -149,5 +154,5 @@ func SealerApplyCmd(clusterFile string) string {
 }
 
 func SealerDeleteCmd(clusterFile string) string {
-	return fmt.Sprintf("%s delete -f %s --force -d", settings.DefaultSealerBin, clusterFile)
+	return fmt.Sprintf("%s delete -f %s --force -d", settings.DefaultSealerBin,clusterFile)
 }
