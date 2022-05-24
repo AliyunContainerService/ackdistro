@@ -1,4 +1,4 @@
-name: Sealer-Test-Run
+name: Sealer-Test-Apply
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
   build:
     name: test
     runs-on: ubuntu-latest
-    if: ${{ (github.event.issue.pull_request && (github.event.comment.body == '/test all' || github.event.comment.body == '/test run')) || github.event_name == 'push' }}
+    if: ${{ (github.event.issue.pull_request && (github.event.comment.body == '/test all' || github.event.comment.body == '/test apply')) || github.event_name == 'push' }}
     env:
       GO111MODULE: on
     steps:
@@ -38,15 +38,16 @@ jobs:
       - name: Install sealer and ginkgo
         shell: bash
         run: |
-          wget https://sealer.oss-cn-beijing.aliyuncs.com/sealers/sealer-v0.8.3-linux-amd64.tar.gz
-          tar -xvf sealer-v0.8.3-linux-amd64.tar.gz -C /usr/bin/
+          wget wget https://sealer.oss-cn-beijing.aliyuncs.com/sealer-latest.tar.gz
+          tar -xvf sealer-latest.tar.gz -C /usr/bin/
           go get github.com/onsi/ginkgo/ginkgo@v1.16.2
           go get github.com/onsi/gomega/...@v1.12.0
           GOPATH=`go env GOPATH`
           echo "$GOPATH/bin" >> $GITHUB_PATH
         #working-directory: src/github.com/alibaba/sealer
 
-      - name: Run sealer run test
+
+      - name: Run sealer apply test
         shell: bash
         working-directory: src/github.com/alibaba/sealer
         env:
@@ -54,6 +55,6 @@ jobs:
           ACCESSKEYID: ${{ secrets.ACCESSKEYID }}
           ACCESSKEYSECRET: ${{ secrets.ACCESSKEYSECRET }}
           RegionID: ${{ secrets.RegionID }}
-        if: ${{ github.event.comment.body == '/test run' || github.event.comment.body == '/test all' || github.event_name == 'push' }}
+        if: ${{ github.event.comment.body == '/test apply' || github.event.comment.body == '/test all' || github.event_name == 'push' }}
         run: |
-          ginkgo -v --focus="sealer run calico" test
+          ginkgo -v --focus="run hybirdnet" test

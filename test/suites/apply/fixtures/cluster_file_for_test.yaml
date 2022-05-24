@@ -20,14 +20,14 @@ spec:
   masters:
     cpu: 4
     memory: 4
-    count: 1
+    count: 3
     systemDisk: 100
     dataDisks:
       - 100
   nodes:
     cpu: 4
     memory: 4
-    count: 1
+    count: 3
     systemDisk: 100
     dataDisks:
       - 100
