@@ -2,8 +2,6 @@
 
 hybridnet is an open source container networking solution designed for hybrid clouds.
 
-![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.4.2](https://img.shields.io/badge/AppVersion-0.4.2-informational?style=flat-square)
-
 ## Prerequisites
 
 - Kubernetes v1.16+
@@ -22,7 +20,6 @@ helm repo update
 ```shell
 helm install hybridnet hybridnet/hybridnet -n kube-system
 ```
-
 The command deploys hybridnet on the Kubernetes cluster in the default configuration.
 
 _See [configuration](#configuration) below._
@@ -52,7 +49,7 @@ After deploying hybridnet with the default configuration, you can change the def
 
 ```shell
 # Change default network type to Underlay
-helm upgrade hybridnet hybridnet/hybridnet -n kube-system --set advancedSettings.defualtNetworkType=Underlay
+helm upgrade hybridnet hybridnet/hybridnet -n kube-system --set defaultNetworkType=Underlay
 ```
 
 Of course, if you want to change your container network to use Underlay as default network type, you should

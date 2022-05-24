@@ -26,11 +26,12 @@ if [[ "$ARCH" == "" ]];then
     ARCH=amd64
 fi
 
+archs=$ARCH
+if [[ "$MULTI_ARCH" == "true" ]];then
+    archs="amd64,arm64"
+fi
+
 if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
-    archs=$ARCH
-    if [[ "$MULTI_ARCH" == "true" ]];then
-        archs="amd64,arm64"
-    fi
     bins=(helm kubectl kubelet kubeadm trident)
     IFS=","
     for arch in $archs;do
@@ -40,6 +41,7 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
           wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${bin} -O ${arch}/${bin}
       done
     done
+    IFS=" "
 fi
 
 # Build sealer image
