@@ -29,16 +29,16 @@ var _ = Describe("run calico", func() {
 				tempFile = testhelper.CreateTempFile()
 			})
 
-			//AfterEach(func() {
-			//	testhelper.RemoveTempFile(tempFile)
-			//})
+			AfterEach(func() {
+				testhelper.RemoveTempFile(tempFile)
+			})
 			It("init, clean up", func() {
 				By("start to prepare infra")
 				cluster := rawCluster.DeepCopy()
 				cluster.Spec.Provider = settings.AliCloud
 				cluster.Spec.Image = settings.TestImageName
 				cluster = apply.CreateAliCloudInfraAndSave(cluster, tempFile)
-				defer apply.CleanUpAliCloudInfra(cluster)
+				//defer apply.CleanUpAliCloudInfra(cluster)
 				sshClient := testhelper.NewSSHClientByCluster(cluster)
 				testhelper.CheckFuncBeTrue(func() bool {
 					err := sshClient.SSH.Copy(sshClient.RemoteHostIP, settings.DefaultSealerBin, settings.DefaultSealerBin)
