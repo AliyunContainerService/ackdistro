@@ -16,6 +16,7 @@ jobs:
         run: |
           commentbody="${{github.event.comment.body}}"
           tag=`echo "$commentbody"|cut -d" " -f2`
+          branch=`echo "$commentbody"|cut -d" " -f3`
           echo $tag
           wget https://sealer.oss-cn-beijing.aliyuncs.com/sealer-latest.tar.gz
           sudo tar -xvf sealer-latest.tar.gz -C /usr/bin
@@ -23,7 +24,7 @@ jobs:
           sudo apt install git
           git clone https://github.com/AliyunContainerService/ackdistro.git
           cd ackdistro
-          git checkout feature/v1.20.4-ack-3
+          git checkout ${branch}
           cd build
           ls -R
           sudo bash build.sh $tag
