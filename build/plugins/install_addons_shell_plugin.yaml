@@ -26,6 +26,8 @@ spec:
       kubectl taint node node-role.kubernetes.io/master- --all || true
     fi
 
+    [[ "$SkipPostcheck" == "true" ]] && exit 0
+
     sleep 15
     trident health-check
     if [ $? -eq 0 ];then

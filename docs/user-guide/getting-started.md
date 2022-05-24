@@ -90,7 +90,7 @@ sealer apply -f ClusterFile.yaml
 
 ```bash
 # When deploying a cluster, the cluster precheck tool will run by default. If there is a precheck error ErrorX, but you think the error can be ignored, please do as follows
-sealer apply -f ClusterFile.yaml --env IgnoreErrors=ErrorX[,ErrorY]
+sealer apply -f ClusterFile.yaml --env IgnoreErrors="ErrorX[;ErrorY]"
 
 # Also you can ignore all errors
 sealer apply -f ClusterFile.yaml --env IgnoreErrors=all

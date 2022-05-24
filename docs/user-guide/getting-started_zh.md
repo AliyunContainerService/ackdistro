@@ -92,7 +92,7 @@ sealer apply -f ClusterFile.yaml
 
 ```bash
 # 部署集群时，默认会运行集群预检工具，如果出现了预检错误ErrorX，但您评估觉得可以忽略该报错，请按如下操作
-sealer apply -f ClusterFile.yaml --env IgnoreErrors=ErrorX[,ErrorY]
+sealer apply -f ClusterFile.yaml --env IgnoreErrors="ErrorX[;ErrorY]"
 
 # 如果想忽略所有
 sealer apply -f ClusterFile.yaml --env IgnoreErrors=all
