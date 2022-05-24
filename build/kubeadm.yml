@@ -25,7 +25,8 @@ apiServer:
     feature-gates: TTLAfterFinished=true,EphemeralContainers=true
     audit-policy-file: "/etc/kubernetes/audit-policy.yml"
     audit-log-path: "/var/log/kubernetes/audit.log"
-    enable-admission-plugins: PodSecurityPolicy,NodeRestriction
+    api-audiences: https://kubernetes.default.svc
+    enable-admission-plugins: NodeRestriction
     audit-log-format: json
     runtime-config: apps/v1beta1=true,admissionregistration.k8s.io/v1beta1=true
     audit-log-maxbackup: '10'
