@@ -1,11 +1,10 @@
 annotations:
   artifacthub.io/changes: |
-    - "#197 adjust client qps and burst "
-    - "#194 mute uselss logging"
-    - "#192 fix file exists error while creating pod"
+    - "fix the error that nodes get "empty" quota while the Underlay Network still have available addresses to allocate"
+    - "fix daemon policy container exit with ip6tables-legacy-save error"
   artifacthub.io/prerelease: "false"
 apiVersion: v2
-appVersion: 0.4.2
+appVersion: 0.4.4
 description: A container networking solution aiming at hybrid clouds.
 home: https://github.com/alibaba/hybridnet
 keywords:
@@ -20,4 +19,4 @@ name: hybridnet
 sources:
 - https://github.com/alibaba/hybridnet
 type: application
-version: 0.1.1
+version: 0.2.2
