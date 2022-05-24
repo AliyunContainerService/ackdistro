@@ -20,4 +20,4 @@ for bin in ${bins[@]};do
 done
 
 # Build sealer image
-sealer build -m lite -t ack-distro:${TAG} .
+sealer build -f Kubefile -t ack-distro:${TAG} .
