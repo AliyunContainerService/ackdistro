@@ -51,4 +51,4 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
 fi
 
 # Build sealer image
-sealer build -m lite -t ack-distro:${TAG} --platform ${archs} .
+sealer build -f Kubefile -t ack-distro:${TAG} --platform ${archs} .
