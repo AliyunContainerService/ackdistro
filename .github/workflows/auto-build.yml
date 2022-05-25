@@ -30,7 +30,7 @@ jobs:
           sudo bash build.sh $tag
           sudo sealer tag ack-distro:$tag ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag
           sudo sealer push ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag
-          echo "::set-output name=version::$version"
+          echo "::set-output name=version::$tag"
       - name: Auto build image
         uses: peter-evans/create-or-update-comment@v1
         with:
