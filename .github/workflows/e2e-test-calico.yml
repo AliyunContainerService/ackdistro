@@ -38,7 +38,7 @@ jobs:
       - name: Install sealer and ginkgo
         shell: bash
         run: |
-          wget wget https://sealer.oss-cn-beijing.aliyuncs.com/sealer-latest.tar.gz
+          wget https://sealer.oss-cn-beijing.aliyuncs.com/sealer-latest.tar.gz
           tar -xvf sealer-latest.tar.gz -C /usr/bin/
           go get github.com/onsi/ginkgo/ginkgo@v1.16.2
           go get github.com/onsi/gomega/...@v1.12.0
