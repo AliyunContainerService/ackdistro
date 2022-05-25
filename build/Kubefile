@@ -19,7 +19,7 @@ COPY plugins/preflight_shell_plugin.yaml plugins
 COPY plugins/install_addons_shell_plugin.yaml plugins
 
 COPY imageList manifests
-COPY kubeadm.yml ./etc
+COPY kubeadm.yaml.tmpl ./etc
 COPY statics/audit-policy.yml ./statics
 
 COPY charts/kube-core chart
