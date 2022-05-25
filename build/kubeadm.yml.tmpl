@@ -1,0 +1,95 @@
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: InitConfiguration
+localAPIEndpoint:
+  bindPort: 6443
+nodeRegistration:
+  criSocket: /var/run/dockershim.sock
+
+---
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+kubernetesVersion: v1.20.4-aliyun.1
+controlPlaneEndpoint: "apiserver.cluster.local:6443"
+imageRepository: sea.hub:5000/ecp_builder
+networking:
+  # dnsDomain: cluster.local
+  podSubnet: {{ .PodCIDR }}
+  serviceSubnet: {{ .SvcCIDR }}
+apiServer:
+  certSANs:
+  - 127.0.0.1
+  - apiserver.cluster.local
+  - 10.96.0.1
+  - 10.103.97.2
+  extraArgs:
+    feature-gates: TTLAfterFinished=true,EphemeralContainers=true
+    audit-policy-file: "/etc/kubernetes/audit-policy.yml"
+    audit-log-path: "/var/log/kubernetes/audit.log"
+    enable-admission-plugins: PodSecurityPolicy,NodeRestriction
+    audit-log-format: json
+    runtime-config: apps/v1beta1=true,admissionregistration.k8s.io/v1beta1=true
+    audit-log-maxbackup: '10'
+    audit-log-maxsize: '100'
+    audit-log-maxage: '30'
+    enable-aggregator-routing: 'true'
+    tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+    profiling: 'false'
+  extraVolumes:
+    - name: "audit"
+      hostPath: "/etc/kubernetes"
+      mountPath: "/etc/kubernetes"
+      pathType: DirectoryOrCreate
+    - name: "audit-log"
+      hostPath: "/var/log/kubernetes"
+      mountPath: "/var/log/kubernetes"
+      pathType: DirectoryOrCreate
+    - name: localtime
+      hostPath: /etc/localtime
+      mountPath: /etc/localtime
+      readOnly: true
+      pathType: File
+controllerManager:
+  extraArgs:
+    feature-gates: TTLAfterFinished=true,EphemeralContainers=true
+    experimental-cluster-signing-duration: 876000h
+    bind-address: 0.0.0.0
+    address: 0.0.0.0
+    port: '10252'
+    profiling: 'false'
+  extraVolumes:
+    - hostPath: /etc/localtime
+      mountPath: /etc/localtime
+      name: localtime
+      readOnly: true
+      pathType: File
+scheduler:
+  extraArgs:
+    feature-gates: TTLAfterFinished=true,EphemeralContainers=true
+    bind-address: 0.0.0.0
+    address: 0.0.0.0
+    port: '10251'
+    profiling: 'false'
+  extraVolumes:
+    - hostPath: /etc/localtime
+      mountPath: /etc/localtime
+      name: localtime
+      readOnly: true
+      pathType: File
+etcd:
+  local:
+    extraArgs:
+      listen-metrics-urls: http://0.0.0.0:2381
+    imageRepository: sea.hub:5000/ecp_builder
+    imageTag: 3.4.3-0
+
+---
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: JoinConfiguration
+caCertPath: /etc/kubernetes/pki/ca.crt
+discovery:
+  timeout: 5m0s
+nodeRegistration:
+  criSocket: /var/run/dockershim.sock
+controlPlane:
+  localAPIEndpoint:
+    bindPort: 6443
