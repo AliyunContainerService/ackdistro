@@ -16,6 +16,7 @@ jobs:
         run: |
           commentbody="${{github.event.comment.body}}"
           tag=`echo "$commentbody"|cut -d" " -f2`
+          branch=`echo "$commentbody"|cut -d" " -f3`
           echo $tag
           wget https://sealer.oss-cn-beijing.aliyuncs.com/sealer-latest.tar.gz
           sudo tar -xvf sealer-latest.tar.gz -C /usr/bin
@@ -23,15 +24,16 @@ jobs:
           sudo apt install git
           git clone https://github.com/AliyunContainerService/ackdistro.git
           cd ackdistro
-          git checkout feature/v1.20.4-ack-3
+          git checkout ${branch}
           cd build
           ls -R
           sudo bash build.sh $tag
-          sudo sealer push ack-distro:$tag
-          echo "::set-output name=version::$version"
+          sudo sealer tag ack-distro:$tag ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag
+          sudo sealer push ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag
+          echo "::set-output name=version::$tag"
       - name: Auto build image
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            Image ack-distro:${{ steps.autobuild.outputs.version }} build successfully!
+            Image ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ack-distro:${{ steps.autobuild.outputs.version }} build successfully!
