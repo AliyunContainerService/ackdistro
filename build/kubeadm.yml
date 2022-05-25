@@ -13,8 +13,8 @@ controlPlaneEndpoint: "apiserver.cluster.local:6443"
 imageRepository: sea.hub:5000/ecp_builder
 networking:
   # dnsDomain: cluster.local
-  podSubnet: 100.64.0.0/10
-  serviceSubnet: 10.96.0.0/22
+  podSubnet: 100.64.0.0/16
+  serviceSubnet: 10.96.0.0/16
 apiServer:
   certSANs:
   - 127.0.0.1
