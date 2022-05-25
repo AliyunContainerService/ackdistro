@@ -35,5 +35,3 @@ COPY yamls ack-distro-yamls
 CMD helm -n kube-system upgrade -i kube-core chart/kube-core
 CMD kubectl create ns acs-system || true
 CMD kubectl apply -f ack-distro-yamls/*
-CMD kubectl apply -f etc/kubeadm.yml
-
