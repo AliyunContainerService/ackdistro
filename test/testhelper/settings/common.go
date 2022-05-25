@@ -12,7 +12,7 @@ const (
 const (
 	BAREMETAL    = "BAREMETAL"
 	AliCloud     = "ALI_CLOUD"
-	DefaultImage = "ack-distro:test"
+	DefaultImage = "ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ack-distro:test"
 )
 
 var (
