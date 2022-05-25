@@ -1,0 +1,37 @@
+name: Auto build image
+on:
+  issue_comment:
+    types:
+      - created
+jobs:
+  issue_comment:
+    name: Auto build image
+    if: startswith(github.event.comment.body, '/imagebuild')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+
+      - name: Check outputs
+        run: |
+          commentbody="${{github.event.comment.body}}"
+          tag=`echo "$commentbody"|cut -d" " -f2`
+          echo $tag
+          wget https://sealer.oss-cn-beijing.aliyuncs.com/sealer-latest.tar.gz
+          sudo tar -xvf sealer-latest.tar.gz -C /usr/bin
+          sudo sealer login ${{secrets.PRIVATEWAREHOUSE}}
+          sudo apt install git
+          git clone https://github.com/AliyunContainerService/ackdistro.git
+          cd ackdistro
+          git checkout feature/v1.20.4-ack-3
+          cd build
+          ls -R
+          sudo bash build.sh $tag
+          sudo sealer push ack-distro:$tag
+          echo "::set-output name=version::$version"
+      - name: Auto build image
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            Image ack-distro:${{ steps.autobuild.outputs.version }} build successfully!

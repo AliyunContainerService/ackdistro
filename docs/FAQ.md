@@ -10,11 +10,11 @@ ACK Distro release strategy is as follows:
 - Technical support: ACK Distro provides installation of the latest Kubernetes version and technical support for the last three major Kubernetes releases in the community, but will stop supporting Kubernetes clusters with outdated versions.
 
 Version number definition:
-v{kubernetes-major}.{kubernetes-minio}.{kubernetes-patch}-ack-{patch}
+v{kubernetes-major}-{kubernetes-minio}-{kubernetes-patch}-ack-{patch}
 For example:
 
-- v1.20.4-ack-1
-- v1.20.4-ack-2
-- v1.22.8-ack-1
+- v1-20-4-ack-1
+- v1-20-4-ack-2
+- v1-22-8-ack-1
 
 Please refer to [ACK user doc](https://help.aliyun.com/document_detail/115453.html) for ACK version strategy
