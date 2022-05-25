@@ -99,6 +99,7 @@ metadata:
   #   Service "kube-dns" is invalid: metadata.resourceVersion: Invalid value: "": must be specified for an update
 spec:
   sessionAffinity: ClientIP
+  clusterIP: {{ .Values.globalconfig.CoreDnsIP }}
   ports:
     - name: dns
       port: 53

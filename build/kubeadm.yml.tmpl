@@ -18,11 +18,7 @@ networking:
   {{ else }}
   podSubnet: 100.64.0.0/16
   {{- end }}
-  {{- if .SvcCIDR }}
-  serviceSubnet: {{ .SvcCIDR }}
-  {{ else }}
   serviceSubnet: 10.96.0.0/16
-  {{- end }}
 apiServer:
   certSANs:
   - 127.0.0.1
@@ -101,3 +97,25 @@ nodeRegistration:
 controlPlane:
   localAPIEndpoint:
     bindPort: 6443
+
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+readOnlyPort: 10255
+kubeReserved:
+  memory: 400Mi
+  pid: "10000"
+systemReserved:
+  memory: 300Mi
+  pid: "10000"
+tlsCipherSuites:
+  - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+  - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+  - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+  - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+  - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+  - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+  - TLS_RSA_WITH_AES_256_GCM_SHA384
+  - TLS_RSA_WITH_AES_128_GCM_SHA256
+featureGates:
+  EphemeralContainers: true
