@@ -93,9 +93,13 @@ var _ = Describe("run hybirdnet", func() {
 				//	" --cmd 'bash load.sh'")
 				//testhelper.CheckErr(err)
 				//
-				////give exec permissions && download and exec scripe
+				//By("give exec permissions && download and exec scripe")
 				//err = sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "sudo cp .kube/config /tmp/kubeconfig", "chmod 777 /tmp/kubeconfig",
-				//	"wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/run.sh", "wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/get-log.sh", "bash run.sh & sleep 50s && bash get-log.sh")
+				//	"wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/run.sh", "wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/get-log.sh", "wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/begin.sh")
+				//testhelper.CheckErr(err)
+				//
+				//By("exec run.sh && get-log.sh")
+				//err = sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "bash begin.sh")
 				//testhelper.CheckErr(err)
 			})
 		})
