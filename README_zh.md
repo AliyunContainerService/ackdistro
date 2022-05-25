@@ -1,6 +1,6 @@
 # ACK Distro
 ## 简介
-Alibaba ACK Distro（即ACK发行版）是阿里巴巴针对异构Iaas环境发布的Kubernetes发行版，使用者可通过阿里云ACR免费获取完整内容以及长期支持。其核心组件经过阿里云ACK服务和阿里巴巴集团核心业务场景的大规模生产环境验证和安全检查，具备业界领先的安全性与可靠性。
+Alibaba ACK Distro（即ACK发行版）是阿里巴巴针对异构Iaas环境发布的Kubernetes发行版，使用者可通过阿里云ACR免费获取完整内容并获得社区支持。其核心组件经过阿里云ACK服务和阿里巴巴集团核心业务场景的大规模生产环境验证和安全检查，具备业界领先的安全性与可靠性。
 
 ACK Distro作为完整的Kubernetes发行版，通过阿里巴巴开源的应用打包交付工具[Sealer](https://github.com/alibaba/sealer)，可以简单、快速地交付到离线环境，帮助使用者更简单、敏捷地管理自己的集群。核心组件同时支持X86和ARM硬件架构，所包含的高性能网络插件[Hybridnet](https://github.com/alibaba/hybridnet)，可以确保ACK Distro能够丝滑运行于多样化的基础设施之上。同时，ACK Distro可以被注册到阿里云ACK服务上，实现资源管理、策略合规、流量管控一致，让使用者获得和线上ACK集群一致的用户体验。
 
@@ -55,7 +55,7 @@ wget -c https://sealer.oss-cn-beijing.aliyuncs.com/sealers/sealer-v0.8.5-linux-a
       tar -xvf sealer-v0.8.5-linux-amd64.tar.gz -C /usr/bin
 
 # 获取ACK Distro制品并拉起集群
-sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1.20.4-ack-3 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-3 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
 
 # 检查集群
 kubectl get cs

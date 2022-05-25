@@ -16,7 +16,7 @@ wget -c https://sealer.oss-cn-beijing.aliyuncs.com/sealers/sealer-v0.8.5-linux-a
 使用sealer获取ACK Distro制品，并创建集群：
 
 ```bash
-sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1.20.4-ack-3 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-3 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
 ```
 
 查看集群状态：
@@ -28,6 +28,7 @@ kubectl get cs
 ### 【进阶】使用生产级别的配置创建Distro集群
 
 ACK Distro有丰富的生产级别集群管理经验，我们目前提供了以下生产级别的功能：
+
 1. 管理K8s管控组件的分区，自动地对K8s管控组件进行隔离和容量管理，以提升etcd性能以及OS稳定性
 2. 集群预检工具，可以在集群部署之前检查出可能影响集群稳定性的隐患
 3. 集群健康检查工具，可以一键检查集群是否健康
@@ -37,6 +38,7 @@ ACK Distro有丰富的生产级别集群管理经验，我们目前提供了以�
 #### 1) 管理K8s管控组件的分区
 
 如果想让ACK Distro更好地管理它使用的磁盘，请按需准备好裸的数据盘（无需分区及挂载）：
+
 - EtcdDevice: 分配给etcd的磁盘，容量必须大于20GiB，IOPS>3300，仅Master节点需要
 - StorageDevice: 分配给docker和kubelet的磁盘，容量建议大于100GiB
 
@@ -48,7 +50,7 @@ kind: Cluster
 metadata:
   name: my-cluster
 spec:
-  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1.20.4-ack-3
+  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-3
   env:
     - PodCIDR=172.45.0.0/16
     - SvcCIDR=10.96.0.0/16
@@ -71,9 +73,9 @@ spec:
         - EtcdDevice=/dev/vdb
         - StorageDevice=/dev/vde
       # rewrite ssh config if some node has different passwd...
-      # ssh: 
+      # ssh:
       #  user: root
-      #  passwd: Seadent123
+      #  passwd: passwd
       #  port: "22"
     - ips:
         - 4.4.4.4
