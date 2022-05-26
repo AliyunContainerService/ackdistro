@@ -13,6 +13,7 @@ jobs:
     steps:
 
       - name: Check outputs
+        id: autobuild
         run: |
           commentbody="${{github.event.comment.body}}"
           tag=`echo "$commentbody"|cut -d" " -f2`

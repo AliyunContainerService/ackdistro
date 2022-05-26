@@ -19,7 +19,8 @@ COPY plugins/preflight_shell_plugin.yaml plugins
 COPY plugins/install_addons_shell_plugin.yaml plugins
 
 COPY imageList manifests
-COPY kubeadm.yaml.tmpl ./etc
+COPY kubeadm.yml ./etc
+COPY kubeadm.yml.tmpl ./etc
 COPY statics/audit-policy.yml ./statics
 
 COPY charts/kube-core chart
@@ -34,3 +35,5 @@ COPY yamls ack-distro-yamls
 CMD helm -n kube-system upgrade -i kube-core chart/kube-core
 CMD kubectl create ns acs-system || true
 CMD kubectl apply -f ack-distro-yamls/*
+CMD kubectl apply -f etc/kubeadm.yml
+
