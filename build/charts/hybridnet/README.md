@@ -20,7 +20,6 @@ helm repo update
 ```shell
 helm install hybridnet hybridnet/hybridnet -n kube-system
 ```
-
 The command deploys hybridnet on the Kubernetes cluster in the default configuration.
 
 _See [configuration](#configuration) below._

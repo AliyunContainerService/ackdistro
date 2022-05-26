@@ -8,13 +8,13 @@ nodeRegistration:
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
-kubernetesVersion: v1.22.3-aliyun.1
+kubernetesVersion: v1.20.4-aliyun.1
 controlPlaneEndpoint: "apiserver.cluster.local:6443"
 imageRepository: sea.hub:5000/ecp_builder
 networking:
   # dnsDomain: cluster.local
-  podSubnet: ${PodCIDR}
-  serviceSubnet: ${SvcCIDR}
+  podSubnet: {{ .PodCIDR }}
+  serviceSubnet: {{ .SvcCIDR }}
 apiServer:
   certSANs:
   - 127.0.0.1
@@ -25,8 +25,7 @@ apiServer:
     feature-gates: TTLAfterFinished=true,EphemeralContainers=true
     audit-policy-file: "/etc/kubernetes/audit-policy.yml"
     audit-log-path: "/var/log/kubernetes/audit.log"
-    api-audiences: https://kubernetes.default.svc
-    enable-admission-plugins: NodeRestriction
+    enable-admission-plugins: PodSecurityPolicy,NodeRestriction
     audit-log-format: json
     runtime-config: apps/v1beta1=true,admissionregistration.k8s.io/v1beta1=true
     audit-log-maxbackup: '10'
@@ -52,8 +51,10 @@ apiServer:
 controllerManager:
   extraArgs:
     feature-gates: TTLAfterFinished=true,EphemeralContainers=true
-    cluster-signing-duration: 876000h
+    experimental-cluster-signing-duration: 876000h
     bind-address: 0.0.0.0
+    address: 0.0.0.0
+    port: '10252'
     profiling: 'false'
   extraVolumes:
     - hostPath: /etc/localtime
@@ -79,7 +80,7 @@ etcd:
     extraArgs:
       listen-metrics-urls: http://0.0.0.0:2381
     imageRepository: sea.hub:5000/ecp_builder
-    imageTag: 3.5.0-0
+    imageTag: 3.4.3-0
 
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
@@ -92,25 +93,3 @@ nodeRegistration:
 controlPlane:
   localAPIEndpoint:
     bindPort: 6443
-
----
-apiVersion: kubelet.config.k8s.io/v1beta1
-kind: KubeletConfiguration
-readOnlyPort: 10255
-kubeReserved:
-  memory: 400Mi
-  pid: "10000"
-systemReserved:
-  memory: 300Mi
-  pid: "10000"
-tlsCipherSuites:
-  - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
-  - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-  - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
-  - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-  - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
-  - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
-  - TLS_RSA_WITH_AES_256_GCM_SHA384
-  - TLS_RSA_WITH_AES_128_GCM_SHA256
-featureGates:
-  EphemeralContainers: true
