@@ -38,7 +38,7 @@ var _ = Describe("run calico", func() {
 				cluster.Spec.Provider = settings.AliCloud
 				cluster.Spec.Image = settings.TestImageName
 				cluster = apply.CreateAliCloudInfraAndSave(cluster, tempFile)
-				//defer apply.CleanUpAliCloudInfra(cluster)
+				defer apply.CleanUpAliCloudInfra(cluster)
 				sshClient := testhelper.NewSSHClientByCluster(cluster)
 				testhelper.CheckFuncBeTrue(func() bool {
 					err := sshClient.SSH.Copy(sshClient.RemoteHostIP, settings.DefaultSealerBin, settings.DefaultSealerBin)
@@ -61,7 +61,7 @@ var _ = Describe("run calico", func() {
 				masters := strings.Join(cluster.Spec.Masters.IPList, ",")
 				nodes := strings.Join(cluster.Spec.Nodes.IPList, ",")
 				apply.SendAndRunCluster(sshClient, tempFile, masters, nodes, cluster.Spec.SSH.Passwd)
-				apply.CheckNodeNumWithSSH(sshClient, 6)
+				apply.CheckNodeNumWithSSH(sshClient, 4)
 
 				By("exec e2e test")
 				//download e2e && sshcmdfile and give sshcmd exec permissions

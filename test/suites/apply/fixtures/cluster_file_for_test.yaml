@@ -27,7 +27,7 @@ spec:
   nodes:
     cpu: 4
     memory: 4
-    count: 3
+    count: 1
     systemDisk: 100
     dataDisks:
       - 100

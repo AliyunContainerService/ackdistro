@@ -29,12 +29,12 @@ jobs:
           cd build
           ls -R
           sudo bash build.sh $tag
-          sudo sealer tag ack-distro:$tag ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ack-distro:$tag
-          sudo sealer push ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ack-distro:$tag
+          sudo sealer tag ack-distro:$tag ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag
+          sudo sealer push ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag
           echo "::set-output name=version::$tag"
       - name: Auto build image
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            Image ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ack-distro:${{ steps.autobuild.outputs.version }} build successfully!
+            Image ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${{ steps.autobuild.outputs.version }} build successfully!

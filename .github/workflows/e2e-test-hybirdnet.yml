@@ -1,8 +1,6 @@
 name: Sealer-Test-Apply
 
 on:
-  push:
-    branches: "release*"
   issue_comment:
     types:
       - created
@@ -10,7 +8,7 @@ jobs:
   build:
     name: test
     runs-on: ubuntu-latest
-    if: ${{ (github.event.issue.pull_request && (github.event.comment.body == '/test all' || github.event.comment.body == '/test apply')) || github.event_name == 'push' }}
+    if: ${{ github.event.comment.body == '/test hybirdnet' || github.event.comment.body == '/test all' }}
     env:
       GO111MODULE: on
     steps:
@@ -44,7 +42,7 @@ jobs:
           go get github.com/onsi/gomega/...@v1.12.0
           GOPATH=`go env GOPATH`
           echo "$GOPATH/bin" >> $GITHUB_PATH
-        #working-directory: src/github.com/alibaba/sealer
+        working-directory: src/github.com/alibaba/sealer
 
 
       - name: Run sealer apply test
@@ -55,6 +53,6 @@ jobs:
           ACCESSKEYID: ${{ secrets.ACCESSKEYID }}
           ACCESSKEYSECRET: ${{ secrets.ACCESSKEYSECRET }}
           RegionID: ${{ secrets.RegionID }}
-        if: ${{ github.event.comment.body == '/test apply' || github.event.comment.body == '/test all' || github.event_name == 'push' }}
+        if: ${{ github.event.comment.body == '/test hybirdnet' || github.event.comment.body == '/test all' }}
         run: |
           ginkgo -v --focus="run hybirdnet" test
