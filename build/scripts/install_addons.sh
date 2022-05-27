@@ -1,32 +1,29 @@
 #!/usr/bin/env bash
+set -x
 
 # Prepare envs
-SvcCIDR=${SvcCIDR:-10.96.0.0/16}
 CoreDnsIP=`trident get-indexed-ip --cidr ${SvcCIDR} --index 10`
-if [ "$Gateway" == "" ];then
-  Gateway=`trident get-indexed-ip --cidr ${PodCIDR} --index 1`
-fi
-DNSDomain=${DNSDomain:-cluster.local}
 
 # Apply yamls
-for f in `ls ack-distro-yamls/`;do
-  sed "s/##DNSDomain##/${DNSDomain}/g" ack-distro-yamls/${f} | kubectl apply -f -
+for f in `ls ack-distro-yamls/yamls`;do
+  sed "s/##DNSDomain##/${DNSDomain}/g" ack-distro-yamls/yamls/${f} | kubectl apply -f -
 done
 
 # Prepare helm config
 cat >/tmp/ackd-helmconfig.yaml <<EOF
 globalconfig:
   CoreDnsIP: ${CoreDnsIP}
-  PodCIDR: ${PodCIDR:-100.64.0.0/16}
-  Gateway: ${Gateway}
-  IPVersion: "${IPVersion:-4}"
-  MTU: "${MTU:-4}"
-  IPIP: ${IPIP:-Always}
-  IPAutoDetectionMethod: ${IPAutoDetectionMethod:-can-reach=8.8.8.8}
-  DisableFailureDomain: ${DisableFailureDomain:-false}
-  RegistryURL: ${RegistryURL:-sea.hub:5000}
-  SuspendPeriodHealthCheck: ${SuspendPeriodHealthCheck:-false}
-  SuspendPeriodBroadcastHealthCheck: ${SuspendPeriodBroadcastHealthCheck:-false}
+  PodCIDR: ${PodCIDR}
+  MTU: "${MTU}"
+  IPIP: ${IPIP}
+  IPAutoDetectionMethod: ${IPAutoDetectionMethod}
+  DisableFailureDomain: ${DisableFailureDomain}
+  RegistryURL: ${RegistryURL}
+  SuspendPeriodHealthCheck: ${SuspendPeriodHealthCheck}
+  SuspendPeriodBroadcastHealthCheck: ${SuspendPeriodBroadcastHealthCheck}
+  init:
+    cidr: ${PodCIDR}
+    ipVersion: "${IPVersion}"
 EOF
 
 # install kube core addons
