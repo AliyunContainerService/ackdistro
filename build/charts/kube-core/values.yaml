@@ -34,5 +34,3 @@ images:
 globalconfig:
   RegistryURL: sea.hub:5000
   CoreDnsIP: 10.96.0.10
-  PodCIDR: 100.64.0.0/16
-  DNSDomain: cluster.local

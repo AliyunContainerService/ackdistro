@@ -12,9 +12,9 @@ kubernetesVersion: v1.20.4-aliyun.1
 controlPlaneEndpoint: "apiserver.cluster.local:6443"
 imageRepository: sea.hub:5000/ecp_builder
 networking:
-  # dnsDomain: cluster.local
-  podSubnet: {{ .PodCIDR }}
-  serviceSubnet: {{ .SvcCIDR }}
+  dnsDomain: {{or .DNSDomain "cluster.local"}}
+  podSubnet: {{or .PodCIDR "100.64.0.0/16"}}
+  serviceSubnet: {{or .SvcCIDR "10.96.0.0/16"}}
 apiServer:
   certSANs:
   - 127.0.0.1
@@ -23,6 +23,7 @@ apiServer:
   - 10.103.97.2
   extraArgs:
     feature-gates: TTLAfterFinished=true,EphemeralContainers=true
+    service-node-port-range: {{or .ServiceNodePortRange "30000-32767"}}
     audit-policy-file: "/etc/kubernetes/audit-policy.yml"
     audit-log-path: "/var/log/kubernetes/audit.log"
     enable-admission-plugins: PodSecurityPolicy,NodeRestriction
@@ -93,3 +94,25 @@ nodeRegistration:
 controlPlane:
   localAPIEndpoint:
     bindPort: 6443
+
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+readOnlyPort: 10255
+kubeReserved:
+  memory: 400Mi
+  pid: "10000"
+systemReserved:
+  memory: 300Mi
+  pid: "10000"
+tlsCipherSuites:
+  - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+  - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+  - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+  - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+  - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+  - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+  - TLS_RSA_WITH_AES_256_GCM_SHA384
+  - TLS_RSA_WITH_AES_128_GCM_SHA256
+featureGates:
+  EphemeralContainers: true

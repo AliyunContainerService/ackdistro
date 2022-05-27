@@ -7,7 +7,20 @@ spec:
   action: PostInstall # PreInit PreInstall PostInstall
   'on': master0
   data: |
-    bash scripts/install_addons.sh "${Network}"
+    export SvcCIDR=${SvcCIDR:-10.96.0.0/16}
+    export PodCIDR=${PodCIDR:-100.64.0.0/16}
+    export DNSDomain=${DNSDomain:-cluster.local}
+    export IPVersion=${IPVersion:-4}
+    export MTU=${MTU:-1440}
+    export IPIP=${IPIP:-Always}
+    export IPAutoDetectionMethod=${IPAutoDetectionMethod:-can-reach=8.8.8.8}
+    export DisableFailureDomain=${DisableFailureDomain:-false}
+    export RegistryURL=${RegistryURL:-sea.hub:5000}
+    export SuspendPeriodHealthCheck=${SuspendPeriodHealthCheck:-false}
+    export SuspendPeriodBroadcastHealthCheck=${SuspendPeriodBroadcastHealthCheck:-false}
+    export Addons=${Addons}
+
+    bash scripts/install_addons.sh
     if [ $? -ne 0 ];then
       exit 1
     fi

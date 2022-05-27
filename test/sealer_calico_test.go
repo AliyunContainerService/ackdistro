@@ -55,7 +55,7 @@ var _ = Describe("run calico", func() {
 
 				//wait 20s
 				By("wait 20s")
-				time.Sleep(20 *time.Second)
+				time.Sleep(20 * time.Second)
 
 				By("sealer run calico")
 				masters := strings.Join(cluster.Spec.Masters.IPList, ",")
