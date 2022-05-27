@@ -57,6 +57,10 @@ spec:
     - StorageDevice=/dev/vdc
     #- DockerRunDiskSize=200 # unit is GiB, capacity for /var/lib/docker
     #- KubeletRunDiskSize=200 # unit is GiB, capacity for /var/lib/kubelet
+    #- DNSDomain=cluster.local
+    #- MTU=1440 # mtu for calico interface, default is 1440
+    #- IPAutoDetectionMethod=can-reach=8.8.8.8 # calico ip auto-detection method, default is "can-reach=8.8.8.8", see https://projectcalico.docs.tigera.io/archive/v3.8/reference/node/configuration
+    #- SuspendPeriodHealthCheck=false # suspend period health-check, default is false
   ssh:
     passwd: "password"
     #user: root
