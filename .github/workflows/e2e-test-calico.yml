@@ -1,8 +1,6 @@
 name: Sealer-Test-Run
 
 on:
-  push:
-    branches: "release*"
   issue_comment:
     types:
       - created
@@ -10,7 +8,7 @@ jobs:
   build:
     name: test
     runs-on: ubuntu-latest
-    if: ${{ (github.event.issue.pull_request && (github.event.comment.body == '/test all' || github.event.comment.body == '/test run')) || github.event_name == 'push' }}
+    if: ${{ github.event.comment.body == '/test calico' || github.event.comment.body == '/test all' }}
     env:
       GO111MODULE: on
     steps:
@@ -54,6 +52,6 @@ jobs:
           ACCESSKEYID: ${{ secrets.ACCESSKEYID }}
           ACCESSKEYSECRET: ${{ secrets.ACCESSKEYSECRET }}
           RegionID: ${{ secrets.RegionID }}
-        if: ${{ github.event.comment.body == '/test run' || github.event.comment.body == '/test all' || github.event_name == 'push' }}
+        if: ${{ github.event.comment.body == '/test calico' || github.event.comment.body == '/test all' }}
         run: |
           ginkgo -v --focus="run calico" test
