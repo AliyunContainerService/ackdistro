@@ -18,7 +18,11 @@ networking:
   {{ else }}
   podSubnet: 100.64.0.0/16
   {{- end }}
+  {{- if .SvcCIDR }}
+  serviceSubnet: {{ .SvcCIDR }}
+  {{ else }}
   serviceSubnet: 10.96.0.0/16
+  {{- end }}
 apiServer:
   certSANs:
   - 127.0.0.1
