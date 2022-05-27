@@ -12,17 +12,9 @@ kubernetesVersion: v1.20.4-aliyun.1
 controlPlaneEndpoint: "apiserver.cluster.local:6443"
 imageRepository: sea.hub:5000/ecp_builder
 networking:
-  # dnsDomain: cluster.local
-  {{- if .PodCIDR }}
-  podSubnet: {{ .PodCIDR }}
-  {{ else }}
-  podSubnet: 100.64.0.0/16
-  {{- end }}
-  {{- if .SvcCIDR }}
-  serviceSubnet: {{ .SvcCIDR }}
-  {{ else }}
-  serviceSubnet: 10.96.0.0/16
-  {{- end }}
+  dnsDomain: {{or .DNSDomain cluster.local}}
+  podSubnet: {{or .PodCIDR 100.64.0.0/16}}
+  serviceSubnet: {{or .SvcCIDR 10.96.0.0/16}}
 apiServer:
   certSANs:
   - 127.0.0.1
@@ -31,6 +23,7 @@ apiServer:
   - 10.103.97.2
   extraArgs:
     feature-gates: TTLAfterFinished=true,EphemeralContainers=true
+    service-node-port-range: {{or .ServiceNodePortRange 30000-32767}}
     audit-policy-file: "/etc/kubernetes/audit-policy.yml"
     audit-log-path: "/var/log/kubernetes/audit.log"
     enable-admission-plugins: PodSecurityPolicy,NodeRestriction

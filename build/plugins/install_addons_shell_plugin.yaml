@@ -7,7 +7,7 @@ spec:
   action: PostInstall # PreInit PreInstall PostInstall
   'on': master0
   data: |
-    bash scripts/install_addons.sh "${Network}"
+    bash scripts/install_addons.sh
     if [ $? -ne 0 ];then
       exit 1
     fi
