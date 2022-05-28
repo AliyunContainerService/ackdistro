@@ -1,0 +1,134 @@
+apiVersion: storage.k8s.io/v1beta1
+kind: CSIDriver
+metadata:
+  name: {{ .Values.csi_name }}
+  labels:
+    trident-app: csi-minio
+spec:
+  attachRequired: false
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: csi-minio
+  namespace: {{ .Values.namespace }}
+  labels:
+    trident-app: csi-minio
+spec:
+  selector:
+    matchLabels:
+      app: csi-minio
+  template:
+    metadata:
+      labels:
+        app: csi-minio
+        trident-app: csi-minio
+    spec:
+      tolerations:
+        - operator: Exists
+      serviceAccount: csi-minio
+      hostNetwork: true
+      hostPID: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: driver-registrar
+          image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.registrar.image }}:{{ .Values.images.registrar.tag }}"
+          securityContext:
+            privileged: true
+          args:
+            - "--kubelet-registration-path=$(DRIVER_REG_SOCK_PATH)"
+            - "--v=4"
+            - "--csi-address=$(ADDRESS)"
+          env:
+            - name: ADDRESS
+              value: /csi/csi.sock
+            - name: DRIVER_REG_SOCK_PATH
+              value: /var/lib/kubelet/plugins/{{ .Values.csi_name }}/csi.sock
+            - name: KUBE_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: TZ
+              value: Asia/Shanghai
+          resources:
+            limits:
+              cpu: 10m
+              memory: 32Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
+          volumeMounts:
+            - name: plugin-dir
+              mountPath: /csi
+            - name: registration-dir
+              mountPath: /registration/
+        - name: csi-minio
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["SYS_ADMIN"]
+            allowPrivilegeEscalation: true
+          image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.csi_minio.image }}:{{ .Values.images.csi_minio.tag }}"
+          args:
+            - "--endpoint=$(CSI_ENDPOINT)"
+            - "--nodeid=$(NODE_ID)"
+            - "--v=4"
+            - "--driver={{ .Values.csi_name }}"
+          env:
+            - name: CSI_ENDPOINT
+              value: unix:///csi/csi.sock
+            - name: NODE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: TZ
+              value: Asia/Shanghai
+          resources:
+            limits:
+              cpu: 50m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+          imagePullPolicy: "IfNotPresent"
+          volumeMounts:
+            - name: plugin-dir
+              mountPath: /csi
+            - name: pods-mount-dir
+              mountPath: /var/lib/kubelet/pods
+              mountPropagation: "Bidirectional"
+            - name: fuse-device
+              mountPath: /dev/fuse
+            - name: connector-systemd-service-dir 
+              mountPath: /host/usr/lib/systemd/system
+            - name: connector-log
+              mountPath: /var/log/csi-minio
+            - name: host-etc
+              mountPath: /host/etc
+      volumes:
+        - name: registration-dir
+          hostPath:
+            path: /var/lib/kubelet/plugins_registry/
+            type: DirectoryOrCreate
+        - name: plugin-dir
+          hostPath:
+            path: /var/lib/kubelet/plugins/{{ .Values.csi_name }}
+            type: DirectoryOrCreate
+        - name: pods-mount-dir
+          hostPath:
+            path: /var/lib/kubelet/pods
+            type: Directory
+        - name: fuse-device
+          hostPath:
+            path: /dev/fuse
+        - name: connector-systemd-service-dir
+          hostPath:
+            path: /usr/lib/systemd/system
+            type: DirectoryOrCreate
+        - name: connector-log
+          hostPath:
+            path: /var/log/csi-minio
+            type: DirectoryOrCreate
+        - name: host-etc
+          hostPath:
+            path: /etc

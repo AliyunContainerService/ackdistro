@@ -30,6 +30,20 @@ EOF
 helm -n kube-system upgrade -i kube-core chart/kube-core -f /tmp/ackd-helmconfig.yaml
 kubectl create ns acs-system || true
 
+# create etcd secret
+for NS in kube-system acs-system;do
+	if kubectl get secret etcd-client-cert -n ${NS};then
+	  continue
+	fi
+
+	if ! kubectl create secret generic etcd-client-cert  \
+    --from-file=ca.pem=/etc/kubernetes/pki/etcd/ca.crt --from-file=etcd-client.pem=/etc/kubernetes/pki/apiserver-etcd-client.crt  \
+    --from-file=etcd-client-key.pem=/etc/kubernetes/pki/apiserver-etcd-client.key -n ${NS};then
+    echo "failed to create etcd secret"
+    exit 1
+  fi
+done
+
 # install net plugin
 if [ "$Network" == "calico" ];then
   helm -n kube-system upgrade -i calico chart/calico -f /tmp/ackd-helmconfig.yaml
