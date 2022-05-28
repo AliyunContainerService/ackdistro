@@ -91,11 +91,19 @@ var _ = Describe("run calico", func() {
 
 				By("give exec permissions && download and exec scripe")
 				err = sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "sudo cp .kube/config /tmp/kubeconfig", "chmod 777 /tmp/kubeconfig",
-					"wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/run.sh", "wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/get-log.sh", "wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/begin.sh")
+					"wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/run.sh", "wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/get-log.sh")
 				testhelper.CheckErr(err)
 
-				By("exec run.sh && get-log.sh")
-				err = sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "bash begin.sh")
+				By("exec run.sh ")
+				go func() {
+					err := sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "bash run.sh")
+					testhelper.CheckErr(err)
+				}()
+
+				By("get-log.sh")
+				//wait 20s exec get-log.sh
+				time.Sleep(20 *time.Second)
+				err = sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "bash get-log.sh")
 				testhelper.CheckErr(err)
 			})
 		})
