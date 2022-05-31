@@ -63,5 +63,5 @@ helm -n acs-system upgrade -i l-zero-library chart/l-zero-library -f /tmp/ackd-h
 # install optional addons
 IFS=,
 for addon in ${Addons};do
- helm -n acs-system upgrade -i ${addon} chart/${addon} /tmp/ackd-helmconfig.yaml
+  helm -n acs-system upgrade -i ${addon} chart/${addon} -f /tmp/ackd-helmconfig.yaml
 done

@@ -30,4 +30,5 @@ COPY charts/l-zero chart
 COPY charts/l-zero-library chart
 COPY charts/calico chart
 COPY charts/etcd-backup chart
+COPY charts/csi-minio chart
 COPY yamls ack-distro-yamls
