@@ -1,0 +1,51 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: csi-minio-resizer
+  namespace: {{ .Values.namespace }}
+  labels:
+    trident-app: csi-minio
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 20
+  strategy:
+    rollingUpdate:
+      maxSurge: 5
+      maxUnavailable: 5
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      external-resizer: csi-minio-resizer
+  template:
+    metadata:
+      labels:
+        external-resizer: csi-minio-resizer
+        trident-app: csi-minio
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      tolerations:
+      - operator: Exists
+        effect: NoSchedule
+        key: node-role.kubernetes.io/master
+      serviceAccount: csi-minio
+      containers:
+        - name: csi-resizer
+          image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.resizer.image }}:{{ .Values.images.resizer.tag }}"
+          args:
+            - "--v=5"
+            - "--csi-address=$(ADDRESS)"
+          env:
+            - name: ADDRESS
+              value: /var/lib/kubelet/plugins/{{ .Values.csi_name }}/csi.sock
+            - name: TZ
+              value: Asia/Shanghai
+          imagePullPolicy: "IfNotPresent"
+          volumeMounts:
+            - name: socket-dir
+              mountPath: /var/lib/kubelet/plugins/{{ .Values.csi_name }}
+      volumes:
+        - name: socket-dir
+          hostPath:
+            path: /var/lib/kubelet/plugins/{{ .Values.csi_name }}
+            type: DirectoryOrCreate
