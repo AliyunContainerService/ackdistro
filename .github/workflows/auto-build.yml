@@ -13,6 +13,7 @@ jobs:
     steps:
 
       - name: Check outputs
+        id: autobuild
         run: |
           commentbody="${{github.event.comment.body}}"
           tag=`echo "$commentbody"|cut -d" " -f2`
@@ -36,4 +37,4 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            Image ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ack-distro:${{ steps.autobuild.outputs.version }} build successfully!
+            Image ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${{ steps.autobuild.outputs.version }} build successfully!

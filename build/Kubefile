@@ -17,9 +17,11 @@ COPY plugins/disk_init_rollback_shell_plugin.yaml plugins
 COPY plugins/disk_init_shell_plugin.yaml plugins
 COPY plugins/preflight_shell_plugin.yaml plugins
 COPY plugins/install_addons_shell_plugin.yaml plugins
+COPY plugins/umount_master_etcd_shell_plugin.yaml plugins
 
 COPY imageList manifests
 COPY kubeadm.yml ./etc
+COPY kubeadm.yml.tmpl ./etc
 COPY statics/audit-policy.yml ./statics
 
 COPY charts/kube-core chart
@@ -29,8 +31,5 @@ COPY charts/l-zero chart
 COPY charts/l-zero-library chart
 COPY charts/calico chart
 COPY charts/etcd-backup chart
+COPY charts/csi-minio chart
 COPY yamls ack-distro-yamls
-
-CMD helm -n kube-system upgrade -i kube-core chart/kube-core
-CMD kubectl create ns acs-system || true
-CMD kubectl apply -f ack-distro-yamls/*

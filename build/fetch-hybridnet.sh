@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Pull hybridnet helm charts
-export HYBRIDNET_CHART_VERSION=0.1.1
+export HYBRIDNET_CHART_VERSION=0.3.0
 
 helm repo add hybridnet https://alibaba.github.io/hybridnet/
 helm repo update

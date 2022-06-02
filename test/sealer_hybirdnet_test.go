@@ -59,7 +59,7 @@ var _ = Describe("run hybirdnet", func() {
 				masters := strings.Join(cluster.Spec.Masters.IPList, ",")
 				nodes := strings.Join(cluster.Spec.Nodes.IPList, ",")
 				apply.SendAndRunHybirdnetCluster(sshClient, tempFile, masters, nodes, cluster.Spec.SSH.Passwd)
-				apply.CheckNodeNumWithSSH(sshClient, 6)
+				apply.CheckNodeNumWithSSH(sshClient, 4)
 
 				//By("exec e2e test")
 				////download e2e && sshcmdfile and give sshcmd exec permissions

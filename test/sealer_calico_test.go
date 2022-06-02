@@ -38,7 +38,7 @@ var _ = Describe("run calico", func() {
 				cluster.Spec.Provider = settings.AliCloud
 				cluster.Spec.Image = settings.TestImageName
 				cluster = apply.CreateAliCloudInfraAndSave(cluster, tempFile)
-				//defer apply.CleanUpAliCloudInfra(cluster)
+				defer apply.CleanUpAliCloudInfra(cluster)
 				sshClient := testhelper.NewSSHClientByCluster(cluster)
 				testhelper.CheckFuncBeTrue(func() bool {
 					err := sshClient.SSH.Copy(sshClient.RemoteHostIP, settings.DefaultSealerBin, settings.DefaultSealerBin)
@@ -55,13 +55,13 @@ var _ = Describe("run calico", func() {
 
 				//wait 20s
 				By("wait 20s")
-				time.Sleep(20 *time.Second)
+				time.Sleep(20 * time.Second)
 
 				By("sealer run calico")
 				masters := strings.Join(cluster.Spec.Masters.IPList, ",")
 				nodes := strings.Join(cluster.Spec.Nodes.IPList, ",")
 				apply.SendAndRunCluster(sshClient, tempFile, masters, nodes, cluster.Spec.SSH.Passwd)
-				apply.CheckNodeNumWithSSH(sshClient, 6)
+				apply.CheckNodeNumWithSSH(sshClient, 4)
 
 				By("exec e2e test")
 				//download e2e && sshcmdfile and give sshcmd exec permissions
@@ -78,18 +78,12 @@ var _ = Describe("run calico", func() {
 
 				By("master0 exec load.sh,send e2e file to master && node，then,exec load.sh")
 				err = sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "bash load.sh", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Nodes.IPList[0]+
-					" --mode 'scp' --local-path 'kubernetes_e2e_images_v1.20.0.tar.gz' --remote-path 'kubernetes_e2e_images_v1.20.0.tar.gz'", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Nodes.IPList[1]+
-					" --mode 'scp' --local-path 'kubernetes_e2e_images_v1.20.0.tar.gz' --remote-path 'kubernetes_e2e_images_v1.20.0.tar.gz'", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Nodes.IPList[2]+
-					" --mode 'scp' --local-path 'kubernetes_e2e_images_v1.20.0.tar.gz' --remote-path 'kubernetes_e2e_images_v1.20.0.tar.gz'", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Masters.IPList[1]+
+					" --mode 'scp' --local-path 'kubernetes_e2e_images_v1.20.0.tar.gz' --remote-path 'kubernetes_e2e_images_v1.20.0.tar.gz'",  "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Masters.IPList[1]+
 					" --mode 'scp' --local-path 'kubernetes_e2e_images_v1.20.0.tar.gz' --remote-path 'kubernetes_e2e_images_v1.20.0.tar.gz'", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Masters.IPList[2]+
 					" --mode 'scp' --local-path 'kubernetes_e2e_images_v1.20.0.tar.gz' --remote-path 'kubernetes_e2e_images_v1.20.0.tar.gz'", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Nodes.IPList[0]+
-					" --mode 'scp' --local-path 'load.sh' --remote-path 'load.sh'", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Nodes.IPList[1]+
-					" --mode 'scp' --local-path 'load.sh' --remote-path 'load.sh'", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Nodes.IPList[2]+
-					" --mode 'scp' --local-path 'load.sh' --remote-path 'load.sh'", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Masters.IPList[1]+
+					" --mode 'scp' --local-path 'load.sh' --remote-path 'load.sh'",  "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Masters.IPList[1]+
 					" --mode 'scp' --local-path 'load.sh' --remote-path 'load.sh'", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Masters.IPList[2]+
 					" --mode 'scp' --local-path 'load.sh' --remote-path 'load.sh'", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Nodes.IPList[0]+
-					" --cmd 'bash load.sh'", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Nodes.IPList[1]+
-					" --cmd 'bash load.sh'", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Nodes.IPList[2]+
 					" --cmd 'bash load.sh'", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Masters.IPList[1]+
 					" --cmd 'bash load.sh'", "./sshcmd --user root --passwd Sealer123 --host "+cluster.Spec.Masters.IPList[2]+
 					" --cmd 'bash load.sh'")
@@ -97,11 +91,19 @@ var _ = Describe("run calico", func() {
 
 				By("give exec permissions && download and exec scripe")
 				err = sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "sudo cp .kube/config /tmp/kubeconfig", "chmod 777 /tmp/kubeconfig",
-					"wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/run.sh", "wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/get-log.sh", "wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/begin.sh")
+					"wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/run.sh", "wget https://sealer.oss-cn-beijing.aliyuncs.com/e2e/get-log.sh")
 				testhelper.CheckErr(err)
 
-				By("exec run.sh && get-log.sh")
-				err = sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "bash begin.sh")
+				By("exec run.sh ")
+				go func() {
+					err := sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "bash run.sh")
+					testhelper.CheckErr(err)
+				}()
+
+				By("get-log.sh")
+				//wait 20s exec get-log.sh
+				time.Sleep(20 *time.Second)
+				err = sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "bash get-log.sh")
 				testhelper.CheckErr(err)
 			})
 		})

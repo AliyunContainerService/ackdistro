@@ -3,19 +3,19 @@
 images:
   pause:
     image: ecp_builder/pause
-    tag: 3.5
+    tag: 3.2
   apiserver:
     image: ecp_builder/kube-apiserver
-    tag: v1.22.3-aliyun.1
+    tag: v1.20.4-aliyun.1
   controllermanager:
     image: ecp_builder/kube-controller-manager
-    tag: v1.22.3-aliyun.1
+    tag: v1.20.4-aliyun.1
   scheduler:
     image: ecp_builder/kube-scheduler
-    tag: v1.22.3-aliyun.1
+    tag: v1.20.4-aliyun.1
   etcd:
     image: ecp_builder/etcd
-    tag: 3.5.0-0
+    tag: 3.4.3-0
   lvscare:
     image: ecp_builder/lvscare
     tag: v1.1.1
@@ -27,12 +27,10 @@ images:
     tag: v0.3.8.5-307cf45-aliyun
   kubeproxy:
     image: ecp_builder/kube-proxy
-    tag: v1.22.3-aliyun.1
+    tag: v1.20.4-aliyun.1
   coredns:
     image: ecp_builder/coredns
     tag: 1.7.0
 globalconfig:
   RegistryURL: sea.hub:5000
   CoreDnsIP: 10.96.0.10
-  PodCIDR: 100.64.0.0/16
-  DNSDomain: cluster.local
