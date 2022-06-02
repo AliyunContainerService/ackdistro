@@ -3,7 +3,7 @@
 images:
   lzero:
     image: ecp_builder/l-zero
-    tag: v1.1.0-d18ee35
+    tag: v1.1.0-ba472562
   nginxdemos:
     image: ecp_builder/nginxdemos
     tag: 0.2
