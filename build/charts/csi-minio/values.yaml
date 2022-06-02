@@ -1,0 +1,36 @@
+namespace: acs-minio
+csi_name: minio.csi.alibabacloud.com
+
+minio:
+  svcName: minio-external-service
+  svcNamespace: acs-minio
+  externalSVCName: minio-external-service-for-csi
+  externalSVCNamespace: acs-minio
+
+images:
+  csi_minio:
+    image: ecp_builder/csi-minio
+    tag: v1.0.18
+  provisioner:
+    image: ecp_builder/csi-provisioner
+    tag: v2.2.2
+  registrar:
+    image: ecp_builder/csi-node-driver-registrar
+    tag: v2.3.0
+  resizer:
+    image: ecp_builder/csi-resizer
+    tag: v1.3.0
+
+globalconfig:
+  DisableFailureDomain: false
+  RegistryURL: sea.hub:5000
+  # 使用外部 MinIO svc
+  EnableExternalMinIO: false
+  # 外部 MinIO 节点IP
+  MetaClusterVIP: "127.0.0.1"
+  # 外部 MinIO 端口
+  ExternalMinIOPort: "32757"
+  # MinIO 用户名
+  MinIOUsername: minio
+  # MinIO 密码
+  MinIOPassword: miniostorage
