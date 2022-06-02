@@ -6,7 +6,7 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/etcd:3.5.0-0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/metrics-server:v0.3.8.5-307cf45-aliyun
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/kube-proxy:v1.22.3-aliyun.1
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/coredns:1.7.0
-ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/l-zero:v1.1.0-d18ee35
+ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/l-zero:v1.1.0-ba472562
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/nginxdemos:0.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/opsbase-alpine:v0.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/open-local-rpms:v0.2-0fb0430
