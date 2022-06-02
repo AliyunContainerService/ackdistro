@@ -39,12 +39,15 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
     for arch in $archs;do
         rm -rf ${arch}
         mkdir ${arch}
+
+        bins=(kubectl kubelet kubeadm)
         for bin in ${bins[@]};do
-            if [ "$bin" == "helm" ];then
-                wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${bin} -O ${arch}/${bin}
-            else
-                wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${KUBE_VERSION}/${bin} -O ${arch}/${bin}
-            fi
+            wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${KUBE_VERSION}/${bin} -O ${arch}/${bin}
+        done
+
+        bins=(helm trident)
+        for bin in ${bins[@]};do
+            wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${bin} -O ${arch}/${bin}
         done
     done
     IFS=" "
