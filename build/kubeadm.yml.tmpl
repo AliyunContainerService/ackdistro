@@ -8,7 +8,7 @@ nodeRegistration:
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
-kubernetesVersion: v1.20.4-aliyun.1
+kubernetesVersion: v1.22.3-aliyun.1
 controlPlaneEndpoint: "apiserver.cluster.local:6443"
 imageRepository: sea.hub:5000/ecp_builder
 networking:
@@ -81,7 +81,7 @@ etcd:
     extraArgs:
       listen-metrics-urls: http://0.0.0.0:2381
     imageRepository: sea.hub:5000/ecp_builder
-    imageTag: 3.4.3-0
+    imageTag: 3.5.0-0
 
 ---
 apiVersion: kubeadm.k8s.io/v1beta2

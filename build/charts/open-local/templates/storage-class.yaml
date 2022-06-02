@@ -57,7 +57,7 @@ provisioner: {{ .Values.driver }}
 parameters:
   csi.storage.k8s.io/fstype: ext4
   volumeType: Device
-  mediaType: ssd
+  mediaType: sdd
 reclaimPolicy: Delete
 volumeBindingMode: WaitForFirstConsumer
 allowVolumeExpansion: false
