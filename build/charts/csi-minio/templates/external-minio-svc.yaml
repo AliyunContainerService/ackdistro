@@ -1,0 +1,26 @@
+{{- if .Values.globalconfig.EnableExternalMinIO }}
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: {{ .Values.minio.externalSVCName }}
+  namespace: {{ .Values.minio.externalSVCNamespace }}
+subsets:
+- addresses:
+  - ip: '{{ .Values.globalconfig.MetaClusterVIP }}'
+  ports:
+  - port: {{ int $.Values.globalconfig.ExternalMinIOPort }}
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.minio.externalSVCName }}
+  namespace: {{ .Values.minio.externalSVCNamespace }}
+spec:
+  ports:
+  - port: 9000
+    protocol: TCP
+    targetPort: {{ int $.Values.globalconfig.ExternalMinIOPort }}
+  sessionAffinity: None
+  type: ClusterIP
+{{- end }}
