@@ -19,9 +19,10 @@ import (
 	"math/big"
 	"net"
 	"strings"
+
+	k8snet "k8s.io/apimachinery/pkg/util/net"
 )
 
-//use only one
 func GetHostIP(host string) string {
 	if !strings.ContainsRune(host, ':') {
 		return host
@@ -61,14 +62,14 @@ func GetHostNetInterface(host string) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("failed to get Addrs, %v", err)
 		}
-		if IsLocalIP(host, &addrs) {
+		if IsLocalIP(host, addrs) {
 			return netInterfaces[i].Name, nil
 		}
 	}
 	return "", nil
 }
 
-func GetLocalHostAddresses() (*[]net.Addr, error) {
+func GetLocalHostAddresses() ([]net.Addr, error) {
 	netInterfaces, err := net.Interfaces()
 	if err != nil {
 		fmt.Println("net.Interfaces failed, err:", err.Error())
@@ -87,16 +88,24 @@ func GetLocalHostAddresses() (*[]net.Addr, error) {
 			allAddrs = append(allAddrs, addrs[j])
 		}
 	}
-	return &allAddrs, nil
+	return allAddrs, nil
 }
 
-func IsLocalIP(ip string, addrs *[]net.Addr) bool {
-	for _, address := range *addrs {
+func IsLocalIP(ip string, addrs []net.Addr) bool {
+	for _, address := range addrs {
 		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() && ipnet.IP.To4() != nil && ipnet.IP.String() == ip {
 			return true
 		}
 	}
 	return false
+}
+
+func GetLocalDefaultIP() (string, error) {
+	netIP, err := k8snet.ChooseHostInterface()
+	if err != nil {
+		return "", fmt.Errorf("failed to get default route ip, err: %v", err)
+	}
+	return netIP.String(), nil
 }
 
 func GetLocalIP(master0IP string) (string, error) {

@@ -73,15 +73,9 @@ func GinkgoRandomSeed() int64 {
 	return config.GinkgoConfig.RandomSeed
 }
 
-//GinkgoParallelNode is deprecated, use GinkgoParallelProcess instead
+//GinkgoParallelNode returns the parallel node number for the current ginkgo process
+//The node number is 1-indexed
 func GinkgoParallelNode() int {
-	deprecationTracker.TrackDeprecation(types.Deprecations.ParallelNode(), codelocation.New(1))
-	return GinkgoParallelProcess()
-}
-
-//GinkgoParallelProcess returns the parallel process number for the current ginkgo process
-//The process number is 1-indexed
-func GinkgoParallelProcess() int {
 	return config.GinkgoConfig.ParallelNode
 }
 
@@ -115,7 +109,6 @@ func GinkgoT(optionalOffset ...int) GinkgoTInterface {
 //in the testing package's T.
 type GinkgoTInterface interface {
 	Cleanup(func())
-	Setenv(key, value string)
 	Error(args ...interface{})
 	Errorf(format string, args ...interface{})
 	Fail()
@@ -480,28 +473,24 @@ func By(text string, callbacks ...func()) {
 //The body function must have the signature:
 //	func(b Benchmarker)
 func Measure(text string, body interface{}, samples int) bool {
-	deprecationTracker.TrackDeprecation(types.Deprecations.Measure(), codelocation.New(1))
 	global.Suite.PushMeasureNode(text, body, types.FlagTypeNone, codelocation.New(1), samples)
 	return true
 }
 
 //You can focus individual Measures using FMeasure
 func FMeasure(text string, body interface{}, samples int) bool {
-	deprecationTracker.TrackDeprecation(types.Deprecations.Measure(), codelocation.New(1))
 	global.Suite.PushMeasureNode(text, body, types.FlagTypeFocused, codelocation.New(1), samples)
 	return true
 }
 
 //You can mark Measurements as pending using PMeasure
 func PMeasure(text string, _ ...interface{}) bool {
-	deprecationTracker.TrackDeprecation(types.Deprecations.Measure(), codelocation.New(1))
 	global.Suite.PushMeasureNode(text, func(b Benchmarker) {}, types.FlagTypePending, codelocation.New(1), 0)
 	return true
 }
 
 //You can mark Measurements as pending using XMeasure
 func XMeasure(text string, _ ...interface{}) bool {
-	deprecationTracker.TrackDeprecation(types.Deprecations.Measure(), codelocation.New(1))
 	global.Suite.PushMeasureNode(text, func(b Benchmarker) {}, types.FlagTypePending, codelocation.New(1), 0)
 	return true
 }
