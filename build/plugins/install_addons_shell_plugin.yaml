@@ -19,6 +19,7 @@ spec:
     export SuspendPeriodHealthCheck=${SuspendPeriodHealthCheck:-false}
     export SuspendPeriodBroadcastHealthCheck=${SuspendPeriodBroadcastHealthCheck:-false}
     export Addons=${Addons}
+    export Network=${Network}
 
     bash scripts/install_addons.sh
     if [ $? -ne 0 ];then
