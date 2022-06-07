@@ -98,7 +98,7 @@ sealer apply -f ClusterFile.yaml
 sealer apply -f ClusterFile.yaml --env IgnoreErrors=ErrorX[,ErrorY]
 
 # Also you can ignore all errors
-sealer apply -f ClusterFile.yaml --env IgnoreErrors=all
+sealer apply -f ClusterFile.yaml --env SkipPreflight=true
 ```
 
 #### 3) Use health check

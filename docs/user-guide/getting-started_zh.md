@@ -100,7 +100,7 @@ sealer apply -f ClusterFile.yaml
 sealer apply -f ClusterFile.yaml --env IgnoreErrors=ErrorX[,ErrorY]
 
 # 如果想忽略所有
-sealer apply -f ClusterFile.yaml --env IgnoreErrors=all
+sealer apply -f ClusterFile.yaml --env SkipPreflight=true
 ```
 
 #### 3) 使用集群健康检查工具
