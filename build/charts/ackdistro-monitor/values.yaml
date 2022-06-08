@@ -1,0 +1,8 @@
+monitor:                      # Prometheus-operator监控相关配置
+  namespace: acs-system       # 监控组件命名空间
+  namespace_yoda: kube-system # Yoda组件空间
+  namespace_minio: acs-minio  # MinIO组件命名空间
+  servicemonitor:             # ServiceMonitor资源
+    enabled: true
+  dashboard:                  # Grafana Dashboard
+    enabled: true

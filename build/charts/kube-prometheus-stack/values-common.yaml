@@ -1,0 +1,312 @@
+## upgradeCRDs options
+upgradeCRDs:
+  enabled: true
+  image:
+    repoTag: reg.docker.alibaba-inc.com/cip/kube-prometheus-stack-crds:v30.0.1
+    pullPolicy: IfNotPresent
+    resources: {}
+  kubectlImage:
+    repoTag: reg.docker.alibaba-inc.com/cip/kubectl:v1.22.2-r0
+    pullPolicy: IfNotPresent
+    resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  # # allow schedule to master nodes
+  # - effect: NoSchedule
+  #   operator: Exists
+
+## Create default rules for monitoring the cluster
+##
+defaultRules:
+  create: false
+
+## Configuration for alertmanager
+## ref: https://prometheus.io/docs/alerting/alertmanager/
+##
+alertmanager:
+  alertmanagerSpec:
+
+    ## Pod anti-affinity can prevent the scheduler from placing Alertmanager replicas on the same node.
+    ## The default value "soft" means that the scheduler should *prefer* to not schedule two replica pods onto the same node but no guarantee is provided.
+    ## The value "hard" means that the scheduler is *required* to not schedule two replica pods onto the same node.
+    ## The value "" will disable pod anti-affinity so that no anti-affinity rules will be configured.
+    ##
+    podAntiAffinity: "soft"
+
+    ## If anti-affinity is enabled sets the topologyKey to use for anti-affinity.
+    ## This can be changed to, for example, failure-domain.beta.kubernetes.io/zone
+    ##
+    podAntiAffinityTopologyKey: kubernetes.io/hostname
+
+    # tolerations:
+    # # allow schedule to master nodes
+    # - effect: NoSchedule
+    #   operator: Exists
+
+    storage:
+      volumeClaimTemplate:
+        spec:
+          # storageClassName: gluster
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 1Gi
+          # selector: {}
+
+  ## Alertmanager configuration directives
+  ## ref: https://prometheus.io/docs/alerting/configuration/#configuration-file
+  ##      https://prometheus.io/webtools/alerting/routing-tree-editor/
+  ##
+  config:
+    ## Global config
+    ## ref: https://www.prometheus.io/docs/alerting/latest/configuration/#configuration-file
+    global:
+      resolve_timeout: 5m
+
+
+      # # SMTP config
+      # smtp_smarthost: ""
+      # smtp_from: ""
+      # smtp_auth_username: ""
+      # smtp_auth_password: ""
+      # # smtp_auth_auth_secret:
+      # # smtp_auth_identity:
+      # smtp_require_tls: false
+
+    # The root route on which each incoming alert enters.
+    route:
+      # The labels by which incoming alerts are grouped together. For example,
+      # multiple alerts coming in for cluster=A and alertname=LatencyHigh would
+      # be batched into a single group.
+      #
+      # To aggregate by all possible labels use '...' as the sole label name.
+      # This effectively disables aggregation entirely, passing through all
+      # alerts as-is. This is unlikely to be what you want, unless you have
+      # a very low alert volume or your upstream notification system performs
+      # its own grouping. Example: group_by: [...]
+      # group_by: ['job']
+      group_by: ['alertname', 'cluster', 'service']
+    
+      # When a new group of alerts is created by an incoming alert, wait at
+      # least 'group_wait' to send the initial notification.
+      # This way ensures that you get multiple alerts for the same group that start
+      # firing shortly after another are batched together on the first 
+      # notification.
+      group_wait: 30s
+
+      # When the first notification was sent, wait 'group_interval' to send a batch
+      # of new alerts that started firing for that group.
+      group_interval: 5m
+
+      # If an alert has successfully been sent, wait 'repeat_interval' to
+      # resend them.
+      repeat_interval: 12h
+      receiver: default
+      routes:
+      - match:
+          alertname: Watchdog
+        receiver: 'null'
+      - match_re:
+          alertname: ^(host_cpu_usage|node_filesystem_free|host_down)$
+        receiver: default
+        routes:
+        - match:
+            severity: critical
+          receiver: default
+
+    # - name: some-team-mails
+    #   email_configs:
+    #   -
+    #     # Whether or not to notify about resolved alerts.
+    #     send_resolved: false 
+ 
+    #     # The email address to send notifications to.
+    #     to: "crazyacking@qq.com"
+    #     from: "shanbiao.jsb@aliyun.com"
+    #     require_tls: false
+ 
+    #     # TLS configuration.
+    #     # tls_config:
+    #       # # CA certificate to validate the server certificate with.
+    #       # [ ca_file: <filepath> ]
+ 
+    #       # # Certificate and key files for client cert authentication to the server.
+    #       # [ cert_file: <filepath> ]
+    #       # [ key_file: <filepath> ]
+ 
+    #       # # ServerName extension to indicate the name of the server.
+    #       # # http://tools.ietf.org/html/rfc4366#section-3.1
+    #       # [ server_name: <string> ]
+ 
+    #       # # Disable validation of the server certificate.
+    #       # [ insecure_skip_verify: <boolean> | default = false]
+ 
+    #     # # The HTML body of the email notification.
+    #     # html: <tmpl_string> | default = '{{ template "email.default.html" . }}' ]
+    #     # # The text body of the email notification.
+    #     # [ text: <tmpl_string> ]
+
+    #     # # Further headers email header key/value pairs. Overrides any headers
+    #     # # previously set by the notification implementation.
+    #     # [ headers: { <string>: <tmpl_string>, ... } ]
+
+## Using default values from https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
+##
+# grafana:
+#   ##
+#   ## dashboards per provider, use provider name as key.
+#   ##
+#   dashboards:
+#     default:
+#       kubernetes-pod-monitor_rev1:
+#         file: dashboards/kubernetes-pod-monitor_rev1.json
+#       node-exporter-for-prometheus-dashboard-cn-v20201010_rev24:
+#         file: dashboards/node-exporter-for-prometheus-dashboard-cn-v20201010_rev24.json
+#       node-exporter-full_rev22:
+#         file: dashboards/node-exporter-full_rev22.json
+#       kubernetes-cluster-overall-dashboard_rev1:
+#         file: dashboards/kubernetes-cluster-overall-dashboard_rev1.json
+#       "1-k8s-for-prometheus-dashboard-20211010_rev1":
+#         file: "dashboards/1-k8s-for-prometheus-dashboard-20211010_rev1.json"
+  
+  sidecar:
+    dashboards:
+      # If specified, the sidecar will search for dashboard config-maps inside this namespace.
+      # Otherwise the namespace in which the sidecar is running will be used.
+      # It's also possible to specify ALL to search in all namespaces
+      searchNamespace: ALL
+    
+    datasources:
+      # If specified, the sidecar will search for datasource config-maps inside this namespace.
+      # Otherwise the namespace in which the sidecar is running will be used.
+      # It's also possible to specify ALL to search in all namespaces
+      searchNamespace: ALL
+
+## Deploy a Prometheus instance
+##
+prometheus:
+  ## Settings affecting prometheusSpec
+  ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#prometheusspec
+  ##
+  prometheusSpec:
+
+    ## Pod anti-affinity can prevent the scheduler from placing Prometheus replicas on the same node.
+    ## The default value "soft" means that the scheduler should *prefer* to not schedule two replica pods onto the same node but no guarantee is provided.
+    ## The value "hard" means that the scheduler is *required* to not schedule two replica pods onto the same node.
+    ## The value "" will disable pod anti-affinity so that no anti-affinity rules will be configured.
+    podAntiAffinity: "soft"
+
+    ## If anti-affinity is enabled sets the topologyKey to use for anti-affinity.
+    ## This can be changed to, for example, failure-domain.beta.kubernetes.io/zone
+    ##
+    podAntiAffinityTopologyKey: kubernetes.io/hostname
+
+    # ## Image of Prometheus.
+    # ##
+    # image:
+    #   repository: quay.io/prometheus/prometheus
+    #   tag: v2.26.0
+
+    ## How long to retain metrics
+    ##
+    retention: 15d
+
+    ## Enable compression of the write-ahead log using Snappy.
+    ##
+    walCompression: false
+
+    ## If true, a nil or {} value for prometheus.prometheusSpec.ruleSelector will cause the
+    ## prometheus resource to be created with selectors based on values in the helm deployment,
+    ## which will also match the PrometheusRule resources created
+    ##
+    ruleSelectorNilUsesHelmValues: false
+
+    ## If true, a nil or {} value for prometheus.prometheusSpec.serviceMonitorSelector will cause the
+    ## prometheus resource to be created with selectors based on values in the helm deployment,
+    ## which will also match the servicemonitors created
+    ##
+    serviceMonitorSelectorNilUsesHelmValues: false
+
+    ## If true, a nil or {} value for prometheus.prometheusSpec.podMonitorSelector will cause the
+    ## prometheus resource to be created with selectors based on values in the helm deployment,
+    ## which will also match the podmonitors created
+    ##
+    podMonitorSelectorNilUsesHelmValues: false
+
+    ## If true, a nil or {} value for prometheus.prometheusSpec.probeSelector will cause the
+    ## prometheus resource to be created with selectors based on values in the helm deployment,
+    ## which will also match the probes created
+    ##
+    probeSelectorNilUsesHelmValues: false
+
+    ## Prometheus StorageSpec for persistent data
+    ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/user-guides/storage.md
+    ##
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+         #  storageClassName: gluster
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 1Gi
+          # selector: {}
+
+defaultRules:
+  disabled:
+    etcdHighNumberOfFailedGRPCRequests: true
+
+# ## Manages Prometheus and Alertmanager components
+# ##
+# prometheusOperator:
+#   ## Admission webhook support for PrometheusRules resources added in Prometheus Operator 0.30 can be enabled to prevent incorrectly formatted
+#   ## rules from making their way into prometheus and potentially preventing the container from starting
+#   admissionWebhooks:
+#     ## If enabled, generate a self-signed certificate, then patch the webhook configurations with the generated data.
+#     ## On chart upgrades (or if the secret exists) the cert will not be re-generated. You can use this to provide your own
+#     ## certs ahead of time if you wish.
+#     ##
+#     patch:
+#       tolerations:
+#       # allow schedule to master nodes
+#       - effect: NoSchedule
+#         operator: Exists
+
+#   tolerations:
+#   # allow schedule to master nodes
+#   - effect: NoSchedule
+#     operator: Exists
+
+
+# # grafana:
+# #   image:
+# #     # USE Grafana v6.7.4 instead of v7.2.1 due to Chinese i18N
+# #     repository: grafana/grafana
+# #     tag: 6.7.4
+# #     sha: ""
+# #     pullPolicy: IfNotPresent
+
+## Component scraping etcd
+##
+kubeEtcd:
+  ## Etcd service. If using kubeEtcd.endpoints only the port and targetPort are used
+  ##
+  service:
+    port: 2381
+    targetPort: 2381
+    # selector:
+    #   component: etcd
+
+# kube-state-metrics:
+#   image:
+#     repository: reg.docker.alibaba-inc.com/cip/kube-state-metrics
+#     tag: v1.9.7
+
+## Component scraping kube proxy
+##
+kubeProxy:
+
+  service:
+    selector:
+      app: kube-proxy

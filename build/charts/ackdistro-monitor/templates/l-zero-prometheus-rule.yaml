@@ -1,0 +1,245 @@
+kind: PrometheusRule
+apiVersion: monitoring.coreos.com/v1
+metadata:
+  name: l-zero
+  namespace: {{ .Release.Namespace }}
+spec:
+  groups:
+    - name: l-zero-key-component
+      rules:
+        - alert: check-k8s-apiserver-crash
+          annotations:
+            alertLevel: critical
+            message: >-
+              kube-apiserver is crashing, please check.
+            metric: opstask_last_status
+            summary: K8s kube-apiserver is crashing, please check.
+          expr: >-
+            opstask_last_status{opsTask='check-k8s-apiserver-crash'}
+            == 1
+          for: 1m
+          labels:
+            severity: critical
+        - alert: check-k8s-apiserver-crash
+          annotations:
+            alertLevel: critical
+            message: >-
+              kube-apiserver check ended with error, please check.
+            metric: opstask_last_status
+            summary: kube-apiserver check ended with error, please check.
+          expr: >-
+            opstask_last_status{opsTask='check-k8s-apiserver-crash'}
+            == 2
+          for: 1m
+          labels:
+            severity: critical
+        - alert: check-k8s-cs
+          annotations:
+            alertLevel: critical
+            message: >-
+              K8s cluster status is not healthy, please check.
+            metric: opstask_last_status
+            summary: K8s cluster status is not healthy, please check.
+          expr: >-
+            opstask_last_status{opsTask='check-k8s-cs'}
+            == 1
+          for: 1m
+          labels:
+            severity: critical
+        - alert: check-k8s-cs
+          annotations:
+            alertLevel: critical
+            message: >-
+              K8s cluster status checking ended with error, please check.
+            metric: opstask_last_status
+            summary: K8s cluster status checking ended with error, please check.
+          expr: >-
+            opstask_last_status{opsTask='check-k8s-cs'}
+            == 2
+          for: 1m
+          labels:
+            severity: critical
+        - alert: check-kubelet-evict
+          annotations:
+            alertLevel: critical
+            message: >-
+              At least one of nodes is abnormal, please check.
+            metric: opstask_last_status
+            summary: At least one of nodes is abnormal, please check.
+          expr: >-
+            opstask_last_status{opsTask='check-kubelet-evict'}
+            == 1
+          for: 1m
+          labels:
+            severity: critical
+        - alert: check-kubelet-evict
+          annotations:
+            alertLevel: critical
+            message: >-
+              Cluster node condition check ended with error, please check.
+            metric: opstask_last_status
+            summary: Cluster node condition check ended with error, please check.
+          expr: >-
+            opstask_last_status{opsTask='check-kubelet-evict'}
+            == 2
+          for: 1m
+          labels:
+            severity: critical
+        - alert: check-docker-overlay-mount
+          annotations:
+            alertLevel: critical
+            message: >-
+              At least one of nodes' docker is abnormal due to overlay mount failure, please check.
+            metric: opstask_last_status
+            summary: At least one of nodes' docker is abnormal due to overlay mount failure, please check.
+          expr: >-
+            opstask_last_status{opsTask='check-docker-overlay-mount'}
+            == 1
+          for: 1m
+          labels:
+            severity: critical
+        - alert: check-docker-overlay-mount
+          annotations:
+            alertLevel: critical
+            message: >-
+              Docker overlay mount check ended with error, please check.
+            metric: opstask_last_status
+            summary: Docker overlay mount check ended with error, please check.
+          expr: >-
+            opstask_last_status{opsTask='check-docker-overlay-mount'}
+            == 2
+          for: 1m
+          labels:
+            severity: critical
+    - name: l-zero-networking
+      rules:
+        - alert: check-kube-proxy-pod
+          annotations:
+            alertLevel: critical
+            message: >-
+              At least one kube-proxy checks fails, please check.
+            metric: opstask_last_status
+            summary: At least one kube-proxy checks fails, please check.
+          expr: >-
+            opstask_last_status{opsTask='check-kube-proxy-pod'}
+            == 1
+          for: 1m
+          labels:
+            severity: critical
+        - alert: check-kube-proxy-pod
+          annotations:
+            alertLevel: critical
+            message: >-
+              kube-proxy check ended with error, please check.
+            metric: opstask_last_status
+            summary: kube-proxy check ended with error, please check.
+          expr: >-
+            opstask_last_status{opsTask='check-kube-proxy-pod'}
+            == 2
+          for: 1m
+          labels:
+            severity: critical
+        - alert: check-network-control-plane
+          annotations:
+            alertLevel: critical
+            message: >-
+              Cluster network control plane fails, please check.
+            metric: opstask_last_status
+            summary: Cluster network control plane fails, please check.
+          expr: >-
+            opstask_last_status{opsTask='check-network-control-plane'}
+            == 1
+          for: 1m
+          labels:
+            severity: critical
+        - alert: check-network-control-plane
+          annotations:
+            alertLevel: critical
+            message: >-
+              network control plane check ended with error, please check.
+            metric: opstask_last_status
+            summary: network control plane check ended with error, please check.
+          expr: >-
+            opstask_last_status{opsTask='check-network-control-plane'}
+            == 2
+          for: 1m
+          labels:
+            severity: critical
+        - alert: check-node-network
+          annotations:
+            alertLevel: critical
+            message: >-
+              At least one of nodes network check fails, please check.
+            metric: opstask_last_status
+            summary: At least one of nodes network check fails, please check.
+          expr: >-
+            opstask_last_status{opsTask='check-node-network'}
+            == 1
+          for: 1m
+          labels:
+            severity: critical
+        - alert: check-node-network
+          annotations:
+            alertLevel: critical
+            message: >-
+              node network check ended with error, please check.
+            metric: opstask_last_status
+            summary: node network check ended with error, please check.
+          expr: >-
+            opstask_last_status{opsTask='check-node-network'}
+            == 2
+          for: 1m
+          labels:
+            severity: critical
+        - alert: check-k8s-dns-hostnet
+          annotations:
+            alertLevel: critical
+            message: >-
+              K8s core-dns check fails, please check.
+            metric: opstask_last_status
+            summary: K8s core-dns check fails, please check.
+          expr: >-
+            opstask_last_status{opsTask='check-k8s-dns-hostnet'}
+            == 1
+          for: 1m
+          labels:
+            severity: critical
+        - alert: check-k8s-dns-hostnet
+          annotations:
+            alertLevel: critical
+            message: >-
+              K8s core-dns check ended with error, please check
+            metric: opstask_last_status
+            summary: K8s core-dns check ended with error, please check
+          expr: >-
+            opstask_last_status{opsTask='check-k8s-dns-hostnet'}
+            == 2
+          for: 1m
+          labels:
+            severity: critical
+        - alert: check-pod-network
+          annotations:
+            alertLevel: critical
+            message: >-
+              At least one of pods' network check fails, please check.
+            metric: opstask_last_status
+            summary: At least one of pods' network check fails, please check.
+          expr: >-
+            opstask_last_status{opsTask='check-pod-network'}
+            == 1
+          for: 1m
+          labels:
+            severity: critical
+        - alert: check-pod-network
+          annotations:
+            alertLevel: critical
+            message: >-
+              Pod network check ended with error, please check.
+            metric: opstask_last_status
+            summary: Pod network check ended with error, please check.
+          expr: >-
+            opstask_last_status{opsTask='check-pod-network'}
+            == 2
+          for: 1m
+          labels:
+            severity: critical

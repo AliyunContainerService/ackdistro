@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    meta.helm.sh/release-name: kube-prometheus-stack
+    meta.helm.sh/release-namespace: acs-system
+  labels:
+    app: kube-prometheus-stack-npd
+    app.kubernetes.io/managed-by: Helm
+    chart: kube-prometheus-stack-11.1.8
+    heritage: Helm
+    jobLabel: npd
+    release: kube-prometheus-stack
+    app: kube-prometheus-stack-npd
+  name: kube-prometheus-stack-npd
+  namespace: kube-system
+  resourceVersion: "5071"
+  uid: 8f1aff3a-ccf6-46f2-b6d2-17d9d4107d09
+spec:
+  clusterIP: None
+  clusterIPs:
+  - None
+  ports:
+  - name: http-metrics
+    port: 20257
+    protocol: TCP
+    targetPort: 20257
+  selector:
+    app: ack-node-problem-detector
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

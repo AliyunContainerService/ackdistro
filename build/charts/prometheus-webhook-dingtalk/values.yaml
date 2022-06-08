@@ -1,0 +1,10 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+images:
+  dingtalk:
+    image: ecp_builder/prometheus-webhook-dingtalk
+    tag: v1.1.0-d18ee35
+k8s_namespace: kube-system
+globalconfig:
+  DisableFailureDomain: false
+  RegistryURL: sea.hub:5000

@@ -1,0 +1,2553 @@
+{{- if .Values.monitor.dashboard.enabled }}
+apiVersion: v1
+data:
+  l-zero-dashboard-v1.json: |-
+    {
+    "__inputs": [
+        {
+        "name": "DS_PROMETHEUS",
+        "label": "Prometheus",
+        "description": "",
+        "type": "datasource",
+        "pluginId": "prometheus",
+        "pluginName": "Prometheus"
+        }
+    ],
+    "__requires": [
+        {
+        "type": "grafana",
+        "id": "grafana",
+        "name": "Grafana",
+        "version": "7.2.1"
+        },
+        {
+        "type": "panel",
+        "id": "graph",
+        "name": "Graph",
+        "version": ""
+        },
+        {
+        "type": "datasource",
+        "id": "prometheus",
+        "name": "Prometheus",
+        "version": "1.0.0"
+        },
+        {
+        "type": "panel",
+        "id": "stat",
+        "name": "Stat",
+        "version": ""
+        }
+    ],
+    "annotations": {
+        "list": [
+        {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+        }
+        ]
+    },
+    "editable": true,
+    "gnetId": null,
+    "graphTooltip": 0,
+    "id": null,
+    "links": [],
+    "panels": [
+        {
+        "collapsed": false,
+        "datasource": null,
+        "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+        },
+        "id": 19,
+        "panels": [],
+        "title": "关键组件 Key Components",
+        "type": "row"
+        },
+        {
+        "datasource": null,
+        "description": "检查K8s Apiserver是否有crash",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [
+                {
+                "from": "",
+                "id": 1,
+                "text": "正常",
+                "to": "",
+                "type": 1,
+                "value": "0"
+                },
+                {
+                "from": "1",
+                "id": 2,
+                "text": "异常",
+                "to": "",
+                "type": 2,
+                "value": "1"
+                }
+            ],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "red",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 0,
+            "y": 1
+        },
+        "id": 25,
+        "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_last_status{opsTask=\"check-k8s-apiserver-crash\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "",
+            "refId": "C"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "当前apiserver crash检查结果",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查cluster status，等同于kubectl get cs",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [
+                {
+                "from": "",
+                "id": 1,
+                "text": "正常",
+                "to": "",
+                "type": 1,
+                "value": "0"
+                },
+                {
+                "from": "1",
+                "id": 2,
+                "text": "异常",
+                "to": "",
+                "type": 1,
+                "value": "1"
+                }
+            ],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "red",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 6,
+            "y": 1
+        },
+        "id": 26,
+        "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_last_status{opsTask=\"check-k8s-cs\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "l",
+            "refId": "C"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "当前cluster status检查结果",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "是否存在有eviction现象的节点",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [
+                {
+                "from": "",
+                "id": 1,
+                "text": "正常",
+                "to": "",
+                "type": 1,
+                "value": "0"
+                },
+                {
+                "from": "",
+                "id": 2,
+                "text": "异常",
+                "to": "",
+                "type": 1,
+                "value": "1"
+                }
+            ],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "red",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 12,
+            "y": 1
+        },
+        "id": 31,
+        "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_last_status{opsTask=\"check-kubelet-evict\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "",
+            "refId": "C"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "当前node condition检查结果",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查docker overlay文件系统是否可以正常mount",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [
+                {
+                "from": "",
+                "id": 1,
+                "text": "正常",
+                "to": "",
+                "type": 1,
+                "value": "0"
+                },
+                {
+                "from": "",
+                "id": 2,
+                "text": "异常",
+                "to": "",
+                "type": 1,
+                "value": "1"
+                }
+            ],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "red",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 18,
+            "y": 1
+        },
+        "id": 35,
+        "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_last_status{opsTask=\"check-docker-overlay-mount\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "",
+            "refId": "C"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "当前docker overlay mount检查结果",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查K8s Apiserver是否有crash",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "#EAB839",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 0,
+            "y": 5
+        },
+        "id": 36,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_failed_numbers{opsTask=\"check-k8s-apiserver-crash\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "total failed",
+            "refId": "C"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史失败总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查K8s Apiserver是否有crash",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 3,
+            "y": 5
+        },
+        "id": 41,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_success_numbers{opsTask=\"check-k8s-apiserver-crash\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "total failed",
+            "refId": "C"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史通过总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查cluster status，等同于kubectl get cs",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "yellow",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 6,
+            "y": 5
+        },
+        "id": 37,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_failed_numbers{opsTask=\"check-k8s-cs\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "l",
+            "refId": "C"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史失败总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查cluster status，等同于kubectl get cs",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 9,
+            "y": 5
+        },
+        "id": 42,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_success_numbers{opsTask=\"check-k8s-cs\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "l",
+            "refId": "C"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史通过总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "历史node condition失败总数",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "#EAB839",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 12,
+            "y": 5
+        },
+        "id": 20,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "mean"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_failed_numbers{opsTask=\"check-kubelet-evict\",level=\"critical\"}",
+            "instant": false,
+            "interval": "",
+            "legendFormat": "",
+            "refId": "A"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史失败总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "历史node condition失败总数",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 15,
+            "y": 5
+        },
+        "id": 43,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "mean"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_success_numbers{opsTask=\"check-kubelet-evict\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "kubelet eviction",
+            "refId": "A"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史通过总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "历史docker overaly mount失败总数",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "yellow",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 18,
+            "y": 5
+        },
+        "id": 38,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_failed_numbers{opsTask=\"check-docker-overlay-mount\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "",
+            "refId": "C"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史失败总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "历史docker overaly mount失败总数",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 21,
+            "y": 5
+        },
+        "id": 44,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_success_numbers{opsTask=\"check-docker-overlay-mount\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "",
+            "refId": "C"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史通过总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "collapsed": false,
+        "datasource": null,
+        "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 9
+        },
+        "id": 12,
+        "panels": [],
+        "title": "网络连通 Networking",
+        "type": "row"
+        },
+        {
+        "datasource": null,
+        "description": "检查kube proxy是否健康，Pod状态正常且数量正常",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [
+                {
+                "from": "",
+                "id": 1,
+                "text": "正常",
+                "to": "",
+                "type": 1,
+                "value": "0"
+                },
+                {
+                "from": "",
+                "id": 2,
+                "text": "异常",
+                "to": "",
+                "type": 1,
+                "value": "1"
+                }
+            ],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "red",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 0,
+            "y": 10
+        },
+        "id": 10,
+        "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "mean"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_last_status{opsTask=\"check-kube-proxy-pod\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "kube-proxy pod failure",
+            "refId": "D"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "当前kube-proxy检查结果",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查网络插件管控是否健康",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [
+                {
+                "from": "",
+                "id": 1,
+                "text": "正常",
+                "to": "",
+                "type": 1,
+                "value": "0"
+                },
+                {
+                "from": "",
+                "id": 2,
+                "text": "异常",
+                "to": "",
+                "type": 1,
+                "value": "1"
+                }
+            ],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "red",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 6,
+            "y": 10
+        },
+        "id": 50,
+        "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "mean"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_last_status{opsTask=\"check-network-control-plane\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "l",
+            "refId": "D"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "当前网络控制面检查结果",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查节点网络是否联通",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [
+                {
+                "from": "",
+                "id": 1,
+                "text": "正常",
+                "to": "",
+                "type": 1,
+                "value": "0"
+                },
+                {
+                "from": "",
+                "id": 2,
+                "text": "异常",
+                "to": "",
+                "type": 1,
+                "value": "1"
+                }
+            ],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "red",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 12,
+            "y": 10
+        },
+        "id": 53,
+        "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "mean"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_last_status{opsTask=\"check-node-network\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "l",
+            "refId": "D"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "当前节点网络检查结果",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查容器网络是否联通",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [
+                {
+                "from": "",
+                "id": 1,
+                "text": "正常",
+                "to": "",
+                "type": 1,
+                "value": "0"
+                },
+                {
+                "from": "",
+                "id": 2,
+                "text": "异常",
+                "to": "",
+                "type": 1,
+                "value": "1"
+                }
+            ],
+            "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "red",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 18,
+            "y": 10
+        },
+        "id": 56,
+        "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "mean"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_last_status{opsTask=\"check-node-network\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "l",
+            "refId": "D"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "当前容器网络检查结果",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查kube proxy是否健康，Pod状态正常且数量正常",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "#EAB839",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 0,
+            "y": 14
+        },
+        "id": 45,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "mean"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_failed_numbers{opsTask=\"check-kube-proxy-pod\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "",
+            "refId": "D"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史失败总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查kube proxy是否健康，Pod状态正常且数量正常",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 3,
+            "y": 14
+        },
+        "id": 46,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "mean"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_success_numbers{opsTask=\"check-kube-proxy-pod\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "kube-proxy pod failure",
+            "refId": "D"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史通过总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查网络插件管控是否健康",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "#EAB839",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 6,
+            "y": 14
+        },
+        "id": 51,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "mean"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_failed_numbers{opsTask=\"check-network-control-plane\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "l",
+            "refId": "D"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史失败总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查网络插件管控是否健康",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 9,
+            "y": 14
+        },
+        "id": 52,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "mean"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_success_numbers{opsTask=\"check-network-control-plane\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "l",
+            "refId": "D"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史通过总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查节点网络是否联通",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "yellow",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 12,
+            "y": 14
+        },
+        "id": 54,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "mean"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_failed_numbers{opsTask=\"check-node-network\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "l",
+            "refId": "D"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史失败总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查节点网络是否联通",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 15,
+            "y": 14
+        },
+        "id": 55,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "mean"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_success_numbers{opsTask=\"check-node-network\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "l",
+            "refId": "D"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史通过总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查容器网络是否联通",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "#EAB839",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 18,
+            "y": 14
+        },
+        "id": 57,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "mean"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_failed_numbers{opsTask=\"check-pod-network\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "l",
+            "refId": "D"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史失败总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查容器网络是否联通",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 21,
+            "y": 14
+        },
+        "id": 58,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "mean"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_success_numbers{opsTask=\"check-pod-network\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "l",
+            "refId": "D"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史通过总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查coredns是否正常，service能调用",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [
+                {
+                "from": "",
+                "id": 1,
+                "text": "正常",
+                "to": "",
+                "type": 1,
+                "value": "0"
+                },
+                {
+                "from": "",
+                "id": 2,
+                "text": "异常",
+                "to": "",
+                "type": 1,
+                "value": "1"
+                }
+            ],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "red",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 0,
+            "y": 18
+        },
+        "id": 47,
+        "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "mean"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_last_status{opsTask=\"check-k8s-dns-hostnet\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "",
+            "refId": "D"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "当前coredns检查结果",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查coredns是否正常，service能调用",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                },
+                {
+                    "color": "#EAB839",
+                    "value": 1
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 0,
+            "y": 22
+        },
+        "id": 48,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "mean"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_failed_numbers{opsTask=\"check-k8s-dns-hostnet\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "l",
+            "refId": "D"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史失败总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "datasource": null,
+        "description": "检查coredns是否正常，service能调用",
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": null,
+                "filterable": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green",
+                    "value": null
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 3,
+            "y": 22
+        },
+        "id": 49,
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "mean"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "textMode": "auto"
+        },
+        "pluginVersion": "7.2.1",
+        "targets": [
+            {
+            "expr": "opstask_success_numbers{opsTask=\"check-k8s-dns-hostnet\"}",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "l",
+            "refId": "D"
+            }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "历史通过总数",
+        "transformations": [],
+        "type": "stat"
+        },
+        {
+        "collapsed": true,
+        "datasource": null,
+        "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 26
+        },
+        "id": 7,
+        "panels": [
+            {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": null,
+            "description": "",
+            "fieldConfig": {
+                "defaults": {
+                "custom": {}
+                },
+                "overrides": []
+            },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 9,
+                "w": 12,
+                "x": 0,
+                "y": 3
+            },
+            "hiddenSeries": false,
+            "id": 2,
+            "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "alertThreshold": true
+            },
+            "percentage": false,
+            "pluginVersion": "7.2.1",
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                "expr": "opstask_last_status{opsTask=\"check-k8s-dns-hostnet\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "A"
+                },
+                {
+                "expr": "opstask_last_status{opsTask=\"check-docker-overlay-mount\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "B"
+                },
+                {
+                "expr": "opstask_last_status{opsTask=\"check-k8s-apiserver-crash\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "C"
+                },
+                {
+                "expr": "opstask_last_status{opsTask=\"check-k8s-cs\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "D"
+                },
+                {
+                "expr": "opstask_last_status{opsTask=\"check-kube-proxy-pod\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "E"
+                },
+                {
+                "expr": "opstask_last_status{opsTask=\"check-kubelet-evict\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "F"
+                },
+                {
+                "expr": "opstask_last_status{opsTask=\"check-k8s-dns-hostnet\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "G"
+                },
+                {
+                "expr": "opstask_last_status{opsTask=\"check-network-control-plane\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "H"
+                },
+                {
+                "expr": "opstask_last_status{opsTask=\"check-node-network\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "I"
+                },
+                {
+                "expr": "opstask_last_status{opsTask=\"check-pod-network\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "J"
+                }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "l-zero: recent check status",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                "$$hashKey": "object:131",
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+                },
+                {
+                "$$hashKey": "object:132",
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+            },
+            {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": null,
+            "description": "",
+            "fieldConfig": {
+                "defaults": {
+                "custom": {}
+                },
+                "overrides": []
+            },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 9,
+                "w": 12,
+                "x": 12,
+                "y": 3
+            },
+            "hiddenSeries": false,
+            "id": 5,
+            "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "alertThreshold": true
+            },
+            "percentage": false,
+            "pluginVersion": "7.2.1",
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                "expr": "opstask_failed_numbers{opsTask=\"check-k8s-dns-hostnet\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "A"
+                },
+                {
+                "expr": "opstask_failed_numbers{opsTask=\"check-docker-overlay-mount\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "B"
+                },
+                {
+                "expr": "opstask_failed_numbers{opsTask=\"check-k8s-apiserver-crash\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "C"
+                },
+                {
+                "expr": "opstask_failed_numbers{opsTask=\"check-k8s-cs\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "D"
+                },
+                {
+                "expr": "opstask_failed_numbers{opsTask=\"check-kube-proxy-pod\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "E"
+                },
+                {
+                "expr": "opstask_failed_numbers{opsTask=\"check-kubelet-evict\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "F"
+                },
+                {
+                "expr": "opstask_failed_numbers{opsTask=\"check-k8s-dns-hostnet\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "G"
+                },
+                {
+                "expr": "opstask_failed_numbers{opsTask=\"check-network-control-plane\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "H"
+                },
+                {
+                "expr": "opstask_failed_numbers{opsTask=\"check-node-network\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "I"
+                },
+                {
+                "expr": "opstask_failed_numbers{opsTask=\"check-pod-network\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "J"
+                }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "l-zero: total failed checks",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                "$$hashKey": "object:337",
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+                },
+                {
+                "$$hashKey": "object:338",
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+            },
+            {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": null,
+            "description": "",
+            "fieldConfig": {
+                "defaults": {
+                "custom": {}
+                },
+                "overrides": []
+            },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 9,
+                "w": 12,
+                "x": 0,
+                "y": 12
+            },
+            "hiddenSeries": false,
+            "id": 3,
+            "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "alertThreshold": true
+            },
+            "percentage": false,
+            "pluginVersion": "7.2.1",
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                "expr": "opstask_success_numbers{opsTask=\"check-k8s-dns-hostnet\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "A"
+                },
+                {
+                "expr": "opstask_success_numbers{opsTask=\"check-docker-overlay-mount\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "B"
+                },
+                {
+                "expr": "opstask_success_numbers{opsTask=\"check-k8s-apiserver-crash\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "C"
+                },
+                {
+                "expr": "opstask_success_numbers{opsTask=\"check-k8s-cs\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "D"
+                },
+                {
+                "expr": "opstask_success_numbers{opsTask=\"check-kube-proxy-pod\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "E"
+                },
+                {
+                "expr": "opstask_success_numbers{opsTask=\"check-kubelet-evict\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "F"
+                },
+                {
+                "expr": "opstask_success_numbers{opsTask=\"check-k8s-dns-hostnet\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "G"
+                },
+                {
+                "expr": "opstask_success_numbers{opsTask=\"check-network-control-plane\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "H"
+                },
+                {
+                "expr": "opstask_success_numbers{opsTask=\"check-node-network\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "I"
+                },
+                {
+                "expr": "opstask_success_numbers{opsTask=\"check-pod-network\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "J"
+                }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "l-zero: total success checks",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                "$$hashKey": "object:279",
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+                },
+                {
+                "$$hashKey": "object:280",
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+            },
+            {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": null,
+            "description": "",
+            "fieldConfig": {
+                "defaults": {
+                "custom": {}
+                },
+                "overrides": []
+            },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": {
+                "h": 9,
+                "w": 12,
+                "x": 12,
+                "y": 12
+            },
+            "hiddenSeries": false,
+            "id": 4,
+            "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": {
+                "alertThreshold": true
+            },
+            "percentage": false,
+            "pluginVersion": "7.2.1",
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+                {
+                "expr": "opstask_error_numbers{opsTask=\"check-k8s-dns-hostnet\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "A"
+                },
+                {
+                "expr": "opstask_error_numbers{opsTask=\"check-docker-overlay-mount\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "B"
+                },
+                {
+                "expr": "opstask_error_numbers{opsTask=\"check-k8s-apiserver-crash\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "C"
+                },
+                {
+                "expr": "opstask_error_numbers{opsTask=\"check-k8s-cs\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "D"
+                },
+                {
+                "expr": "opstask_error_numbers{opsTask=\"check-kube-proxy-pod\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "E"
+                },
+                {
+                "expr": "opstask_error_numbers{opsTask=\"check-kubelet-evict\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "F"
+                },
+                {
+                "expr": "opstask_error_numbers{opsTask=\"check-k8s-dns-hostnet\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "G"
+                },
+                {
+                "expr": "opstask_error_numbers{opsTask=\"check-network-control-plane\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "H"
+                },
+                {
+                "expr": "opstask_error_numbers{opsTask=\"check-node-network\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "I"
+                },
+                {
+                "expr": "opstask_error_numbers{opsTask=\"check-pod-network\"}",
+                "interval": "",
+                "legendFormat": "",
+                "refId": "J"
+                }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "l-zero: total error checks",
+            "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+            },
+            "type": "graph",
+            "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+            },
+            "yaxes": [
+                {
+                "$$hashKey": "object:308",
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+                },
+                {
+                "$$hashKey": "object:309",
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+                }
+            ],
+            "yaxis": {
+                "align": false,
+                "alignLevel": null
+            }
+            }
+        ],
+        "title": "Overall",
+        "type": "row"
+        }
+    ],
+    "refresh": false,
+    "schemaVersion": 26,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "now-2d",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "集群巡检概览（l-zero summary）",
+    "uid": "l-zero-dashboard"
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    grafana_dashboard: "1"
+  name: l-zero
+  namespace: {{ .Release.Namespace }}
+  {{- end }}

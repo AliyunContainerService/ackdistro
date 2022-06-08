@@ -1,0 +1,67 @@
+{{- if not (empty .Values.upgradeCRDs) }}
+{{- if .Values.upgradeCRDs.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "kube-prometheus-stack.fullname" . }}-upgrade-crds
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade,post-rollback
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    {{- include "kube-prometheus-stack.labels" . | nindent 4 }}
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      name: {{ template "kube-prometheus-stack.fullname" . }}-upgrade-crds
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      initContainers:
+        - name: crds
+          image: {{ .Values.upgradeCRDs.image.repoTag }}
+          imagePullPolicy: {{ .Values.upgradeCRDs.image.pullPolicy }}
+          command:
+            - /bin/sh
+            - -c
+            - cp /crds/* /tmp/crds/
+          volumeMounts:
+            - mountPath: /tmp/crds
+              name: crds
+      containers:
+        - name: kubectl
+          image: {{ .Values.upgradeCRDs.kubectlImage.repoTag }}
+          imagePullPolicy: {{ .Values.upgradeCRDs.kubectlImage.pullPolicy }}
+          command:
+            - /bin/sh
+            - -c
+            - for f in /crds/*.yaml ; do kubectl replace -f $f ; done
+          resources:
+{{ toYaml .Values.upgradeCRDs.kubectlImage.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /crds
+              name: crds
+              readOnly: true
+      volumes:
+        - name: crds
+          emptyDir: {}
+      restartPolicy: OnFailure
+      serviceAccountName:  {{ template "kube-prometheus-stack.operator.serviceAccountName" . }}
+      {{- with .Values.upgradeCRDs.affinity }}
+      nodeSelector:
+{{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.upgradeCRDs.affinity }}
+      affinity:
+{{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.upgradeCRDs.tolerations }}
+      tolerations:
+{{ toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        # runAsGroup: 2000
+        runAsNonRoot: false
+        # runAsUser: 2000
+{{- end }}
+{{- end }}

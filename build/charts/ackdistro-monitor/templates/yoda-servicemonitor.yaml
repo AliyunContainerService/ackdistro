@@ -1,0 +1,18 @@
+{{- if .Values.monitor.servicemonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: yoda
+  namespace: {{ .Release.Namespace }}
+spec:
+  endpoints:
+  - port: http-metrics
+    path: /metrics
+  jobLabel: app
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.monitor.namespace_yoda }}
+  selector:
+    matchLabels:
+      app: yoda
+{{- end }}

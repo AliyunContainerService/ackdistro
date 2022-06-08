@@ -1,0 +1,18 @@
+{{- if .Values.monitor.servicemonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: minio
+  namespace: {{ .Release.Namespace }}
+spec:
+  endpoints:
+  - port: http-metrics
+    path: /minio/prometheus/metrics
+  jobLabel: app
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.monitor.namespace_minio }}
+  selector:
+    matchLabels:
+      app: minio
+{{- end }}

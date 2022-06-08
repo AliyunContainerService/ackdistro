@@ -1,0 +1,82 @@
+version: 1.0
+
+# replica type resources: deployments/statefuleset/CRD
+replicas-resources:
+- resources:
+    cpu:
+      requests:
+      - prometheusOperator.resources.requests.cpu
+      limits:
+      - prometheusOperator.resources.limits.cpu
+    memory:
+      requests:
+      - prometheusOperator.resources.requests.memory
+      limits:
+      - prometheusOperator.resources.limits.memory
+- replica-key: prometheus.prometheusSpec.replicas
+  resources:
+    cpu:
+      requests:
+      - prometheus.prometheusSpec.resources.requests.cpu
+      limits:
+      - prometheus.prometheusSpec.resources.limits.cpu
+    memory:
+      requests:
+      - prometheus.prometheusSpec.resources.requests.memory
+      limits:
+      - prometheus.prometheusSpec.resources.limits.memory
+    persistence:
+    - prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage
+- replica-key: alertmanager.alertmanagerSpec.replicas
+  resources:
+    cpu:
+      requests:
+      - alertmanager.alertmanagerSpec.resources.requests.cpu
+      limits:
+      - alertmanager.alertmanagerSpec.resources.limits.cpu
+    memory:
+      requests:
+      - alertmanager.alertmanagerSpec.resources.requests.memory
+      limits:
+      - alertmanager.alertmanagerSpec.resources.limits.memory
+    persistence:
+    - alertmanager.alertmanagerSpec.storage.volumeClaimTemplate.spec.resources.requests.storage
+- replica-key: kube-state-metrics.replicas
+  resources:
+    cpu:
+      requests:
+      - kube-state-metrics.resources.requests.cpu
+      limits:
+      - kube-state-metrics.resources.limits.cpu
+    memory:
+      requests:
+      - kube-state-metrics.resources.requests.memory
+      limits:
+      - kube-state-metrics.resources.limits.memory
+- replica-key: grafana.replicas
+  resources:
+    cpu:
+      requests:
+      - granana.resources.requests.cpu
+      limits:
+      - granana.resources.limits.cpu
+    memory:
+      requests:
+      - granana.resources.requests.memory
+      limits:
+      - granana.resources.limits.memory
+    persistence:
+    - grafana.persistence.size
+
+# daemonset type resources: daemonset/CRD
+daemonset-resources:
+  cpu:
+    requests:
+    - prometheus-node-exporter.resources.requests.cpu
+    limits:
+    - prometheus-node-exporter.resources.limits.cpu
+  memory:
+    requests:
+    - prometheus-node-exporter.resources.requests.memory
+    limits:
+    - prometheus-node-exporter.resources.limits.memory
