@@ -1,0 +1,69 @@
+{{- if .Values.eventer.sinks.sls.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  namespace: kube-system
+  name: kube-eventer-init-1.5-5e0e7c1-aliyun
+spec:
+  template:
+    spec:
+      containers:
+      - name: kube-eventer-init
+        {{- if .Values.controller.clusterType }}
+        {{- if eq .Values.controller.clusterType "ExternalKubernetes"}}
+        image: "registry.{{ .Values.controller.regionId }}.aliyuncs.com/acs/kube-eventer-init:1.5-5e0e7c1-aliyun"
+        command: ["/sls-app-api", "-method=create", "-cluster-id={{ .Values.controller.clusterId }}","-cluster-name={{ .Values.controller.clusterName }}","-project={{ .Values.eventer.sinks.sls.project }}", "-region={{ .Values.controller.regionId }}", "-internal=false"]
+        env:
+        - name: AccessKeyId
+          valueFrom:
+            secretKeyRef:
+              name: alibaba-addon-secret
+              key: access-key-id
+        - name: AccessKeySecret
+          valueFrom:
+            secretKeyRef:
+              name: alibaba-addon-secret
+              key: access-key-secret
+        {{- else }}
+        image: "registry-vpc.{{ .Values.controller.regionId }}.aliyuncs.com/acs/kube-eventer-init:1.5-5e0e7c1-aliyun"
+        command: ["/sls-app-api", "-method=create", "-cluster-id={{ .Values.controller.clusterId }}","-cluster-name={{ .Values.controller.clusterName }}","-project={{ .Values.eventer.sinks.sls.project }}", "-region={{ .Values.controller.regionId }}"]
+        {{- end }}
+        {{- else }}
+        image: "registry-vpc.{{ .Values.controller.regionId }}.aliyuncs.com/acs/kube-eventer-init:1.5-5e0e7c1-aliyun"
+        command: ["/sls-app-api", "-method=create", "-cluster-id={{ .Values.controller.clusterId }}","-cluster-name={{ .Values.controller.clusterName }}","-project={{ .Values.eventer.sinks.sls.project }}", "-region={{ .Values.controller.regionId }}"]
+        {{- end }}
+      {{- if .Values.controller.ramRoleType }}
+      {{- if eq .Values.controller.ramRoleType "restricted"}}
+      {{- if .Values.controller.clusterType }}
+      {{- if ne .Values.controller.clusterType "ExternalKubernetes"}}
+        volumeMounts:
+        - mountPath: "/var/addon"
+          readOnly: true
+          name: eventer-token
+      volumes:
+        - name: eventer-token
+          secret:
+            secretName: addon.log.token
+            items:
+              - key: addon.token.config
+                path: token-config
+      {{- end }}
+      {{- else }}
+        volumeMounts:
+        - mountPath: "/var/addon"
+          readOnly: true
+          name: eventer-token
+      volumes:
+        - name: eventer-token
+          secret:
+            secretName: addon.log.token
+            items:
+              - key: addon.token.config
+                path: token-config
+      {{- end }}
+      {{- end }}
+      {{- end }}
+      restartPolicy: Never
+      hostNetwork: true
+  backoffLimit: 3
+{{- end }}

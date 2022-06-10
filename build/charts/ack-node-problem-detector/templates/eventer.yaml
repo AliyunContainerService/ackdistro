@@ -1,0 +1,123 @@
+{{- if or .Values.eventer.sinks.sls.enabled .Values.eventer.sinks.dingtalk.enabled .Values.eventer.sinks.eventbridge.enabled .Values.eventer.othersinks }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "monitor.fullname" . }}-eventer
+  namespace: kube-system
+  labels:
+    task: monitoring
+    k8s-app: eventer
+spec:
+  selector:
+    matchLabels:
+      task: monitoring
+      k8s-app: eventer
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        task: monitoring
+        k8s-app: eventer
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
+    spec:
+      serviceAccount: {{ .Values.npd.serviceaccount }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: k8s.aliyun.com
+                operator: NotIn
+                values:
+                - "true"
+      containers:
+      - name: eventer
+        image: {{ .Values.eventer.image.repository }}:{{ .Values.eventer.image.tag }}
+        imagePullPolicy: {{ .Values.eventer.image.pullPolicy }}
+        {{- if .Values.controller.ramRoleType }}
+        {{- if eq .Values.controller.ramRoleType "restricted"}}
+        {{- if .Values.controller.clusterType }}
+        {{- if eq .Values.controller.clusterType "ExternalKubernetes"}}
+        env:
+        - name: TZ
+          value: "Asia/Shanghai"
+        - name: RegionId
+          value: {{ .Values.controller.regionId }}
+        - name: AccessKeyId
+          valueFrom:
+            secretKeyRef:
+              name: alibaba-addon-secret
+              key: access-key-id
+        - name: AccessKeySecret
+          valueFrom:
+            secretKeyRef:
+              name: alibaba-addon-secret
+              key: access-key-secret
+        {{- else }}
+        volumeMounts:
+          - mountPath: "/var/addon"
+            readOnly: true
+            name: eventer-token
+        {{- end }}
+        {{- else}}
+        volumeMounts:
+          - mountPath: "/var/addon"
+            readOnly: true
+            name: eventer-token
+        {{- end }}
+        {{- end }}
+        {{- end }}
+#        env:
+#        {{- range .Values.eventer.env }}
+#        {{- range $key,$value := . }}
+#         - name: {{ $key |quote }}
+#           value: {{ $value | quote }}
+#        {{- end }}
+#        {{- end }}
+        command:
+        - /kube-eventer
+        - --source=kubernetes:https://kubernetes.default
+        {{- if .Values.eventer.sinks.dingtalk.enabled }}
+        - --sink=dingtalk:https://oapi.dingtalk.com/robot/send?access_token={{ .Values.eventer.sinks.dingtalk.token }}&kinds={{ .Values.eventer.sinks.dingtalk.monitorkinds }}&namespaces={{ .Values.eventer.sinks.dingtalk.monitornamespaces }}&label={{ .Values.eventer.sinks.dingtalk.label }}&level={{ .Values.eventer.sinks.dingtalk.level }}
+        {{- end }}
+        {{- if .Values.eventer.sinks.sls.enabled }}
+        {{- if .Values.eventer.sinks.sls.project }}
+        - --sink=sls:https://sls.aliyuncs.com?internal={{ .Values.eventer.sinks.sls.internal }}&logStore={{ .Values.eventer.sinks.sls.logstore }}&project={{ .Values.eventer.sinks.sls.project }}&topic={{ .Values.eventer.sinks.sls.topic }}
+        {{- else }}
+        - --sink=sls:https://sls.aliyuncs.com?internal={{ .Values.eventer.sinks.sls.internal }}&logStore={{ .Values.eventer.sinks.sls.logstore }}&project=k8s-log-{{ .Values.controller.clusterId }}&topic={{ .Values.eventer.sinks.sls.topic }}
+        {{- end }}
+        {{- end }}
+        {{- if .Values.eventer.sinks.eventbridge.enabled }}
+        - --sink=eventbridge:https://eventbridge.aliyuncs.com?clusterId={{ .Values.controller.clusterId }}&regionId={{ .Values.controller.regionId }}
+        {{- end }}
+        {{- if .Values.eventer.othersinks }}
+        {{- range $index, $sink := .Values.eventer.othersinks }}
+        - --sink={{ $sink }}
+        {{- end }}
+        {{- end }}
+      {{- if .Values.controller.ramRoleType }}
+      {{- if eq .Values.controller.ramRoleType "restricted"}}
+      {{- if .Values.controller.clusterType }}
+      {{- if eq .Values.controller.clusterType "ExternalKubernetes"}}
+      {{- else }}
+      volumes:
+        - name: eventer-token
+          secret:
+            secretName: addon.log.token
+            items:
+              - key: addon.token.config
+                path: token-config
+      {{- end }}
+      {{- else }}
+      volumes:
+        - name: eventer-token
+          secret:
+            secretName: addon.log.token
+            items:
+              - key: addon.token.config
+                path: token-config
+      {{- end }}
+      {{- end }}
+      {{- end }}
+{{- end }}
