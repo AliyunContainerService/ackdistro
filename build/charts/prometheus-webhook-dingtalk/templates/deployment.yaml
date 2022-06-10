@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dingtalk
+spec:
+  selector:
+    matchLabels:
+      app: dingtalk-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dingtalk-app
+    spec:
+      containers:
+        - name: dingtalk-app
+          image: reg.docker.alibaba-inc.com:5000/oecp/prometheus-webhook-dingtalk:v2.1.0
+          ports:
+            - containerPort: 8060
+          command:
+          imagePullPolicy: IfNotPresent

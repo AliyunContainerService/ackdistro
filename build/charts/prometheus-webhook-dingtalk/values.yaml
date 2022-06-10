@@ -3,7 +3,7 @@
 images:
   dingtalk:
     image: ecp_builder/prometheus-webhook-dingtalk
-    tag: v1.1.0-d18ee35
+    tag: v0.1
 k8s_namespace: kube-system
 globalconfig:
   DisableFailureDomain: false
