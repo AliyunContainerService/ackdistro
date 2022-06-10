@@ -1,4 +1,4 @@
-FROM registry.cn-qingdao.aliyuncs.com/sealer-io/ackdistro-multi:v0.2.0
+FROM registry.cn-qingdao.aliyuncs.com/sealer-io/ackdistro-multi:v0.1.0
 
 COPY Metadata .
 
