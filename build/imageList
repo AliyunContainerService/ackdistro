@@ -7,7 +7,7 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/metrics-server:v0.3
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/kube-proxy:v1.20.4-aliyun.1
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/coredns:1.7.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/l-zero:v1.1.0-d18ee35
-ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/nginxdemos:0.2
+ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/httpd:alpine3.15
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/opsbase-alpine:v0.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-cni:v3.8.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-pod2daemon-flexvol:v3.9.1
@@ -21,5 +21,7 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-node-driver-reg
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-provisioner:v2.2.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-resizer:v1.3.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-snapshotter:v4.2.1
-ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-minio:v1.0.18
+ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-minio:v1.0.18-b4d67fe
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/snapshot-controller:v4.2.1
+registry.cn-zhangjiakou.aliyuncs.com/acs/coredns:v1.8.4.5-2ce07fd2-aliyun
+ghcr.io/labring/lvscare:v1.1.3-beta.3

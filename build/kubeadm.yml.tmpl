@@ -2,6 +2,11 @@ apiVersion: kubeadm.k8s.io/v1beta2
 kind: InitConfiguration
 localAPIEndpoint:
   bindPort: 6443
+  {{ if eq .HostIPFamily "6" }}
+  advertiseAddress: ::
+  {{else}}
+  advertiseAddress: 0.0.0.0
+  {{ fi }}
 nodeRegistration:
   criSocket: /var/run/dockershim.sock
 
@@ -13,11 +18,24 @@ controlPlaneEndpoint: "apiserver.cluster.local:6443"
 imageRepository: sea.hub:5000/ecp_builder
 networking:
   dnsDomain: {{or .DNSDomain "cluster.local"}}
-  podSubnet: {{or .PodCIDR "100.64.0.0/16"}}
-  serviceSubnet: {{or .SvcCIDR "10.96.0.0/16"}}
+  {{ if .PodCIDR }}
+  podSubnet: {{ .PodCIDR }}
+  {{else if eq .HostIPFamily "6"}}
+  podSubnet: "3408:4003:10bb:6a01:83b9:6360:c66d:0000/112"
+  {{else}}
+  podSubnet: "100.64.0.0/16"
+  {{ fi }}
+  {{ if .SvcCIDR }}
+  serviceSubnet: {{ .SvcCIDR }}
+  {{else if eq .HostIPFamily "6"}}
+  serviceSubnet: "4408:4003:10bb:6a01:83b9:6360:c66d:0000/112"
+  {{else}}
+  serviceSubnet: "10.96.0.0/16"
+  {{ fi }}
 apiServer:
   certSANs:
   - 127.0.0.1
+  - ::1
   - apiserver.cluster.local
   - 10.96.0.1
   - 10.103.97.2
@@ -53,8 +71,13 @@ controllerManager:
   extraArgs:
     feature-gates: TTLAfterFinished=true,EphemeralContainers=true
     experimental-cluster-signing-duration: 876000h
+    {{ if eq .HostIPFamily "6" }}
+    bind-address: ::
+    address: ::
+    {{else}}
     bind-address: 0.0.0.0
     address: 0.0.0.0
+    {{ fi }}
     port: '10252'
     profiling: 'false'
   extraVolumes:
@@ -66,8 +89,13 @@ controllerManager:
 scheduler:
   extraArgs:
     feature-gates: TTLAfterFinished=true,EphemeralContainers=true
+    {{ if eq .HostIPFamily "6" }}
+    bind-address: ::
+    address: ::
+    {{else}}
     bind-address: 0.0.0.0
     address: 0.0.0.0
+    {{ fi }}
     port: '10251'
     profiling: 'false'
   extraVolumes:
@@ -79,7 +107,11 @@ scheduler:
 etcd:
   local:
     extraArgs:
+      {{ if eq .HostIPFamily "6" }}
+      listen-metrics-urls: http://[::]:2381
+      {{else}}
       listen-metrics-urls: http://0.0.0.0:2381
+      {{ fi }}
     imageRepository: sea.hub:5000/ecp_builder
     imageTag: 3.4.3-0
 
@@ -94,6 +126,11 @@ nodeRegistration:
 controlPlane:
   localAPIEndpoint:
     bindPort: 6443
+    {{ if eq .HostIPFamily "6" }}
+    advertiseAddress: ::
+    {{else}}
+    advertiseAddress: 0.0.0.0
+    {{ fi }}
 
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1

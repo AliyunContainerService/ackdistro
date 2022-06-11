@@ -108,15 +108,16 @@ for node_ip in $NODE_IP_LIST
 do
     # L3 network
     count=0
+    dest=`WrapIPAndPort ${node_ip} $TARGET_NODEPORT`
     while [[ true ]]; do
-        curl ${node_ip}:$TARGET_NODEPORT --max-time ${TIME_LIMIT} > /dev/null 2>&1
+        curl "$dest" --max-time ${TIME_LIMIT} > /dev/null 2>&1
         if [ `echo $?` -eq 0 ]; then
             #echo "Curl from src:pod($myip)/node($HOST_IP) to dest:nodeport_service(${node_ip}:${TARGET_NODEPORT}) success"
             break
         else
             count=$[${count}+1]
             if [[ ${count} -eq 4 ]]; then
-                errMsg=$errMsg";Curl from src:pod($myip)/node($HOST_IP) to dest:nodeport_service(${node_ip}:${TARGET_NODEPORT}) failed"
+                errMsg=$errMsg";Curl from src:pod($myip)/node($HOST_IP) to dest:nodeport_service($dest) failed"
                 echo ${errMsg}
                 break
             fi
@@ -141,14 +142,15 @@ kube_dns_endpoints_ips=`kubectl -n kube-system get ep kube-dns -ojsonpath='{.sub
 for pod in `echo "$kube_dns_endpoints_ips"`
 do
     count=0
+    dest=`WrapIPAndPort ${pod} 53`
     while [[ true ]]; do
-        curl "$pod:53" -k --connect-timeout 15 > /dev/null 2>&1
+        curl "$dest" -k --connect-timeout 15 > /dev/null 2>&1
         error_code=`echo $?`
         if [ $error_code -ne 0 ] && [ $error_code -ne 52 ]; then
             count=$[${count}+1]
             if [[ ${count} -eq 4 ]]; then
                 #curl "$pod:53" -k --connect-timeout 15
-                errMsg=$errMsg";Curl from src:pod($myip)/node($HOST_IP) to dest:dns_endpoint($pod:53) failed"
+                errMsg=$errMsg";Curl from src:pod($myip)/node($HOST_IP) to dest:dns_endpoint($dest) failed"
                 echo $errMsg
                 break
             fi
@@ -172,14 +174,15 @@ errMsg=""
 kube_dns_service_ip=`kubectl -n kube-system get svc kube-dns -ojsonpath='{.spec.clusterIP}'`
 
 count=0
+dest=`WrapIPAndPort ${kube_dns_service_ip} 53`
 while [[ true ]]; do
-    curl "$kube_dns_service_ip:53" -k --connect-timeout 15 > /dev/null 2>&1
+    curl "$dest" -k --connect-timeout 15 > /dev/null 2>&1
     error_code=`echo $?`
     if [ $error_code -ne 0 ] && [ $error_code -ne 52 ]; then
         count=$[${count}+1]
         if [[ ${count} -eq 4 ]]; then
             #curl "$kube_dns_service_ip:53" -k --connect-timeout 15
-            errMsg="Curl from src:pod($myip)/node($HOST_IP) to dest:dns_service($kube_dns_service_ip:53) failed"
+            errMsg="Curl from src:pod($myip)/node($HOST_IP) to dest:dns_service($dest) failed"
             echo $errMsg
             break
         fi

@@ -170,6 +170,14 @@ data:
       echo ${1#*,}
     }
 
+    WrapIPAndPort() {
+      if [[ $1 =~ .*:.* ]];then
+        echo "[${1}]:${2}"
+      else
+        echo "${1}:${2}"
+      fi
+    }
+
     CreatePod() {
       export TARGET_POD_NAME="${INSTANCE_NAME}-target"
       kubectl -n ${NAMESPACE} get pod ${TARGET_POD_NAME}
@@ -180,7 +188,7 @@ data:
             if [ "$phase" == "Running" ];then
               export TARGET_POD_NAME="${TARGET_POD_NAME}"
               export TARGET_POD_IP=`kubectl -n ${NAMESPACE} get pod ${TARGET_POD_NAME} -ojsonpath='{.status.podIP}'`
-              export TARGET_POD_URL=${TARGET_POD_IP}":80"
+              export TARGET_POD_URL=`WrapIPAndPort ${TARGET_POD_IP} 80`
               return 0
             fi
             echo "wait pod ready"
@@ -208,7 +216,7 @@ data:
         uid: ${POD_UID}
     spec:
       containers:
-      - image: sea.hub:5000/ecp_builder/nginxdemos:0.2
+      - image: ${REGISTRY_URL}/oecp/httpd:alpine3.15
         imagePullPolicy: IfNotPresent
         name: main
       dnsPolicy: ClusterFirst
@@ -230,7 +238,7 @@ data:
         if [ "$phase" == "Running" ];then
           export TARGET_POD_NAME="${TARGET_POD_NAME}"
           export TARGET_POD_IP=`kubectl -n ${NAMESPACE} get pod ${TARGET_POD_NAME} -ojsonpath='{.status.podIP}'`
-          export TARGET_POD_URL=${TARGET_POD_IP}":80"
+          export TARGET_POD_URL=`WrapIPAndPort ${TARGET_POD_IP} 80`
           return 0
         fi
       done
@@ -249,8 +257,8 @@ data:
           export TARGET_CLUSTER_IP=`kubectl -n ${NAMESPACE} get svc ${TARGET_SVC_NAME} -ojsonpath='{.spec.clusterIP}'`
           export TARGET_PORT=`kubectl -n ${NAMESPACE} get svc ${TARGET_SVC_NAME} -ojsonpath='{.spec.ports[0].port}'`
           export TARGET_NODEPORT=`kubectl -n ${NAMESPACE} get svc ${TARGET_SVC_NAME} -ojsonpath='{.spec.ports[0].nodePort}'`
-          export TARGET_SVC_URL=${TARGET_CLUSTER_IP}":"${TARGET_PORT}
-          export TARGET_NODEPORT_URL=${HOST_IP}":"${TARGET_NODEPORT}
+          export TARGET_SVC_URL=`WrapIPAndPort ${TARGET_CLUSTER_IP} ${TARGET_PORT}`
+          export TARGET_NODEPORT_URL=`WrapIPAndPort ${HOST_IP} ${TARGET_NODEPORT}`
           return 0
       fi
       kubectl apply -f -<<EOF
@@ -291,8 +299,8 @@ data:
       export TARGET_CLUSTER_IP=`kubectl -n ${NAMESPACE} get svc ${TARGET_SVC_NAME} -ojsonpath='{.spec.clusterIP}'`
       export TARGET_PORT=`kubectl -n ${NAMESPACE} get svc ${TARGET_SVC_NAME} -ojsonpath='{.spec.ports[0].port}'`
       export TARGET_NODEPORT=`kubectl -n ${NAMESPACE} get svc ${TARGET_SVC_NAME} -ojsonpath='{.spec.ports[0].nodePort}'`
-      export TARGET_SVC_URL=${TARGET_CLUSTER_IP}":"${TARGET_PORT}
-      export TARGET_NODEPORT_URL=${HOST_IP}":"${TARGET_NODEPORT}
+      export TARGET_SVC_URL=`WrapIPAndPort ${TARGET_CLUSTER_IP} ${TARGET_PORT}`
+      export TARGET_NODEPORT_URL=`WrapIPAndPort ${HOST_IP} ${TARGET_NODEPORT}`
       return 0
     }
 

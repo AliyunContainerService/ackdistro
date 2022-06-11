@@ -4,9 +4,9 @@ images:
   lzero:
     image: ecp_builder/l-zero
     tag: v1.1.0-d18ee35
-  nginxdemos:
-    image: ecp_builder/nginxdemos
-    tag: 0.2
+  httpd:
+    image: ecp_builder/httpd
+    tag: alpine3.15
   opsbasealpine:
     image: ecp_builder/opsbase-alpine
     tag: v0.2
