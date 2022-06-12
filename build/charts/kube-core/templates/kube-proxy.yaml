@@ -57,6 +57,7 @@ spec:
         - --kubeconfig=/var/lib/kube-proxy/kubeconfig.conf
         - --hostname-override=$(NODE_NAME)
         - --metrics-bind-address=0.0.0.0
+        - --feature-gates=IPv6DualStack=true
         image: "sea.hub:5000/ecp_builder/kube-proxy:v1.20.4-aliyun.1"
         imagePullPolicy: IfNotPresent
         name: kube-proxy-worker
@@ -169,6 +170,7 @@ spec:
         - --kubeconfig=/var/lib/kube-proxy/kubeconfig.conf
         - --hostname-override=$(NODE_NAME)
         - --metrics-bind-address=0.0.0.0
+        - --feature-gates=IPv6DualStack=true
         image: "sea.hub:5000/ecp_builder/kube-proxy:v1.20.4-aliyun.1"
         imagePullPolicy: IfNotPresent
         name: kube-proxy-master

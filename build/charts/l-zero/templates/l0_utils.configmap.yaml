@@ -216,7 +216,7 @@ data:
         uid: ${POD_UID}
     spec:
       containers:
-      - image: ${REGISTRY_URL}/oecp/httpd:alpine3.15
+      - image: ${REGISTRY_URL}/ecp_builder/httpd:alpine3.15
         imagePullPolicy: IfNotPresent
         name: main
       dnsPolicy: ClusterFirst

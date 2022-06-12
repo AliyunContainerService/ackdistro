@@ -3,10 +3,10 @@ kind: InitConfiguration
 localAPIEndpoint:
   bindPort: 6443
   {{ if eq .HostIPFamily "6" }}
-  advertiseAddress: ::
+  advertiseAddress: 0000:0000:0000:0000:0000:0000:0000:0000
   {{else}}
   advertiseAddress: 0.0.0.0
-  {{ fi }}
+  {{ end }}
 nodeRegistration:
   criSocket: /var/run/dockershim.sock
 
@@ -20,18 +20,18 @@ networking:
   dnsDomain: {{or .DNSDomain "cluster.local"}}
   {{ if .PodCIDR }}
   podSubnet: {{ .PodCIDR }}
-  {{else if eq .HostIPFamily "6"}}
+  {{else if eq .HostIPFamily "6" }}
   podSubnet: "3408:4003:10bb:6a01:83b9:6360:c66d:0000/112"
   {{else}}
   podSubnet: "100.64.0.0/16"
-  {{ fi }}
+  {{ end }}
   {{ if .SvcCIDR }}
   serviceSubnet: {{ .SvcCIDR }}
-  {{else if eq .HostIPFamily "6"}}
+  {{else if eq .HostIPFamily "6" }}
   serviceSubnet: "4408:4003:10bb:6a01:83b9:6360:c66d:0000/112"
   {{else}}
   serviceSubnet: "10.96.0.0/16"
-  {{ fi }}
+  {{ end }}
 apiServer:
   certSANs:
   - 127.0.0.1
@@ -39,8 +39,9 @@ apiServer:
   - apiserver.cluster.local
   - 10.96.0.1
   - 10.103.97.2
+  - 1248:4003:10bb:6a01:83b9:6360:c66d:0002
   extraArgs:
-    feature-gates: TTLAfterFinished=true,EphemeralContainers=true
+    feature-gates: TTLAfterFinished=true,EphemeralContainers=true,IPv6DualStack=true
     service-node-port-range: {{or .ServiceNodePortRange "30000-32767"}}
     audit-policy-file: "/etc/kubernetes/audit-policy.yml"
     audit-log-path: "/var/log/kubernetes/audit.log"
@@ -69,17 +70,27 @@ apiServer:
       pathType: File
 controllerManager:
   extraArgs:
-    feature-gates: TTLAfterFinished=true,EphemeralContainers=true
+    feature-gates: TTLAfterFinished=true,EphemeralContainers=true,IPv6DualStack=true
     experimental-cluster-signing-duration: 876000h
     {{ if eq .HostIPFamily "6" }}
-    bind-address: ::
-    address: ::
+    bind-address: 0000:0000:0000:0000:0000:0000:0000:0000
+    address: 0000:0000:0000:0000:0000:0000:0000:0000
+    {{ if ne .IPv6DualStack "true" }}
+    node-cidr-mask-size: "120"
+    {{ end }}
     {{else}}
     bind-address: 0.0.0.0
     address: 0.0.0.0
-    {{ fi }}
+    {{ if ne .IPv6DualStack "true" }}
+    node-cidr-mask-size: "24"
+    {{ end }}
+    {{ end }}
     port: '10252'
     profiling: 'false'
+    {{ if eq .IPv6DualStack "true" }}
+    node-cidr-mask-size-ipv6: "120"
+    node-cidr-mask-size-ipv4: "24"
+    {{ end }}
   extraVolumes:
     - hostPath: /etc/localtime
       mountPath: /etc/localtime
@@ -88,14 +99,14 @@ controllerManager:
       pathType: File
 scheduler:
   extraArgs:
-    feature-gates: TTLAfterFinished=true,EphemeralContainers=true
+    feature-gates: TTLAfterFinished=true,EphemeralContainers=true,IPv6DualStack=true
     {{ if eq .HostIPFamily "6" }}
-    bind-address: ::
-    address: ::
+    bind-address: 0000:0000:0000:0000:0000:0000:0000:0000
+    address: 0000:0000:0000:0000:0000:0000:0000:0000
     {{else}}
     bind-address: 0.0.0.0
     address: 0.0.0.0
-    {{ fi }}
+    {{ end }}
     port: '10251'
     profiling: 'false'
   extraVolumes:
@@ -111,9 +122,11 @@ etcd:
       listen-metrics-urls: http://[::]:2381
       {{else}}
       listen-metrics-urls: http://0.0.0.0:2381
-      {{ fi }}
+      {{ end }}
     imageRepository: sea.hub:5000/ecp_builder
     imageTag: 3.4.3-0
+featureGates:
+  IPv6DualStack: {{or .IPv6DualStack false}}
 
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
@@ -127,10 +140,10 @@ controlPlane:
   localAPIEndpoint:
     bindPort: 6443
     {{ if eq .HostIPFamily "6" }}
-    advertiseAddress: ::
+    advertiseAddress: 0000:0000:0000:0000:0000:0000:0000:0000
     {{else}}
     advertiseAddress: 0.0.0.0
-    {{ fi }}
+    {{ end }}
 
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
@@ -153,3 +166,4 @@ tlsCipherSuites:
   - TLS_RSA_WITH_AES_128_GCM_SHA256
 featureGates:
   EphemeralContainers: true
+  IPv6DualStack: {{or .IPv6DualStack false}}

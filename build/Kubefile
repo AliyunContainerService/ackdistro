@@ -7,6 +7,7 @@ COPY ${ARCH}/kubectl ./bin
 COPY ${ARCH}/kubeadm ./bin
 COPY ${ARCH}/kubelet ./bin
 COPY ${ARCH}/helm ./bin
+COPY ${ARCH}/seautil ./bin
 
 COPY scripts/disk_init.sh scripts
 COPY scripts/disk_init_rollback.sh scripts
