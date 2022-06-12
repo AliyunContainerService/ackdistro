@@ -34,7 +34,6 @@ if [[ "$MULTI_ARCH" == "true" ]];then
 fi
 
 if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
-    bins=(helm kubectl kubelet kubeadm trident seautil)
     IFS=","
     for arch in $archs;do
         rm -rf ${arch}
@@ -45,7 +44,7 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
             wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${KUBE_VERSION}/${bin} -O ${arch}/${bin}
         done
 
-        bins=(helm trident)
+        bins=(helm trident seautil)
         for bin in ${bins[@]};do
             wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${bin} -O ${arch}/${bin}
         done
