@@ -10,7 +10,7 @@ minio:
 images:
   csi_minio:
     image: ecp_builder/csi-minio
-    tag: v1.0.18
+    tag: v1.0.18-b4d67fe
   provisioner:
     image: ecp_builder/csi-provisioner
     tag: v2.2.2

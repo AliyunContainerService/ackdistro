@@ -9,6 +9,12 @@ for f in `ls ack-distro-yamls/yamls`;do
   sed "s/##DNSDomain##/${DNSDomain}/g" ack-distro-yamls/yamls/${f} | kubectl apply -f -
 done
 
+#TODO
+hybridnetDualStackMode=${IPv6DualStack}
+if [ "$HostIPFamily" == "6" ];then
+  hybridnetDualStackMode=true
+fi
+
 # Prepare helm config
 cat >/tmp/ackd-helmconfig.yaml <<EOF
 globalconfig:
@@ -21,9 +27,11 @@ globalconfig:
   RegistryURL: ${RegistryURL}
   SuspendPeriodHealthCheck: ${SuspendPeriodHealthCheck}
   SuspendPeriodBroadcastHealthCheck: ${SuspendPeriodBroadcastHealthCheck}
-  init:
-    cidr: ${PodCIDR}
-    ipVersion: "${IPVersion}"
+init:
+  cidr: ${PodCIDR}
+  ipVersion: "${HostIPFamily}"
+dualStack: ${hybridnetDualStackMode}
+defaultIPFamily: IPv${HostIPFamily}
 EOF
 
 # install kube core addons

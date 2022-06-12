@@ -34,7 +34,7 @@ if [[ "$MULTI_ARCH" == "true" ]];then
 fi
 
 if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
-    bins=(helm kubectl kubelet kubeadm trident)
+    bins=(helm kubectl kubelet kubeadm trident seautil)
     IFS=","
     for arch in $archs;do
         rm -rf ${arch}

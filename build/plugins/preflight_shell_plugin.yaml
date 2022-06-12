@@ -8,6 +8,9 @@ spec:
   'on': master0
   data: |
     set -e; set -x
+    if [ "${SkipPreflight}" == "true" ];then
+      exit 0
+    fi
     if [ "${IgnoreErrors}" != "" ];then
       IgnoreErrorsFlag="--ignore-errors ${IgnoreErrors}"
     fi

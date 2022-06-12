@@ -48,41 +48,19 @@ kind: Cluster
 metadata:
   name: my-cluster
 spec:
-  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-3
+  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:test-ipv6
   env:
-    - PodCIDR=172.45.0.0/16
-    - SvcCIDR=10.96.0.0/16
     - StorageDevice=/dev/vdc
-    #- DockerRunDiskSize=200 # unit is GiB, capacity for /var/lib/docker
-    #- KubeletRunDiskSize=200 # unit is GiB, capacity for /var/lib/kubelet
-    #- DNSDomain=cluster.local
-    #- ServiceNodePortRange=30000-32767
-    #- MTU=1440 # mtu for calico interface, default is 1440
-    #- IPAutoDetectionMethod=can-reach=8.8.8.8 # calico ip auto-detection method, default is "can-reach=8.8.8.8", see https://projectcalico.docs.tigera.io/archive/v3.8/reference/node/configuration
-    #- SuspendPeriodHealthCheck=false # suspend period health-check, default is false
+    - EtcdDevice=/dev/vdb
   ssh:
     passwd: "password"
-    #user: root
-    #port: "22"
-    #pk: /root/.ssh/id_rsa
-    #pkPasswd: xxx
   hosts:
     - ips:
-        - 1.1.1.1
-        - 2.2.2.2
-        - 3.3.3.3
+        - 2408:4003:10bb:6a01:83b9:6360:c66d:ed57
+        - 2408:4003:10bb:6a01:83b9:6360:c66d:ed58
       roles: [ master ] # add role field to specify the node role
-      env: # rewrite some nodes has different env config
-        - EtcdDevice=/dev/vdb
-        - StorageDevice=/dev/vde
-      # rewrite ssh config if some node has different passwd...
-      # ssh:
-      #  user: root
-      #  passwd: passwd
-      #  port: "22"
     - ips:
-        - 4.4.4.4
-        - 5.5.5.5
+        - 2408:4003:10bb:6a01:83b9:6360:c66d:ed59
       roles: [ node ]
 ```
 
@@ -95,7 +73,7 @@ sealer apply -f ClusterFile.yaml
 
 ```bash
 # When deploying a cluster, the cluster precheck tool will run by default. If there is a precheck error ErrorX, but you think the error can be ignored, please do as follows
-sealer apply -f ClusterFile.yaml --env IgnoreErrors="ErrorX[;ErrorY]"
+sealer apply -f ClusterFile.yaml --env IgnoreErrors=ErrorX[,ErrorY]
 
 # Also you can ignore all errors
 sealer apply -f ClusterFile.yaml --env SkipPreflight=true

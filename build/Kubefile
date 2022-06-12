@@ -7,6 +7,7 @@ COPY ${ARCH}/kubectl ./bin
 COPY ${ARCH}/kubeadm ./bin
 COPY ${ARCH}/kubelet ./bin
 COPY ${ARCH}/helm ./bin
+COPY ${ARCH}/seautil ./bin
 
 COPY scripts/disk_init.sh scripts
 COPY scripts/disk_init_rollback.sh scripts
@@ -17,6 +18,7 @@ COPY plugins/disk_init_rollback_shell_plugin.yaml plugins
 COPY plugins/disk_init_shell_plugin.yaml plugins
 COPY plugins/preflight_shell_plugin.yaml plugins
 COPY plugins/install_addons_shell_plugin.yaml plugins
+COPY plugins/configure_kubelet_shell_plugin.yaml plugins
 
 COPY imageList manifests
 COPY kubeadm.yml ./etc
