@@ -101,5 +101,8 @@ spec:
     cidr: ${PodCIDR##*,}
     version: "${secondFamily}"
 EOF
-  kubectl apply -f /tmp/subnet2.yaml
+  for i in `seq 1 4`;do
+    kubectl apply -f /tmp/subnet2.yaml && break
+    sleep 30
+  done
 fi
