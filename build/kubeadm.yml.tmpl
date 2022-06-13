@@ -2,7 +2,7 @@ apiVersion: kubeadm.k8s.io/v1beta2
 kind: InitConfiguration
 localAPIEndpoint:
   bindPort: 6443
-  {{ if eq .HostIPFamily "6" }}
+  {{ if and (.HostIPFamily) (eq .HostIPFamily "6") }}
   advertiseAddress: 0000:0000:0000:0000:0000:0000:0000:0000
   {{else}}
   advertiseAddress: 0.0.0.0
@@ -20,14 +20,14 @@ networking:
   dnsDomain: {{or .DNSDomain "cluster.local"}}
   {{ if .PodCIDR }}
   podSubnet: {{ .PodCIDR }}
-  {{else if eq .HostIPFamily "6" }}
+  {{else if and (.HostIPFamily) (eq .HostIPFamily "6") }}
   podSubnet: "3408:4003:10bb:6a01:83b9:6360:c66d:0000/112"
   {{else}}
   podSubnet: "100.64.0.0/16"
   {{ end }}
   {{ if .SvcCIDR }}
   serviceSubnet: {{ .SvcCIDR }}
-  {{else if eq .HostIPFamily "6" }}
+  {{else if and (.HostIPFamily) (eq .HostIPFamily "6") }}
   serviceSubnet: "4408:4003:10bb:6a01:83b9:6360:c66d:0000/112"
   {{else}}
   serviceSubnet: "10.96.0.0/16"
@@ -72,22 +72,22 @@ controllerManager:
   extraArgs:
     feature-gates: TTLAfterFinished=true,EphemeralContainers=true,IPv6DualStack=true
     experimental-cluster-signing-duration: 876000h
-    {{ if eq .HostIPFamily "6" }}
+    {{ if and (.HostIPFamily) (eq .HostIPFamily "6") }}
     bind-address: 0000:0000:0000:0000:0000:0000:0000:0000
     address: 0000:0000:0000:0000:0000:0000:0000:0000
-    {{ if ne .IPv6DualStack "true" }}
+    {{ if or (not .IPv6DualStack) (ne .IPv6DualStack "true") }}
     node-cidr-mask-size: "120"
     {{ end }}
     {{else}}
     bind-address: 0.0.0.0
     address: 0.0.0.0
-    {{ if ne .IPv6DualStack "true" }}
+    {{ if or (not .IPv6DualStack) (ne .IPv6DualStack "true") }}
     node-cidr-mask-size: "24"
     {{ end }}
     {{ end }}
     port: '10252'
     profiling: 'false'
-    {{ if eq .IPv6DualStack "true" }}
+    {{ if and (.IPv6DualStack) (eq .IPv6DualStack "true") }}
     node-cidr-mask-size-ipv6: "120"
     node-cidr-mask-size-ipv4: "24"
     {{ end }}
@@ -100,7 +100,7 @@ controllerManager:
 scheduler:
   extraArgs:
     feature-gates: TTLAfterFinished=true,EphemeralContainers=true,IPv6DualStack=true
-    {{ if eq .HostIPFamily "6" }}
+    {{ if and (.HostIPFamily) (eq .HostIPFamily "6") }}
     bind-address: 0000:0000:0000:0000:0000:0000:0000:0000
     address: 0000:0000:0000:0000:0000:0000:0000:0000
     {{else}}
@@ -118,7 +118,7 @@ scheduler:
 etcd:
   local:
     extraArgs:
-      {{ if eq .HostIPFamily "6" }}
+      {{ if and (.HostIPFamily) (eq .HostIPFamily "6") }}
       listen-metrics-urls: http://[::]:2381
       {{else}}
       listen-metrics-urls: http://0.0.0.0:2381
@@ -139,7 +139,7 @@ nodeRegistration:
 controlPlane:
   localAPIEndpoint:
     bindPort: 6443
-    {{ if eq .HostIPFamily "6" }}
+    {{ if and (.HostIPFamily) (eq .HostIPFamily "6") }}
     advertiseAddress: 0000:0000:0000:0000:0000:0000:0000:0000
     {{else}}
     advertiseAddress: 0.0.0.0
