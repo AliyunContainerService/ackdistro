@@ -59,6 +59,29 @@ else
   helm -n kube-system upgrade -i hybridnet chart/hybridnet -f /tmp/ackd-helmconfig.yaml
 fi
 
+# install required addons
+helm -n kube-system upgrade -i l-zero chart/l-zero -f /tmp/ackd-helmconfig.yaml
+helm -n kube-system upgrade -i open-local chart/open-local -f /tmp/ackd-helmconfig.yaml
+helm -n kube-system upgrade -i etcd-backup chart/etcd-backup -f /tmp/ackd-helmconfig.yaml
+
+echo "sleep 15 for l-zero crds ready"
+sleep 15
+helm -n acs-system upgrade -i l-zero-library chart/l-zero-library -f /tmp/ackd-helmconfig.yaml
+
+# install optional addons
+IFS=,
+for addon in ${Addons};do
+  helm -n acs-system upgrade -i ${addon} chart/${addon} -f /tmp/ackd-helmconfig.yaml
+done
+
+# for hybridnet
+if [ "$Network" == "calico" ];then
+  exit 0
+fi
+
+# sleep for hybridnet webhook ready
+sleep 60
+
 if [ "$IPv6DualStack" == "true" ];then
   secondFamily=6
   if [ "$HostIPFamily" == "6" ];then
@@ -78,20 +101,8 @@ spec:
     cidr: ${PodCIDR##*,}
     version: "${secondFamily}"
 EOF
-  kubectl apply -f /tmp/subnet2.yaml
+  for i in `seq 1 4`;do
+    kubectl apply -f /tmp/subnet2.yaml && break
+    sleep 30
+  done
 fi
-
-# install required addons
-helm -n kube-system upgrade -i l-zero chart/l-zero -f /tmp/ackd-helmconfig.yaml
-helm -n kube-system upgrade -i open-local chart/open-local -f /tmp/ackd-helmconfig.yaml
-helm -n kube-system upgrade -i etcd-backup chart/etcd-backup -f /tmp/ackd-helmconfig.yaml
-
-echo "sleep 15 for l-zero crds ready"
-sleep 15
-helm -n acs-system upgrade -i l-zero-library chart/l-zero-library -f /tmp/ackd-helmconfig.yaml
-
-# install optional addons
-IFS=,
-for addon in ${Addons};do
-  helm -n acs-system upgrade -i ${addon} chart/${addon} -f /tmp/ackd-helmconfig.yaml
-done

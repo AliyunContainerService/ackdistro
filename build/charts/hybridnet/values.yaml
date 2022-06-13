@@ -27,10 +27,21 @@ webhook:
   additionalPodMatchExpressions:
     - key: app
       operator: NotIn
-      values: [ "kube-proxy" ]
+      values:
+      - "kube-proxy"
+      - "hybridnet-daemon"
+      - "hybridnet-manager"
+      - "ack-distro-dependency-installer"
+      - "open-local"
     - key: k8s-app
       operator: NotIn
       values: [ "kube-dns" ]
+    - key: tier
+      operator: NotIn
+      values: [ "control-plane" ]
+    - key: trident-app
+      operator: NotIn
+      values: [ "l-zero" ]
 
   # -- The number of webhook pods
   replicas: 3
