@@ -3,7 +3,7 @@
 images:
   lzero:
     image: ecp_builder/l-zero
-    tag: v1.1.0-ba472562
+    tag: v1.1.0-6829307
   httpd:
     image: ecp_builder/httpd
     tag: alpine3.15

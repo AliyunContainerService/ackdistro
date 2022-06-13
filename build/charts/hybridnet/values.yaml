@@ -28,6 +28,9 @@ webhook:
     - key: app
       operator: NotIn
       values: [ "kube-proxy" ]
+    - key: k8s-app
+      operator: NotIn
+      values: [ "kube-dns" ]
 
   # -- The number of webhook pods
   replicas: 3
