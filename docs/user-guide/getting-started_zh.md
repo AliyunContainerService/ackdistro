@@ -9,8 +9,8 @@
 获取最新版sealer：
 
 ```bash
-wget -c https://sealer.oss-cn-beijing.aliyuncs.com/sealers/sealer-v0.8.5-linux-amd64.tar.gz && \
-      tar -xvf sealer-v0.8.5-linux-amd64.tar.gz -C /usr/bin
+wget -c https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/amd64/sealer-latest-linux-amd64.tar.gz && \
+      tar -xvf sealer-latest-linux-amd64.tar.gz -C /usr/bin
 ```
 
 使用sealer获取ACK Distro制品，并创建集群：
@@ -116,6 +116,41 @@ trident health-check --trigger-all
 
 #更多功能
 trident health-check --help
+```
+
+#### 4) 使用ipv6双栈模式
+
+```yaml
+> 本节描述的是双栈模式的配置，如果您只是想使用IPv6的IP，而不需要双栈，请按1）所述的标准方式，将所有ip、ip段换成ipv6，然后部署即可
+
+IPv6双栈的配置说明：
+1. 节点IP:部署时传入的所有节点地址的地址族需要保持一致，要么都是ipv4，要么都是ipv6，当打开双栈模式时(IPv6DualStack=true)，ACK—Distro 还会额外寻找每个节点上的另一个地址族的默认路由对应的ip，作为Second Host IP
+2. SvcCIDR:部署时必须传入两个svc网段(ipv4段和ipv6段)，用,分隔，第一个svc网段的地址族需要与所有节点的地址族保持一致
+3. PodCIDR:部署时必须传入两个pod网段(ipv4段和ipv6段)，用,分隔，第一个pod网段的地址族需要与所有节点的地址族保持一致
+4. 集群组件将使用第一个PodCIDR分配的IP
+
+```yaml
+apiVersion: sealer.cloud/v2
+kind: Cluster
+metadata:
+  name: my-cluster
+spec:
+  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5-pre
+  env:
+    - PodCIDR=5408:4003:10bb:6a01:83b9:6360:c66d:0000/112,101.64.0.0/16
+    - SvcCIDR=6408:4003:10bb:6a01:83b9:6360:c66d:0000/112,11.96.0.0/16
+    - IPv6DualStack=true
+    - LvsImage=ecp_builder/lvscare:v1.1.3-beta.3
+  ssh:
+    passwd: "passwd"
+  hosts:
+    - ips:
+        - 2408:4003:10bb:6a01:83b9:6360:c66d:ed57
+        - 2408:4003:10bb:6a01:83b9:6360:c66d:ed58
+      roles: [ master ] # add role field to specify the node role
+    - ips:
+        - 2408:4003:10bb:6a01:83b9:6360:c66d:ed59
+      roles: [ node ]
 ```
 
 ### 运维ACK Distro集群
