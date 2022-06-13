@@ -2,7 +2,7 @@
 set -x
 
 # Prepare envs
-CoreDnsIP=`trident get-indexed-ip --cidr ${SvcCIDR} --index 10`
+CoreDnsIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 10` || exit 1
 
 # Apply yamls
 for f in `ls ack-distro-yamls/yamls`;do
