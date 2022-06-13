@@ -28,7 +28,7 @@ globalconfig:
   SuspendPeriodHealthCheck: ${SuspendPeriodHealthCheck}
   SuspendPeriodBroadcastHealthCheck: ${SuspendPeriodBroadcastHealthCheck}
 init:
-  cidr: ${PodCIDR}
+  cidr: ${PodCIDR%,*}
   ipVersion: "${HostIPFamily}"
 dualStack: ${hybridnetDualStackMode}
 defaultIPFamily: IPv${HostIPFamily}
@@ -57,6 +57,28 @@ if [ "$Network" == "calico" ];then
   helm -n kube-system upgrade -i calico chart/calico -f /tmp/ackd-helmconfig.yaml
 else
   helm -n kube-system upgrade -i hybridnet chart/hybridnet -f /tmp/ackd-helmconfig.yaml
+fi
+
+if [ "$IPv6DualStack" == "true" ];then
+  secondFamily=6
+  if [ "$HostIPFamily" == "6" ];then
+    secondFamily=4
+  fi
+  cat >/tmp/subnet2.yaml <<EOF
+---
+apiVersion: networking.alibaba.com/v1
+kind: Subnet
+metadata:
+  name: init-2
+spec:
+  config:
+    autoNatOutgoing: true
+  network: init
+  range:
+    cidr: ${PodCIDR##*,}
+    version: "${secondFamily}"
+EOF
+  kubectl apply -f /tmp/subnet2.yaml
 fi
 
 # install required addons

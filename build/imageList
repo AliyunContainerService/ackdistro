@@ -24,4 +24,4 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-snapshotter:v4.
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-minio:v1.0.18-b4d67fe
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/snapshot-controller:v4.2.1
 registry.cn-zhangjiakou.aliyuncs.com/acs/coredns:v1.8.4.5-2ce07fd2-aliyun
-ghcr.io/labring/lvscare:v1.1.3-beta.3
+ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/lvscare:v1.1.3-beta.3
