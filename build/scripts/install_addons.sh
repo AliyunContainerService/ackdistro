@@ -101,8 +101,12 @@ spec:
     cidr: ${PodCIDR##*,}
     version: "${secondFamily}"
 EOF
-  for i in `seq 1 4`;do
-    kubectl apply -f /tmp/subnet2.yaml && break
+  for i in `seq 1 6`;do
     sleep 30
+    kubectl apply -f /tmp/subnet2.yaml && break
   done
+  if [ $? -ne 0 ];then
+    echo "failed to run kubectl apply -f /tmp/subnet2.yaml, please check"
+    exit 1
+  fi
 fi
