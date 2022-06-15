@@ -2356,8 +2356,8 @@ data:
         ]
     },
     "timezone": "browser",
-    "title": "Trident-MinIO-监控",
-    "uid": "minio-dashboard-trident",
+    "title": "Ackdistro-MinIO-监控",
+    "uid": "minio-dashboard-ackdistro",
     "version": 20
     }
 kind: ConfigMap

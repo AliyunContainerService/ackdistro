@@ -1,7 +1,7 @@
 {{- if .Values.monitor.dashboard.enabled }}
 apiVersion: v1
 data:
-  trident-monitor-dashboard-v1.json: |-
+  ackdistro-monitor-dashboard-v1.json: |-
     {
       "annotations": {
         "list": [
@@ -17,7 +17,7 @@ data:
           }
         ]
       },
-      "description": "Trident监控大盘v1",
+      "description": "Ackdistro监控大盘v1",
       "editable": true,
       "gnetId": null,
       "graphTooltip": 0,
@@ -35,7 +35,7 @@ data:
           },
           "id": 76,
           "panels": [],
-          "title": "Trident底座组件",
+          "title": "Ackdistro底座组件",
           "type": "row"
         },
         {
@@ -1747,7 +1747,7 @@ data:
           },
           "id": 106,
           "panels": [],
-          "title": "Trident集群巡检信息",
+          "title": "Ackdistro集群巡检信息",
           "type": "row"
         },
         {
@@ -2654,14 +2654,14 @@ data:
         ]
       },
       "timezone": "browser",
-      "title": "Trident-Monitor",
-      "uid": "trident-monitor-v1",
+      "title": "Ackdistro-Monitor",
+      "uid": "ackdistro-monitor-v1",
       "version": 1
     }
 kind: ConfigMap
 metadata:
   labels:
     grafana_dashboard: "1"
-  name: trident
+  name: ackdistro
   namespace: {{ .Release.Namespace }}
   {{- end }}
