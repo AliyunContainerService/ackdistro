@@ -8,7 +8,7 @@ jobs:
   build:
     name: test
     runs-on: ubuntu-latest
-    if: startswith(github.event.comment.body, '/testnetwork')
+    if: startswith(github.event.comment.body, '/test')
     env:
       GO111MODULE: on
     steps:
@@ -52,13 +52,12 @@ jobs:
           ACCESSKEYID: ${{ secrets.ACCESSKEYID }}
           ACCESSKEYSECRET: ${{ secrets.ACCESSKEYSECRET }}
           RegionID: ${{ secrets.RegionID }}
-        if: startswith(github.event.comment.body, '/testnetwork')
+        if: startswith(github.event.comment.body, '/test')
         run: |
+          set -x
           commentbody="${{github.event.comment.body}}"
           network=`echo "$commentbody"|cut -d" " -f2`
           export network=$network
-          echo $network
           e2e=`echo "$commentbody"|cut -d" " -f3`
           export e2e=$e2e
-          echo $e2e
-          ginkgo -v --focus="test network" test
+          ginkgo -v --focus="test" test
