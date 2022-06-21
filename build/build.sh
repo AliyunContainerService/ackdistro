@@ -52,5 +52,7 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
     IFS=" "
 fi
 
+echo -n `git log -1 --pretty=format:%h` > VERSION
+
 # Build sealer image
 sealer build -f Kubefile -t ack-distro:${TAG} --platform ${archs} .

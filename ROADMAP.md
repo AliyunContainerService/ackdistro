@@ -28,20 +28,29 @@
 
 ## 2022-06
 
+- take over trident
+- k8s upgrade from 1.20 to 1.22
+- Non-root in sealer
+- sealer release new version 
+- GPU(shared)
+- Prometheus rules
+- change ip
+- sealer support third part k8s
+- multi arch nodes
+- storage device scan and recommend
 - Using OpenKruise to support advanced workload management
 - K8s diagnose, which can automatically diagnose k8s problems
 - Support large cluster(500 nodes, 20000 pods) and K8s Risk Control for large cluster
 - Improve unattended capability on various OS and IaaS
 - Support etcd/apiserver separation (under planning)
-- IPv4&IPv6 Dual Stack
+- IPv4&IPv6 Dual Stack, 1.22 dual stack
 - Support more arch, runtime and IaaS
 
 ## 2022-09
 
-- Using OpenYurt to support edge node management
 - Node pool, which can scale nodes horizontally
 - Cloud Native LoadBanlancer
-- Support  xLarge cluster(1000 nodes, 30000 pods)
+- Support xLarge cluster(1000 nodes, 30000 pods)
 - Support upgrade k8s version
 - Turbo full link performance by 40%
 

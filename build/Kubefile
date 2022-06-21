@@ -34,3 +34,4 @@ COPY charts/calico chart
 COPY charts/etcd-backup chart
 COPY charts/csi-minio chart
 COPY yamls ack-distro-yamls
+COPY VERSION VERSION
