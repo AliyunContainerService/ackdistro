@@ -102,11 +102,10 @@ spec:
     version: "${secondFamily}"
 EOF
   for i in `seq 1 6`;do
-    sleep 30
+    sleep 60
     kubectl apply -f /tmp/subnet2.yaml && break
   done
   if [ $? -ne 0 ];then
-    echo "failed to run kubectl apply -f /tmp/subnet2.yaml, please check"
-    exit 1
+    echo "failed to run kubectl apply -f /tmp/subnet2.yaml, ignore this, please apply it by yourself"
   fi
 fi
