@@ -1,7 +1,7 @@
 images:
   hybridnet:
     image: ecp_builder/hybridnet
-    tag: v0.5.0
+    tag: v0.5.1
     imagePullPolicy: IfNotPresent
 globalconfig:
   RegistryURL: "sea.hub:5000"
@@ -9,6 +9,10 @@ globalconfig:
 # chart will always create an "init" overlay Network/Subnet to initialize the K8s cluster. "init" Network/Subnet
 # will only be created once.
 init:
+
+  # Whether create "init" overlay Network/Subnet
+  withoutNetwork: false
+
   # -- CIDR of "init" Subnet.
   cidr: 100.64.0.0/16
 
