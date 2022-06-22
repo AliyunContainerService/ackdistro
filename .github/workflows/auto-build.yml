@@ -18,6 +18,8 @@ jobs:
           commentbody="${{github.event.comment.body}}"
           tag=`echo "$commentbody"|cut -d" " -f2`
           branch=`echo "$commentbody"|cut -d" " -f3`
+          multi_arch=`echo "$commentbody"|cut -d" " -f4`
+
           echo $tag
           wget https://sealer.oss-cn-beijing.aliyuncs.com/sealer-latest.tar.gz
           sudo tar -xvf sealer-latest.tar.gz -C /usr/bin
@@ -27,8 +29,14 @@ jobs:
           cd ackdistro
           git checkout ${branch}
           cd build
-          ls -R
+
+          if [ "$multi_arch" == "multiarch" ]
+          then
+          sudo bash build.sh $tag true
+          else
           sudo bash build.sh $tag
+          fi
+
           sudo sealer tag ack-distro:$tag ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag
           sudo sealer push ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag
           echo "::set-output name=version::$tag"

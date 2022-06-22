@@ -1,0 +1,9 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+images:
+  paralb:
+    image: ecp_builder/paralb
+    tag: v0.1.0
+globalconfig:
+  RegistryURL: sea.hub:5000
+  ParaLBInterface: ""
