@@ -1,0 +1,189 @@
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: paralb-daemon
+  namespace: kube-system
+  annotations:
+    kubernetes.io/description: |
+      This daemon set launches paralb speaker daemon.
+spec:
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: paralb
+      component: daemon
+      cluster-role: worker
+  template:
+    metadata:
+      labels:
+        app: paralb
+        component: daemon
+        cluster-role: worker
+    spec:
+      tolerations:
+        - effect: NoExecute
+          operator: Exists
+        - effect: NoSchedule
+          operator: Exists
+      priorityClassName: system-node-critical
+      serviceAccountName: paralb
+      hostNetwork: true
+      hostPID: true
+      containers:
+        - name: paralb-daemon
+          image: {{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.paralb.image }}:{{ .Values.images.paralb.tag }}
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1024Mi
+            requests:
+              cpu: 200m
+              memory: 128Mi
+          command:
+            - /paralb-daemon
+          args:
+            - --prefer-interfaces={{ .Values.globalconfig.ParaLBInterface }}
+          securityContext:
+            runAsUser: 0
+            privileged: true
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: MEMBERLIST_BIND_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: MANAGER_SPEAKER_LABELS
+              value: "app=paralb,component=manager"
+            - name: COMPONENT-NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+      nodeSelector:
+        kubernetes.io/os: "linux"
+
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: paralb-manager
+  namespace: kube-system
+  annotations:
+    kubernetes.io/description: "paralb manager"
+spec:
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: paralb
+      component: manager
+      cluster-role: observer
+  template:
+    metadata:
+      labels:
+        app: paralb
+        component: manager
+        cluster-role: observer
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: paralb
+                  component: manager
+              topologyKey: kubernetes.io/hostname
+      priorityClassName: system-cluster-critical
+      serviceAccountName: paralb
+      hostNetwork: true
+      containers:
+        - name: paralb-manager
+          image: {{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.paralb.image }}:{{ .Values.images.paralb.tag }}
+          imagePullPolicy: IfNotPresent
+          command:
+            - /paralb-manager
+          args:
+            - --leader-election-namespace=kube-system
+            - --enable-class-filter=true
+            - --enable-leader-election=true
+            - --metrics-bind-address=:16800
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1Gi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: MEMBERLIST_BIND_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: MANAGER_SPEAKER_LABELS
+              value: "app=paralb,component=manager"
+            - name: PARTICIPANT_SPEAKER_LABELS
+              value: "app=paralb,component=daemon"
+            - name: COMPONENT-NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: paralb-webhook
+  namespace: kube-system
+  annotations:
+    kubernetes.io/description: "paralb webhook"
+spec:
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: paralb-webhook
+  template:
+    metadata:
+      labels:
+        app: paralb-webhook
+    spec:
+      tolerations:
+        - operator: Exists
+          effect: NoSchedule
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      priorityClassName: system-cluster-critical
+      serviceAccountName: paralb
+      hostNetwork: true
+      containers:
+        - name: paralb-webhook
+          image: {{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.paralb.image }}:{{ .Values.images.paralb.tag }}
+          imagePullPolicy: IfNotPresent
+          command:
+            - /paralb-webhook
+          args:
+            - --port=9891
+          ports:
+            - containerPort: 9891
+              name: webhook-port
+
