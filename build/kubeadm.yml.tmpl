@@ -155,6 +155,14 @@ kubeReserved:
 systemReserved:
   memory: 300Mi
   pid: "10000"
+{{ if and (.EnableLocalDNSCache) (eq .EnableLocalDNSCache "true") }}
+clusterDNS:
+  {{ if and (.HostIPFamily) (eq .HostIPFamily "6") }}
+  - fd00::aaaa::ffff:a
+  {{else}}
+  - 169.254.20.10
+  {{ end }}
+{{ end }}
 tlsCipherSuites:
   - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
   - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256

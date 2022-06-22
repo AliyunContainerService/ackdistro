@@ -11,13 +11,17 @@ done
 
 #TODO
 hybridnetDualStackMode=${IPv6DualStack}
+LocalDNSCacheIP=169.254.20.10
 if [ "$HostIPFamily" == "6" ];then
   hybridnetDualStackMode=true
+  LocalDNSCacheIP=fd00::aaaa::ffff:a
 fi
 
 # Prepare helm config
 cat >/tmp/ackd-helmconfig.yaml <<EOF
 globalconfig:
+  EnableLocalDNSCache: ${EnableLocalDNSCache}
+  LocalDNSCacheIP: ${LocalDNSCacheIP}
   CoreDnsIP: ${CoreDnsIP}
   PodCIDR: ${PodCIDR}
   MTU: "${MTU}"
