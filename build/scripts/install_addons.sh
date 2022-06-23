@@ -65,7 +65,7 @@ fi
 
 # install required addons
 helm -n kube-system upgrade -i l-zero chart/l-zero -f /tmp/ackd-helmconfig.yaml
-helm -n kube-system upgrade -i open-local chart/open-local -f /tmp/ackd-helmconfig.yaml
+helm -n kube-system upgrade -i open-local chart/open-local -f chart/open-local/values-acka.yaml -f /tmp/ackd-helmconfig.yaml
 helm -n kube-system upgrade -i etcd-backup chart/etcd-backup -f /tmp/ackd-helmconfig.yaml
 
 echo "sleep 15 for l-zero crds ready"

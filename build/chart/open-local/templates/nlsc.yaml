@@ -12,3 +12,10 @@ spec:
         include:
         - {{ .Values.name }}-pool-[0-9]+
         - yoda-pool[0-9]+
+{{- if .Values.agent.device }}
+    resourceToBeInited:
+      vgs:
+      - devices:
+        - {{ .Values.agent.device }}
+        name: {{ .Values.name }}-pool-0
+{{- end }}
