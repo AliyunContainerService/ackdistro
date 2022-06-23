@@ -1,0 +1,22 @@
+annotations:
+  artifacthub.io/changes: |
+    - "Update hybridnet image to v0.5.1"
+    - "Make network initialization optional"
+  artifacthub.io/prerelease: "false"
+apiVersion: v2
+appVersion: 0.5.1
+description: A container networking solution aiming at hybrid clouds.
+home: https://github.com/alibaba/hybridnet
+keywords:
+- network
+- vlan
+- bgp
+- vxlan
+- cni
+- kubernetes
+kubeVersion: '>=1.16.0-0'
+name: hybridnet
+sources:
+- https://github.com/alibaba/hybridnet
+type: application
+version: 0.3.1

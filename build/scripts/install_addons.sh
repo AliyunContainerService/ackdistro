@@ -4,6 +4,8 @@ set -x
 # Prepare envs
 CoreDnsIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 10` || exit 1
 
+YodaSchedulerSvcIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 4` || exit 1
+
 # Apply yamls
 for f in `ls ack-distro-yamls/yamls`;do
   sed "s/##DNSDomain##/${DNSDomain}/g" ack-distro-yamls/yamls/${f} | kubectl apply -f -
@@ -11,13 +13,18 @@ done
 
 #TODO
 hybridnetDualStackMode=${IPv6DualStack}
+LocalDNSCacheIP=169.254.20.10
 if [ "$HostIPFamily" == "6" ];then
   hybridnetDualStackMode=true
+  LocalDNSCacheIP=fd00::aaaa::ffff:a
 fi
 
 # Prepare helm config
 cat >/tmp/ackd-helmconfig.yaml <<EOF
 globalconfig:
+  EnableLocalDNSCache: ${EnableLocalDNSCache}
+  LocalDNSCacheIP: ${LocalDNSCacheIP}
+  YodaSchedulerSvcIP: ${YodaSchedulerSvcIP}
   CoreDnsIP: ${CoreDnsIP}
   PodCIDR: ${PodCIDR}
   MTU: "${MTU}"
@@ -61,7 +68,7 @@ fi
 
 # install required addons
 helm -n kube-system upgrade -i l-zero chart/l-zero -f /tmp/ackd-helmconfig.yaml
-helm -n kube-system upgrade -i open-local chart/open-local -f /tmp/ackd-helmconfig.yaml
+helm -n kube-system upgrade -i open-local chart/open-local -f chart/open-local/values-acka.yaml -f /tmp/ackd-helmconfig.yaml
 helm -n kube-system upgrade -i etcd-backup chart/etcd-backup -f /tmp/ackd-helmconfig.yaml
 
 echo "sleep 15 for l-zero crds ready"

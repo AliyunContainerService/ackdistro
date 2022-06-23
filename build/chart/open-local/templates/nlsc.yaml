@@ -1,0 +1,21 @@
+apiVersion: csi.aliyun.com/v1alpha1
+kind: NodeLocalStorageInitConfig
+metadata:
+  name: {{ .Values.name }}
+spec:
+# globalConfig is the default global node configuration
+# when the agent creates the NodeLocalStorage resource, the value will be filled in spec of the NodeLocalStorage
+  globalConfig:
+    # listConfig is the white and black list of storage devices(vgs and mountPoints) and supports regular expressions
+    listConfig:
+      vgs:
+        include:
+        - {{ .Values.name }}-pool-[0-9]+
+        - yoda-pool[0-9]+
+{{- if .Values.agent.device }}
+    resourceToBeInited:
+      vgs:
+      - devices:
+        - {{ .Values.agent.device }}
+        name: {{ .Values.name }}-pool-0
+{{- end }}
