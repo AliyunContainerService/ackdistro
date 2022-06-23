@@ -4,6 +4,8 @@ set -x
 # Prepare envs
 CoreDnsIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 10` || exit 1
 
+YodaSchedulerSvcIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 4` || exit 1
+
 # Apply yamls
 for f in `ls ack-distro-yamls/yamls`;do
   sed "s/##DNSDomain##/${DNSDomain}/g" ack-distro-yamls/yamls/${f} | kubectl apply -f -
@@ -22,6 +24,7 @@ cat >/tmp/ackd-helmconfig.yaml <<EOF
 globalconfig:
   EnableLocalDNSCache: ${EnableLocalDNSCache}
   LocalDNSCacheIP: ${LocalDNSCacheIP}
+  YodaSchedulerSvcIP: ${YodaSchedulerSvcIP}
   CoreDnsIP: ${CoreDnsIP}
   PodCIDR: ${PodCIDR}
   MTU: "${MTU}"

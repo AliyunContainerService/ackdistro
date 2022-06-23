@@ -22,7 +22,6 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-node-driver-reg
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-provisioner:v2.2.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-resizer:v1.3.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-snapshotter:v4.2.1
-ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-minio:v1.0.18-b4d67fe
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/k8s-dns-node-cache:1.17.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/snapshot-controller:v4.2.1
 registry.cn-zhangjiakou.aliyuncs.com/acs/coredns:v1.8.4.5-2ce07fd2-aliyun
