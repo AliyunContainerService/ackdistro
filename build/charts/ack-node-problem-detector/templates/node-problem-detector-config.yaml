@@ -283,7 +283,7 @@ data:
           "path": "/home/kubernetes/bin/check-fd",
           "args": [
             "-p=/host/proc",
-            "-t=bug-test"
+            "-t=80"
           ],
           "timeout": "30s"
         }
@@ -639,8 +639,8 @@ data:
 
     iuse=$(df -i | grep "/$" | grep -e [0-9]*% -o | tr -d %)
 
-    if [[ $iuse -gt bug-test ]]; then
-    echo "current inode usage is over bug-test% on node"
+    if [[ $iuse -gt 80 ]]; then
+    echo "current inode usage is over 80% on node"
     exit $NONOK
     fi
     echo "node has no inode pressure"
@@ -667,7 +667,7 @@ data:
           "type": "permanent",
           "condition": "InodesPressure",
           "reason": "NodeHasInodesPressure",
-          "message": "inodes usage is over bug-test% on /dev/sda",
+          "message": "inodes usage is over 80% on /dev/sda",
           "path": "/config/plugin/check_inodes.sh"
         }
       ]

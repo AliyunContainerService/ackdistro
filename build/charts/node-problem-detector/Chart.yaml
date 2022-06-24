@@ -1,0 +1,5 @@
+apiVersion: v2
+name: node-problem-detector
+description: this chart  aims to make various node problems visible to the upstream layers in cluster management stack,and  told people where is the problem on time.
+appVersion: "0.1"
+version: 1.2.6

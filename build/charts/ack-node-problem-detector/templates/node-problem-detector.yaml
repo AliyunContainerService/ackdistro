@@ -37,18 +37,19 @@ spec:
         - --prometheus-port=20257
         - --config.custom-plugin-monitor=/config/ntp-problem-monitor.json
         - --config.custom-plugin-monitor=/config/fd-problem-monitor.json
-#        - --config.custom-plugin-monitor=/config/irqbalance-monitor.json
+        - --config.custom-plugin-monitor=/config/irqbalance-monitor.json
         - --config.custom-plugin-monitor=/config/public-network-problem-monitor.json
         - --config.custom-plugin-monitor=/config/nvidia-gpu-problem-monitor.json
+#        此规则下架： https://yuque.antfin-inc.com/wl3lgn/project/dwoamd
 #        - --config.custom-plugin-monitor=/config/ps-hang-problem-monitor.json
         - --config.custom-plugin-monitor=/config/pid-pressure-problem-monitor.json
-        - --config.custom-plugin-monitor=/config/csi-hang-problem-monitor.json
         - --config.custom-plugin-monitor=/config/inodes-problem-monitor.json
         - --config.custom-plugin-monitor=/config/network-problem-monitor.json
         - --config.custom-plugin-monitor=/config/docker-offline-monitor.json
         - --config.custom-plugin-monitor=/config/system-custom-plugin-monitor.json
         - --config.custom-plugin-monitor=/config/kubelet-custom-plugin-monitor.json
         - --config.custom-plugin-monitor=/config/container-custom-plugin-monitor.json
+#        以下为特定环境规则
 #        - --custom-plugin-monitors=/config/instance_expired_checker.json
 #        - --custom-plugin-monitors=/config/ram-role-problem-monitor.json
         env:
