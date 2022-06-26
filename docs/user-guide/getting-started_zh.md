@@ -167,6 +167,22 @@ sealer join -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...
 sealer delete -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...]
 ```
 
+扩容open-local存储池：
+```bash
+# if follow not exist, cp .sealer/my-cluster/Clusterfile .
+vim Clusterfile
+
+#apiVersion: sealer.cloud/v2
+#kind: Cluster
+#spec:
+#  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5-pre
+#  env:
+#    # add new device /dev/vde for open-local, if more than one, join them with ','
+#    - YodaDevice=/dev/vde
+
+trident on-sealer -f Clusterfile  --sealer
+```
+
 ### 清理ACK Distro集群
 
 ```bash
