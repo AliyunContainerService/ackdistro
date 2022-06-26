@@ -1,5 +1,34 @@
 #!/usr/bin/env bash
+
+scripts_path=$(cd `dirname $0`; pwd)
+source "${scripts_path}"/utils.sh
+
 set -x
+
+set_logrotate() {
+  # logrotate
+  cat >/etc/logrotate.d/allvarlogs <<EOF
+/var/log/*.log
+/var/log/messages {
+    copytruncate
+    missingok
+    notifempty
+    compress
+    hourly
+    maxsize 100M
+    rotate 5
+    dateext
+    dateformat -%Y%m%d-%s
+    create 0644 root root
+}
+EOF
+
+  if [ ! -f "/etc/cron.hourly/logrotate" ]; then
+    cp "${scripts_path}"/logrotate /etc/cron.hourly/logrotate
+  fi
+}
+
+set_logrotate
 
 # Prepare envs
 CoreDnsIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 10` || exit 1
@@ -14,9 +43,11 @@ done
 #TODO
 hybridnetDualStackMode=${IPv6DualStack}
 LocalDNSCacheIP=169.254.20.10
+VtepAddressCIDRs="0.0.0.0/0,::/0"
 if [ "$HostIPFamily" == "6" ];then
   hybridnetDualStackMode=true
   LocalDNSCacheIP=fd00::aaaa::ffff:a
+  VtepAddressCIDRs="::/0"
 fi
 
 # Prepare helm config
@@ -39,6 +70,8 @@ init:
   ipVersion: "${HostIPFamily}"
 dualStack: ${hybridnetDualStackMode}
 defaultIPFamily: IPv${HostIPFamily}
+daemon:
+  vtepAddressCIDRs: ${VtepAddressCIDRs}
 EOF
 
 # install kube core addons

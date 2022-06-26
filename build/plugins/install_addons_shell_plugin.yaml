@@ -57,5 +57,5 @@ spec:
       exit 0
     fi
     echo "First time health check fail, try again"
-    trident health-check --trigger-mode All
+    trident health-check --trigger-mode OnlyUnsuccessful
     exit $?

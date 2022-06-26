@@ -30,7 +30,7 @@ spec:
     export StorageDevice=${StorageDevice}
     export DockerRunDiskSize=${DockerRunDiskSize}
     export KubeletRunDiskSize=${KubeletRunDiskSize}
-    bash scripts/disk_init.sh
+    bash scripts/disk_init_v2.sh
     sh scripts/docker.sh
 ---
 apiVersion: sealer.aliyun.com/v1alpha1
@@ -46,5 +46,5 @@ spec:
     export StorageDevice=${StorageDevice}
     export DockerRunDiskSize=${DockerRunDiskSize}
     export KubeletRunDiskSize=${KubeletRunDiskSize}
-    bash scripts/disk_init.sh
+    bash scripts/disk_init_v2.sh
     sh scripts/docker.sh
