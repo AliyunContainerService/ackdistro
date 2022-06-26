@@ -9,7 +9,6 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/coredns:1.7.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/l-zero:v1.1.0-6829307
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/httpd:alpine3.15
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/opsbase-alpine:v0.2
-ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/open-local-rpms:v0.2-0fb0430
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/debug:ubuntu
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/hybridnet:v0.5.1
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/paralb:v0.1.0
@@ -26,3 +25,4 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-typha:v3.23.
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-kube-controllers:v3.23.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-cni:v3.23.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-node:v3.23.0
+ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/k8s-device-plugin:v1.0.0.3-bd49899-aliyun

@@ -4,12 +4,9 @@ COPY Metadata .
 COPY VERSION VERSION
 COPY imageList manifests
 
-COPY ${ARCH}/trident ./bin
-COPY ${ARCH}/kubectl ./bin
-COPY ${ARCH}/kubeadm ./bin
-COPY ${ARCH}/kubelet ./bin
-COPY ${ARCH}/helm ./bin
-COPY ${ARCH}/seautil ./bin
+COPY ${ARCH}/bin ./bin
+COPY ${ARCH}/rpm ./rpm
+COPY ${ARCH}/tgz ./tgz
 
 COPY scripts scripts
 COPY plugins plugins
