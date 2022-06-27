@@ -38,7 +38,7 @@ spec:
         - --config.custom-plugin-monitor=/config/ntp-problem-monitor.json
         - --config.custom-plugin-monitor=/config/fd-problem-monitor.json
         - --config.custom-plugin-monitor=/config/irqbalance-monitor.json
-        - --config.custom-plugin-monitor=/config/public-network-problem-monitor.json
+#        - --config.custom-plugin-monitor=/config/public-network-problem-monitor.json
         - --config.custom-plugin-monitor=/config/nvidia-gpu-problem-monitor.json
 #        此规则下架： https://yuque.antfin-inc.com/wl3lgn/project/dwoamd
 #        - --config.custom-plugin-monitor=/config/ps-hang-problem-monitor.json
