@@ -74,6 +74,16 @@ daemon:
   vtepAddressCIDRs: ${VtepAddressCIDRs}
 EOF
 
+# wait 120s for apiserver ready
+for i in `seq 1 12`;do
+  sleep 10
+  kubectl get ns && break
+done
+if [ $? -ne 0 ];then
+  echo "failed to wait for apiserver ready"
+  exit 1
+fi
+
 # install kube core addons
 helm -n kube-system upgrade -i kube-core chart/kube-core -f /tmp/ackd-helmconfig.yaml
 kubectl create ns acs-system || true
