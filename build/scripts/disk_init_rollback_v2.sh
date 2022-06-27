@@ -49,12 +49,18 @@ clean_vg_pool()
     do
         echo "vgremove $value"
         vgremove -f $value
+        if [ "$?" != "0" ]; then
+          sleep 5; vgremove -f $value
+        fi
     done
     # step 3: pvremove
     for value in ${pvlist[*]}
     do
         echo "pvremove $value"
         pvremove -f $value
+        if [ "$?" != "0" ]; then
+          sleep 5; pvremove -f $value
+        fi
     done
 }
 
