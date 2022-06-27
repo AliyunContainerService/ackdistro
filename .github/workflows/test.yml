@@ -8,7 +8,7 @@ jobs:
   build:
     name: test
     runs-on: ubuntu-latest
-    if: ${{ github.event.comment.body == '/test hybirdnet' || github.event.comment.body == '/test all' }}
+    if: startswith(github.event.comment.body, '/test')
     env:
       GO111MODULE: on
     steps:
@@ -42,10 +42,9 @@ jobs:
           go get github.com/onsi/gomega/...@v1.12.0
           GOPATH=`go env GOPATH`
           echo "$GOPATH/bin" >> $GITHUB_PATH
-        working-directory: src/github.com/alibaba/sealer
+        #working-directory: src/github.com/alibaba/sealer
 
-
-      - name: Run sealer apply test
+      - name: Run sealer run test
         shell: bash
         working-directory: src/github.com/alibaba/sealer
         env:
@@ -53,6 +52,12 @@ jobs:
           ACCESSKEYID: ${{ secrets.ACCESSKEYID }}
           ACCESSKEYSECRET: ${{ secrets.ACCESSKEYSECRET }}
           RegionID: ${{ secrets.RegionID }}
-        if: ${{ github.event.comment.body == '/test hybirdnet' || github.event.comment.body == '/test all' }}
+        if: startswith(github.event.comment.body, '/test')
         run: |
-          ginkgo -v --focus="run hybirdnet" test
+          set -x
+          commentbody="${{github.event.comment.body}}"
+          network=`echo "$commentbody"|cut -d" " -f2`
+          export network=$network
+          e2e=`echo "$commentbody"|cut -d" " -f3`
+          export e2e=$e2e
+          ginkgo -v --focus="test" test
