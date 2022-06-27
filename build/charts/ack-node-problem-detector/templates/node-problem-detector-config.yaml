@@ -261,7 +261,7 @@ data:
     {
       "plugin": "custom",
       "pluginConfig": {
-        "invoke_interval": "600s",
+        "invoke_interval": "120s",
         "timeout": "30s",
         "max_output_length": 80,
         "concurrency": 3
@@ -314,7 +314,7 @@ data:
       "plugin": "custom",
       "pluginConfig": {
         "timeout": "30s",
-        "invoke_interval": "600s",
+        "invoke_interval": "120s",
         "concurrency": 3
       },
       "source": "irqbalance-custom-plugin-monitor",
@@ -401,7 +401,7 @@ data:
     {
       "plugin": "custom",
       "pluginConfig": {
-        "invoke_interval": "600s",
+        "invoke_interval": "120s",
         "timeout": "90s",
         "max_output_length": 500,
         "concurrency": 3
@@ -556,7 +556,7 @@ data:
     {
       "plugin": "custom",
       "pluginConfig": {
-        "invoke_interval": "600s",
+        "invoke_interval": "300s",
         "timeout": "60s",
         "max_output_length": 100,
         "concurrency": 3
@@ -649,7 +649,7 @@ data:
     {
       "plugin": "custom",
       "pluginConfig": {
-        "invoke_interval": "600s",
+        "invoke_interval": "120s",
         "timeout": "30s",
         "max_output_length": 80,
         "concurrency": 3
@@ -715,7 +715,7 @@ data:
     {
       "plugin": "custom",
       "pluginConfig": {
-        "invoke_interval": "600s",
+        "invoke_interval": "30s",
         "timeout": "5s",
         "max_output_length": 80,
         "concurrency": 3
@@ -778,7 +778,7 @@ data:
     {
       "plugin": "custom",
       "pluginConfig": {
-      "invoke_interval": "600s",
+      "invoke_interval": "30s",
       "timeout": "30s",
       "max_output_length": 80,
         "concurrency": 3
