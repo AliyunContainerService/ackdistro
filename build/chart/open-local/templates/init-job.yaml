@@ -8,8 +8,8 @@ metadata:
     app: {{ .Values.name }}
     component: {{ .Values.name }}-init-job
 spec:
-  completions: 3
-  parallelism: 3
+  completions: {{ .Values.globalconfig.NumOfMasters }}
+  parallelism: {{ .Values.globalconfig.NumOfMasters }}
   template:
     metadata:
       labels:
@@ -33,7 +33,7 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
-              - key: app
+              - key: component
                 operator: In
                 values:
                 - {{ .Values.name }}-init-job

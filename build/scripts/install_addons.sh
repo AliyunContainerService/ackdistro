@@ -49,6 +49,7 @@ if [ "$HostIPFamily" == "6" ];then
   LocalDNSCacheIP=fd00::aaaa::ffff:a
   VtepAddressCIDRs="::/0"
 fi
+NumOfMasters=$(kubectl get no -l node-role.kubernetes.io/master="" | grep -v NAME | wc -l)
 
 # Prepare helm config
 cat >/tmp/ackd-helmconfig.yaml <<EOF
@@ -65,6 +66,7 @@ globalconfig:
   RegistryURL: ${RegistryURL}
   SuspendPeriodHealthCheck: ${SuspendPeriodHealthCheck}
   SuspendPeriodBroadcastHealthCheck: ${SuspendPeriodBroadcastHealthCheck}
+  NumOfMasters: ${NumOfMasters}
 init:
   cidr: ${PodCIDR%,*}
   ipVersion: "${HostIPFamily}"
@@ -72,6 +74,10 @@ dualStack: ${hybridnetDualStackMode}
 defaultIPFamily: IPv${HostIPFamily}
 daemon:
   vtepAddressCIDRs: ${VtepAddressCIDRs}
+manager:
+  replicas: ${NumOfMasters}
+webhook:
+  replicas: ${NumOfMasters}
 EOF
 
 # wait 120s for apiserver ready

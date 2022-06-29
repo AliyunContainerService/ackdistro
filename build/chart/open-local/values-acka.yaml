@@ -57,3 +57,4 @@ monitor:
 globalconfig:
   YodaSchedulerSvcIP: 10.96.0.4
   RegistryURL: sea.hub:5000
+  NumOfMasters: 3
