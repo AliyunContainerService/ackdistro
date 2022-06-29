@@ -48,9 +48,17 @@ clean_vg_pool()
     for value in ${vglist[*]}
     do
         echo "vgremove $value"
-        vgremove -f $value
-        if [ "$?" != "0" ]; then
-          sleep 5; vgremove -f $value
+        for i in `seq 1 6`;do
+          vgremove -f $value
+          if [ "$?" = "0" ]; then
+            suc=true
+            break
+          fi
+          sleep 10
+        done
+        if [ "$suc" != "true" ];then
+          utils_error "failed to do vgremove, please run (vgremove -f $value) by yourself"
+          exit 1
         fi
     done
     # step 3: pvremove
