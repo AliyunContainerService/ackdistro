@@ -15,12 +15,12 @@ jobs:
       - name: Check outputs
         id: autobuild
         run: |
+          set -x
           commentbody="${{github.event.comment.body}}"
           tag=`echo "$commentbody"|cut -d" " -f2`
           branch=`echo "$commentbody"|cut -d" " -f3`
           multi_arch=`echo "$commentbody"|cut -d" " -f4`
 
-          echo $tag
           wget https://sealer.oss-cn-beijing.aliyuncs.com/sealer-latest.tar.gz
           sudo tar -xvf sealer-latest.tar.gz -C /usr/bin
           sudo sealer login ${{secrets.PRIVATEWAREHOUSE}}
@@ -33,6 +33,7 @@ jobs:
           if [ "$multi_arch" == "multiarch" ]
           then
           sudo bash build.sh $tag true
+          echo "::set-output name=multiarch::$multi_arch"
           else
           sudo bash build.sh $tag
           fi
@@ -45,4 +46,4 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            Image ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${{ steps.autobuild.outputs.version }} build successfully!
+            ${{ steps.autobuild.outputs.multiarch }} Image:[ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${{ steps.autobuild.outputs.version }} ]  build successfully!
