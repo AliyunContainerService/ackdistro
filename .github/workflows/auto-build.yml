@@ -46,4 +46,4 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            Image:[ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${{ steps.autobuild.outputs.version }} ${{ steps.autobuild.outputs.multiarch }} ] build successfully!
+            ${{ steps.autobuild.outputs.multiarch }} Image:[ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${{ steps.autobuild.outputs.version }} ]  build successfully!
