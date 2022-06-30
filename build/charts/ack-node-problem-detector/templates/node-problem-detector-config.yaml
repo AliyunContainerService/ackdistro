@@ -280,11 +280,7 @@ data:
           "condition": "FDPressure",
           "reason": "NodeHasFDPressure",
           "message": "too many fds have been used",
-          "path": "/home/kubernetes/bin/check-fd",
-          "args": [
-            "-p=/host/proc",
-            "-t=80"
-          ],
+          "path": "/config/plugin/check_fd.sh",
           "timeout": "30s"
         }
       ]
