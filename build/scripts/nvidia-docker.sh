@@ -113,7 +113,7 @@ public::nvidia::install_nvidia_docker2(){
 }
 
 public::nvidia::enable_gpu_in_node(){
-    cfg=/etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    cfg=/etc/sysconfig/kubelet
     if grep "aliyun\.accelerator\/nvidia_name" ${cfg};then
         utils_info 'nvidia-gpu is already enabled'
         return

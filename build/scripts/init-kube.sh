@@ -59,3 +59,6 @@ copy_kubelet_service
 /usr/bin/kubelet-pre-start.sh
 systemctl enable kubelet
 bash install-lvm.sh || exit 1
+
+# nvidia-docker.sh need set kubelet labels, it should be run after kubelet
+bash ${scripts_path}/nvidia-docker.sh
