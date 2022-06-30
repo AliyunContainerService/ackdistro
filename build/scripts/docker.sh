@@ -103,4 +103,3 @@ disable_selinux
 systemctl daemon-reload
 systemctl restart docker.service
 load_images
-bash ${scripts_path}/nvidia-docker.sh
