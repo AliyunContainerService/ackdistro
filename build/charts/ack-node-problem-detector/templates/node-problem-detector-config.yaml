@@ -836,13 +836,6 @@ data:
         }
       ],
       "rules": [
-#        {
-#          "type": "permanent",
-#          "condition": "Node.CPUPressure",
-#          "reason": "CPULoadTooHigh",
-#          "path": "/config/plugin/check_cpu_load.sh",
-#          "timeout": "60s"
-#        },
         {
           "type": "permanent",
           "condition": "Node.IOPressureOK",
