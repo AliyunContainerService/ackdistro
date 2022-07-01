@@ -3,6 +3,7 @@ package test
 import (
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	v1 "github.com/alibaba/sealer/types/api/v1"
@@ -13,6 +14,9 @@ import (
 	"ackdistro/test/testhelper"
 	"ackdistro/test/testhelper/settings"
 )
+
+var wg sync.WaitGroup //使用sync.WaitGroup来实现goroutine的同步
+var lock sync.Mutex
 
 var _ = Describe("test", func() {
 	Context("start apply calico", func() {
@@ -119,16 +123,18 @@ func e2eTest(sshClient *testhelper.SSHClient, cluster *v1.Cluster) {
 	testhelper.CheckErr(err)
 
 	go func() {
+		wg.Add(1)
+		lock.Lock() //加锁
 		err := sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "bash run.sh")
 		testhelper.CheckErr(err)
 	}()
+	lock.Unlock() //解锁
 
 	//wait 20s exec get-log.sh
 	time.Sleep(10 * time.Second)
-	go func() {
-		err = sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "bash get-log.sh")
-		testhelper.CheckErr(err)
-	}()
+
+	err = sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "bash get-log.sh")
+	testhelper.CheckErr(err)
 
 	time.Sleep(30 * time.Second)
 }
