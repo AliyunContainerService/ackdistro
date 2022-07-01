@@ -15,7 +15,7 @@ import (
 	"ackdistro/test/testhelper/settings"
 )
 
-var wg sync.WaitGroup //使用sync.WaitGroup来实现goroutine的同步
+var wg sync.WaitGroup
 var lock sync.Mutex
 
 var _ = Describe("test", func() {
@@ -124,11 +124,11 @@ func e2eTest(sshClient *testhelper.SSHClient, cluster *v1.Cluster) {
 
 	go func() {
 		wg.Add(1)
-		lock.Lock() //加锁
+		lock.Lock()
 		err := sshClient.SSH.CmdAsync(sshClient.RemoteHostIP, "bash run.sh")
 		testhelper.CheckErr(err)
 	}()
-	lock.Unlock() //解锁
+	lock.Unlock()
 
 	//wait 20s exec get-log.sh
 	time.Sleep(10 * time.Second)
