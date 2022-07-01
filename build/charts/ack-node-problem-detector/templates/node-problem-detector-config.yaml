@@ -878,7 +878,7 @@ data:
     }
 
     # check load
-    # load=$(uptime | awk -F'[ ,]' '{print $16}')
+    load=$(uptime | awk -F'[ ,]' '{print $16}')
     if [[ $(echo "${loadThreshold} < $(uptime | awk -F'[ ,]' '{print $16}')" | bc) -eq 1 ]]; then
       consistency=1
       errMsg="load is too high: ${load}"
