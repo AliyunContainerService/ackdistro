@@ -47,7 +47,10 @@ var _ = Describe("test", func() {
 				cluster.Spec.Provider = settings.AliCloud
 				cluster.Spec.Image = settings.TestImageName
 				cluster = apply.CreateAliCloudInfraAndSave(cluster, tempFile)
-				defer apply.CleanUpAliCloudInfra(cluster)
+				clean := os.Getenv("clean")
+				if clean == "clean" {
+					defer apply.CleanUpAliCloudInfra(cluster)
+				}
 				sshClient := testhelper.NewSSHClientByCluster(cluster)
 				testhelper.CheckFuncBeTrue(func() bool {
 					err := sshClient.SSH.Copy(sshClient.RemoteHostIP, settings.DefaultSealerBin, settings.DefaultSealerBin)
