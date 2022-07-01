@@ -35,7 +35,8 @@ spec:
         - --system-log-monitors=/config/kernel-monitor.json,/config/docker-monitor.json
         - --prometheus-address=0.0.0.0
         - --prometheus-port=20257
-        - --config.custom-plugin-monitor=/config/ntp-problem-monitor.json
+#        重复规则, prom中有
+#        - --config.custom-plugin-monitor=/config/ntp-problem-monitor.json
         - --config.custom-plugin-monitor=/config/fd-problem-monitor.json
         - --config.custom-plugin-monitor=/config/irqbalance-monitor.json
 #        - --config.custom-plugin-monitor=/config/public-network-problem-monitor.json
