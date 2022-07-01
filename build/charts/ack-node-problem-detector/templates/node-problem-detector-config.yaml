@@ -799,6 +799,19 @@ data:
     }
 
 # The following are from ASI rule base
+# 2022.7.1 remove CPUPressure
+#        {
+#          "type": "Node.CPUPressure",
+#          "reason": "CPULoadOK",
+#          "message": "CPU load is ok"
+#        },
+#        {
+#          "type": "permanent",
+#          "condition": "Node.CPUPressure",
+#          "reason": "CPULoadTooHigh",
+#          "path": "/config/plugin/check_cpu_load.sh",
+#          "timeout": "60s"
+#        },
   system-custom-plugin-monitor.json: |
     {
       "plugin": "custom",
@@ -810,11 +823,7 @@ data:
       },
       "source": "system-custom-plugin-monitor.json",
       "conditions": [
-        {
-          "type": "Node.CPUPressure",
-          "reason": "CPULoadOK",
-          "message": "CPU load is ok"
-        },
+
         {
           "type": "Node.IOPressureOK",
           "reason": "CPULoadOK",
@@ -827,13 +836,13 @@ data:
         }
       ],
       "rules": [
-        {
-          "type": "permanent",
-          "condition": "Node.CPUPressure",
-          "reason": "CPULoadTooHigh",
-          "path": "/config/plugin/check_cpu_load.sh",
-          "timeout": "60s"
-        },
+#        {
+#          "type": "permanent",
+#          "condition": "Node.CPUPressure",
+#          "reason": "CPULoadTooHigh",
+#          "path": "/config/plugin/check_cpu_load.sh",
+#          "timeout": "60s"
+#        },
         {
           "type": "permanent",
           "condition": "Node.IOPressureOK",
