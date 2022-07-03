@@ -20,6 +20,26 @@ wget -c https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${ARCH}/seal
 sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
 ```
 
+如果您想在离网环境安装，请按如下操作：
+```bash
+----------------------------------------
+# 以下操作在联网环境执行
+# 使用sealer pull拉取ACK-D集群镜像；
+# 可以通过--platform拉取指定架构的集群镜像，多种架构以,隔开，例如--platform amd64,arm64
+sealer --platform amd64 pull ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5
+
+# 保存集群镜像为tar文件
+sealer save ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5 -o ackdistro.tar
+
+----------------------------------------
+# 以下操作在离网环境执行
+将ackdistro.tar传输到离网环境
+
+sealer load -i ackdistro.tar
+
+然后再照常执行sealer run或者apply
+```
+
 查看集群状态：
 
 ```bash
