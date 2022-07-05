@@ -21,8 +21,9 @@ sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistr
 ```
 
 如果您想在离网环境安装，请按如下操作：
+
 ```bash
-----------------------------------------
+##########################################################
 # 以下操作在联网环境执行
 # 使用sealer pull拉取ACK-D集群镜像；
 # 可以通过--platform拉取指定架构的集群镜像，多种架构以,隔开，例如--platform amd64,arm64
@@ -31,7 +32,7 @@ sealer --platform amd64 pull ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ec
 # 保存集群镜像为tar文件
 sealer save ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5 -o ackdistro.tar
 
-----------------------------------------
+##########################################################
 # 以下操作在离网环境执行
 将ackdistro.tar传输到离网环境
 
@@ -151,9 +152,8 @@ trident health-check --help
 #### 4) 使用ipv6双栈模式
 > 本节描述的是双栈模式的配置，如果您只是想使用IPv6的IP，而不需要双栈，请按1）所述的标准方式，将所有ip、ip段换成ipv6，然后部署即可
 
-```yaml
-
 IPv6双栈的配置说明：
+
 1. 节点IP:部署时传入的所有节点地址的地址族需要保持一致，要么都是ipv4，要么都是ipv6，当打开双栈模式时(IPv6DualStack=true)，ACK—Distro 还会额外寻找每个节点上的另一个地址族的默认路由对应的ip，作为Second Host IP
 2. SvcCIDR:部署时必须传入两个svc网段(ipv4段和ipv6段)，用,分隔，第一个svc网段的地址族需要与所有节点的地址族保持一致
 3. PodCIDR:与SvcCIDR一致

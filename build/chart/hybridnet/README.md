@@ -20,6 +20,7 @@ helm repo update
 ```shell
 helm install hybridnet hybridnet/hybridnet -n kube-system
 ```
+
 The command deploys hybridnet on the Kubernetes cluster in the default configuration.
 
 _See [configuration](#configuration) below._
@@ -45,8 +46,7 @@ helm show values hybridnet/hybridnet
 
 ### Change default network type
 
-After deploying hybridnet with the default configuration, you can change the default network type any 
-time with these commands:
+After deploying hybridnet with the default configuration, you can change the default network type any time with these commands:
 
 ```shell
 # Change default network type to Underlay
