@@ -216,6 +216,9 @@ spec:
               path: plugin/check_ip_duplicate.sh
             - key: check_log_directory_permission.sh
               path: plugin/check_log_directory_permission.sh
+
+            - key: lib.sh
+              path: lib/lib.sh
   updateStrategy:
     rollingUpdate:
       maxUnavailable: 1

@@ -1263,6 +1263,71 @@ data:
     echo "${msg}"
 
     exit ${ret}
+
+  lib.sh: |
+    OK=0
+    NONOK=1
+    UNKNOWN=2
+
+    daemon_type() {
+      rpm -q pouch-container > /dev/null 2>&1
+      if [[ $? -eq 0 ]]; then
+        echo "pouch"
+        return
+      fi
+
+      rpm -q alidocker > /dev/null 2>&1
+      if [[ $? -eq 0 ]]; then
+        echo "docker"
+        return
+      fi
+
+      rpm -q pouch-containerd > /dev/null 2>&1
+      if [[ $? -eq 0 ]]; then
+        echo "containerd"
+        return
+      fi
+
+      if [[ -e "/usr/local/bin/pouchd" ]]; then
+        echo "pouch"
+        return
+      fi
+
+      if [[ -e "/usr/bin/dockerd" ]]; then
+        echo "docker"
+        return
+      fi
+
+      if [[ ! -e "/usr/local/bin/pouchd" ]] && [[ -e "/usr/local/bin/containerd" ]];then
+        echo "containerd"
+        return
+      fi
+
+      return
+    }
+
+    # 满足检测脚本传入label_selector 圈定本机是否需要执行检测
+    function check_label() {
+        if [[ -z $1 ]]; then
+          echo ${UNKNOWN}
+          return
+        fi
+
+        if [[ -f ${lib_path}/node_selector.py ]]; then
+          contain_label=$(python "${lib_path}/node_selector.py" "$1")
+          # 匹配到label表明该机被圈定
+          if [[ ${contain_label} == "match" ]]; then
+             echo ${OK}
+             return
+          fi
+          # 未匹配到
+          echo ${NONOK}
+          return
+        fi
+        # 未执行 selector
+        echo ${UNKNOWN}
+        return
+    }
 kind: ConfigMap
 metadata:
   name: node-problem-detector-config
