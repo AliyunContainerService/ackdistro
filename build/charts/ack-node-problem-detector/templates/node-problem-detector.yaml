@@ -47,9 +47,10 @@ spec:
         - --config.custom-plugin-monitor=/config/inodes-problem-monitor.json
         - --config.custom-plugin-monitor=/config/network-problem-monitor.json
         - --config.custom-plugin-monitor=/config/docker-offline-monitor.json
-        - --config.custom-plugin-monitor=/config/system-custom-plugin-monitor.json
-        - --config.custom-plugin-monitor=/config/kubelet-custom-plugin-monitor.json
-        - --config.custom-plugin-monitor=/config/container-custom-plugin-monitor.json
+#        ASI规则测试未通过
+#        - --config.custom-plugin-monitor=/config/system-custom-plugin-monitor.json
+#        - --config.custom-plugin-monitor=/config/kubelet-custom-plugin-monitor.json
+#        - --config.custom-plugin-monitor=/config/container-custom-plugin-monitor.json
 #        以下为特定环境规则
 #        - --config.custom-plugin-monitor=/config/csi-hang-problem-monitor.json
 #        - --custom-plugin-monitors=/config/instance_expired_checker.json
