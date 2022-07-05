@@ -41,11 +41,9 @@ for f in `ls ack-distro-yamls/yamls`;do
 done
 
 #TODO
-hybridnetDualStackMode=${IPv6DualStack}
 LocalDNSCacheIP=169.254.20.10
 VtepAddressCIDRs="0.0.0.0/0,::/0"
 if [ "$HostIPFamily" == "6" ];then
-  hybridnetDualStackMode=true
   LocalDNSCacheIP=fd00::aaaa::ffff:a
   VtepAddressCIDRs="::/0"
 fi
@@ -70,7 +68,6 @@ globalconfig:
 init:
   cidr: ${PodCIDR%,*}
   ipVersion: "${HostIPFamily}"
-dualStack: ${hybridnetDualStackMode}
 defaultIPFamily: IPv${HostIPFamily}
 daemon:
   vtepAddressCIDRs: ${VtepAddressCIDRs}
