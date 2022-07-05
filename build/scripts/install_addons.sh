@@ -127,6 +127,8 @@ IFS=,
 for addon in ${Addons};do
   helm -n acs-system upgrade -i ${addon} chart/${addon} -f /tmp/ackd-helmconfig.yaml
 done
+IFS="
+"
 
 # for hybridnet
 if [ "$Network" == "calico" ];then
