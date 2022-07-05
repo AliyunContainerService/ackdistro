@@ -6,17 +6,39 @@
 ### 快速创建ACK Distro集群
 在创建集群之前，请根据[部署要求](requirements_zh.md)来检查您的环境是否满足ACK Distro的部署要求。
 
-获取最新版sealer：
+获取sealer：
 
 ```bash
-wget -c https://sealer.oss-cn-beijing.aliyuncs.com/sealers/sealer-v0.8.5-linux-amd64.tar.gz && \
-      tar -xvf sealer-v0.8.5-linux-amd64.tar.gz -C /usr/bin
+ARCH=amd64 # or arm64
+wget -c https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${ARCH}/sealer-latest-linux-${ARCH}.tar.gz && \
+      tar -xvf sealer-latest-linux-${ARCH}.tar.gz -C /usr/bin
 ```
 
 使用sealer获取ACK Distro制品，并创建集群：
 
 ```bash
-sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-3 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+```
+
+如果您想在离网环境安装，请按如下操作：
+
+```bash
+##########################################################
+# 以下操作在联网环境执行
+# 使用sealer pull拉取ACK-D集群镜像；
+# 可以通过--platform拉取指定架构的集群镜像，多种架构以,隔开，例如--platform amd64,arm64
+sealer --platform amd64 pull ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5
+
+# 保存集群镜像为tar文件
+sealer save ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5 -o ackdistro.tar
+
+##########################################################
+# 以下操作在离网环境执行
+将ackdistro.tar传输到离网环境
+
+sealer load -i ackdistro.tar
+
+然后再照常执行sealer run或者apply
 ```
 
 查看集群状态：
@@ -40,7 +62,8 @@ ACK Distro有丰富的生产级别集群管理经验，我们目前提供了以�
 如果想让ACK Distro更好地管理它使用的磁盘，请按需准备好裸的数据盘（无需分区及挂载）：
 
 - EtcdDevice: 分配给etcd的磁盘，容量必须大于20GiB，IOPS>3300，仅Master节点需要
-- StorageDevice: 分配给docker和kubelet的磁盘，容量建议大于100GiB
+- StorageDevice: 分配给docker和kubelet的磁盘，容量建议大于200GiB
+- DockerRunDiskSize, KubeletRunDiskSize: 详见yaml说明
 
 准备好磁盘后，配置您的ClusterFile.yaml文件
 
@@ -50,31 +73,36 @@ kind: Cluster
 metadata:
   name: my-cluster
 spec:
-  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-3
-  env:
-    - PodCIDR=172.45.0.0/16
-    - SvcCIDR=10.96.0.0/16
-    - StorageDevice=/dev/vdc
-    #- DockerRunDiskSize=200 # unit is GiB, capacity for /var/lib/docker
-    #- KubeletRunDiskSize=200 # unit is GiB, capacity for /var/lib/kubelet
-    #- DNSDomain=cluster.local
-    #- ServiceNodePortRange=30000-32767
-    #- MTU=1440 # mtu for calico interface, default is 1440
-    #- IPAutoDetectionMethod=can-reach=8.8.8.8 # calico ip auto-detection method, default is "can-reach=8.8.8.8", see https://projectcalico.docs.tigera.io/archive/v3.8/reference/node/configuration
-    #- SuspendPeriodHealthCheck=false # suspend period health-check, default is false
+  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5
+  env: # all env are NOT necessary
+    - PodCIDR=172.45.0.0/16 # pod subnet, support ipv6 cidr, default is 100.64.0.0/16
+    - SvcCIDR=10.96.0.0/16 # service subnet, support ipv6 cidr default is 10.96.0.0/16
+    - Network=hybridnet # support hybridnet/calico, default is hybridnet
+    - EtcdDevice=/dev/vdb # EtcdDevice is device for etcd, default is "", which will use system disk
+    - StorageDevice=/dev/vdc # StorageDevice is device for kubelet and container daemon, default is "", which will use system disk
+    - DockerRunDiskSize=100 # unit is GiB, capacity for /var/lib/docker, default is 100
+    - KubeletRunDiskSize=100 # unit is GiB, capacity for /var/lib/kubelet, default is 100
+    - DNSDomain=cluster.local # default is cluster.local
+    - ServiceNodePortRange=30000-32767 # default is 30000-32767
+    - MTU=1440 # mtu for calico interface, default is 1440
+    - IPAutoDetectionMethod=can-reach=8.8.8.8 # calico ip auto-detection method, default is "can-reach=8.8.8.8", see https://projectcalico.docs.tigera.io/archive/v3.8/reference/node/configuration
+    - SuspendPeriodHealthCheck=false # suspend period health-check, default is false
+    - EnableLocalDNSCache=false # enable local dns cache component, default is false
+    - IPv6DualStack=false # enable IPv6DualStack mode, default is false
+    - RemoveMasterTaint=false # remove master taint or not, default is false
   ssh:
     passwd: "password"
-    #user: root
-    #port: "22"
+    #user: root # default is root
+    #port: "22" # default is 22
     #pk: /root/.ssh/id_rsa
     #pkPasswd: xxx
   hosts:
-    - ips:
+    - ips: # support ipv6
         - 1.1.1.1
         - 2.2.2.2
         - 3.3.3.3
       roles: [ master ] # add role field to specify the node role
-      env: # rewrite some nodes has different env config
+      env: # all env are NOT necessary, rewrite some nodes has different env config
         - EtcdDevice=/dev/vdb
         - StorageDevice=/dev/vde
       # rewrite ssh config if some node has different passwd...
@@ -82,7 +110,7 @@ spec:
       #  user: root
       #  passwd: passwd
       #  port: "22"
-    - ips:
+    - ips: # support ipv6
         - 4.4.4.4
         - 5.5.5.5
       roles: [ node ]
@@ -96,11 +124,14 @@ sealer apply -f ClusterFile.yaml
 #### 2) 使用集群预检工具
 
 ```bash
-# 部署集群时，默认会运行集群预检工具，如果出现了预检错误ErrorX，但您评估觉得可以忽略该报错，请按如下操作
-sealer apply -f ClusterFile.yaml --env IgnoreErrors=ErrorX[,ErrorY]
+# When deploying a cluster, the cluster precheck tool will run by default. If there is a precheck error ErrorX, but you think the error can be ignored, please do as follows
+# specify IgnoreErrors=ErrorX[,ErrorY] in .spec.env of ClusterFile.yaml, and run again
+sealer apply -f ClusterFile.yaml
 
-# 如果想忽略所有
-sealer apply -f ClusterFile.yaml --env SkipPreflight=true
+# Also you can ignore all errors
+
+# specify SkipPreflight=true in .spec.env of ClusterFile.yaml, and run again
+sealer apply -f ClusterFile.yaml
 ```
 
 #### 3) 使用集群健康检查工具
@@ -116,6 +147,40 @@ trident health-check --trigger-all
 
 #更多功能
 trident health-check --help
+```
+
+#### 4) 使用ipv6双栈模式
+> 本节描述的是双栈模式的配置，如果您只是想使用IPv6的IP，而不需要双栈，请按1）所述的标准方式，将所有ip、ip段换成ipv6，然后部署即可
+
+IPv6双栈的配置说明：
+
+1. 节点IP:部署时传入的所有节点地址的地址族需要保持一致，要么都是ipv4，要么都是ipv6，当打开双栈模式时(IPv6DualStack=true)，ACK—Distro 还会额外寻找每个节点上的另一个地址族的默认路由对应的ip，作为Second Host IP
+2. SvcCIDR:部署时必须传入两个svc网段(ipv4段和ipv6段)，用,分隔，第一个svc网段的地址族需要与所有节点的地址族保持一致
+3. PodCIDR:与SvcCIDR一致
+4. 集群组件将使用第一个PodCIDR分配的IP
+
+```yaml
+apiVersion: sealer.cloud/v2
+kind: Cluster
+metadata:
+  name: my-cluster
+spec:
+  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5-pre
+  env:
+    - PodCIDR=5408:4003:10bb:6a01:83b9:6360:c66d:0000/112,101.64.0.0/16
+    - SvcCIDR=6408:4003:10bb:6a01:83b9:6360:c66d:0000/112,11.96.0.0/16
+    - IPv6DualStack=true
+    - LvsImage=ecp_builder/lvscare:v1.1.3-beta.8
+  ssh:
+    passwd: "passwd"
+  hosts:
+    - ips:
+        - 2408:4003:10bb:6a01:83b9:6360:c66d:ed57
+        - 2408:4003:10bb:6a01:83b9:6360:c66d:ed58
+      roles: [ master ] # add role field to specify the node role
+    - ips:
+        - 2408:4003:10bb:6a01:83b9:6360:c66d:ed59
+      roles: [ node ]
 ```
 
 ### 运维ACK Distro集群

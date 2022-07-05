@@ -4,15 +4,15 @@ metadata:
   name: install-addons # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: PostInstall # PreInit PreInstall PostInstall
+  action: PreGuest # PreInit PreInstall PostInstall
   'on': master0
   data: |
-    export SvcCIDR=${SvcCIDR:-10.96.0.0/16}
-    export PodCIDR=${PodCIDR:-100.64.0.0/16}
     export DNSDomain=${DNSDomain:-cluster.local}
-    export IPVersion=${IPVersion:-4}
+    export HostIPFamily=${HostIPFamily:-4}
+    export EnableLocalDNSCache=${EnableLocalDNSCache:-false}
     export MTU=${MTU:-1440}
     export IPIP=${IPIP:-Always}
+    export IPv6DualStack=${IPv6DualStack:-false}
     export IPAutoDetectionMethod=${IPAutoDetectionMethod:-can-reach=8.8.8.8}
     export DisableFailureDomain=${DisableFailureDomain:-false}
     export RegistryURL=${RegistryURL:-sea.hub:5000}
@@ -20,6 +20,16 @@ spec:
     export SuspendPeriodBroadcastHealthCheck=${SuspendPeriodBroadcastHealthCheck:-false}
     export Addons=${Addons}
     export Network=${Network}
+    export RemoveMasterTaint=${RemoveMasterTaint}
+    export KUBECONFIG=/etc/kubernetes/admin.conf
+    
+    if [ "$HostIPFamily" == "6" ];then
+      export SvcCIDR=${SvcCIDR:-4408:4003:10bb:6a01:83b9:6360:c66d:0000/112}
+      export PodCIDR=${PodCIDR:-3408:4003:10bb:6a01:83b9:6360:c66d:0000/112}
+    else
+      export SvcCIDR=${SvcCIDR:-10.96.0.0/16}
+      export PodCIDR=${PodCIDR:-100.64.0.0/16}
+    fi
 
     bash scripts/install_addons.sh
     if [ $? -ne 0 ];then
@@ -33,8 +43,8 @@ spec:
     fi
     
     # set default storageclass and snapshot
-    kubectl annotate storageclass open-local-lvm snapshot.storage.kubernetes.io/is-default-class="true" --overwrite
-    kubectl annotate storageclass open-local-lvm storageclass.kubernetes.io/is-default-class="true" --overwrite
+    kubectl annotate storageclass yoda-lvm-default snapshot.storage.kubernetes.io/is-default-class="true" --overwrite
+    kubectl annotate storageclass yoda-lvm-default storageclass.kubernetes.io/is-default-class="true" --overwrite
     
     if [ "${RemoveMasterTaint}" == "true" ];then
       kubectl taint node node-role.kubernetes.io/master- --all || true
@@ -49,5 +59,5 @@ spec:
       exit 0
     fi
     echo "First time health check fail, try again"
-    trident health-check --trigger-mode All
+    trident health-check --trigger-mode OnlyUnsuccessful
     exit $?

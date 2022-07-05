@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    scheduler.alpha.kubernetes.io/critical-pod: ""
+  labels:
+    component: nvidia-device-plugin
+  name: nvidia-device-plugin
+  namespace: kube-system
+spec:
+  priorityClassName: system-node-critical
+  hostNetwork: true
+  containers:
+  - image: sea.hub:5000/ecp_builder/k8s-device-plugin:v1.0.0.3-bd49899-aliyun
+    name: nvidia-device-plugin-ctr
+    args: ["--fail-on-init-error=false","--pass-device-specs=true","--device-id-strategy=index"]
+    # Make this pod as Guaranteed pod which will never be evicted because of node's resource consumption.
+    resources:
+      limits:
+        memory: "300Mi"
+        cpu: "500m"
+      requests:
+        memory: "300Mi"
+        cpu: "0"
+    env:
+      - name: DP_DISABLE_HEALTHCHECKS
+        value: all
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+    volumeMounts:
+      - name: device-plugin
+        mountPath: /var/lib/kubelet/device-plugins
+  volumes:
+    - name: device-plugin
+      hostPath:
+        path: /var/lib/kubelet/device-plugins

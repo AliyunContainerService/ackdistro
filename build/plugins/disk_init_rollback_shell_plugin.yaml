@@ -1,3 +1,18 @@
+---
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: disk-init-rollback # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: PostClean # PreInit PreInstall PostInstall
+  'on': master
+  data: |
+    set -e; set -x
+    export EtcdDevice=${EtcdDevice}
+    export StorageDevice=${StorageDevice}
+    bash scripts/disk_init_rollback_v2.sh
+---
 apiVersion: sealer.aliyun.com/v1alpha1
 kind: Plugin
 metadata:
@@ -9,4 +24,4 @@ spec:
   data: |
     set -e; set -x
     export StorageDevice=${StorageDevice}
-    bash scripts/disk_init_rollback.sh
+    bash scripts/disk_init_rollback_v2.sh

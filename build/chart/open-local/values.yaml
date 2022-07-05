@@ -1,0 +1,60 @@
+name: open-local
+namespace: kube-system
+driver: local.csi.aliyun.com
+images:
+  local:
+    image: ecp_builder/open-local
+    tag: v0.5.5
+  registrar:
+    image: ecp_builder/csi-node-driver-registrar
+    tag: v2.3.0
+  provisioner:
+    image: ecp_builder/csi-provisioner
+    tag: v2.2.2
+  resizer:
+    image: ecp_builder/csi-resizer
+    tag: v1.3.0
+  snapshotter:
+    image: ecp_builder/csi-snapshotter
+    tag: v4.2.1
+  snapshot_controller:
+    image: ecp_builder/snapshot-controller
+    tag: v4.2.1
+agent:
+  name: open-local-agent
+  # This block device will be used to create as a Volume Group in every node
+  # Open-Local does nothing if the device has been formatted or mountted
+  kubelet_dir: /var/lib/kubelet
+  volume_name_prefix: local
+extender:
+  name: open-local-scheduler-extender
+  # scheduling strategy: binpack/spread
+  strategy: spread
+  # scheduler extender http port
+  port: 23000
+  # you can also configure your kube-scheduler manually, see docs/user-guide/kube-scheduler-configuration.md to get more details
+  init_job: true
+controller:
+  update_nls: "true"
+storageclass:
+  lvm:
+    name: open-local-lvm
+  lvm_xfs:
+    name: open-local-lvm-xfs
+  lvm_io:
+    name: open-local-lvm-io-throttling
+  device_ssd:
+    name: open-local-device-ssd
+  device_hdd:
+    name: open-local-device-hdd
+  mountpoint_ssd:
+    name: open-local-mountpoint-ssd
+  mountpoint_hdd:
+    name: open-local-mountpoint-hdd
+monitor:
+  # install grafana dashboard
+  enabled: false
+  # grafana namespace
+  namespace: monitoring
+globalconfig:
+  RegistryURL: sea.hub:5000

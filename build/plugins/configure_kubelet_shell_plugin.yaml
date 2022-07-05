@@ -1,0 +1,62 @@
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: configure_kubelet # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: PreInit|PreJoin # PreInit PreInstall PostInstall
+  'on': master
+  data: |
+    set -e; set -x
+    sysctl -w net.ipv6.conf.all.forwarding=1
+
+    if [ "${HostIP}" == "" ];then
+      echo "Can't find HostIP in env"
+      exit 1
+    fi
+    
+    # if not IPv6DualStack, just write one ip
+    if [ "${IPv6DualStack}" != "true" ];then
+      echo "KUBELET_EXTRA_ARGS=--node-ip=${HostIP}" > /etc/sysconfig/kubelet
+      exit 0
+    fi
+    
+    family_of_ip_need_get=6
+    if [ "${HostIPFamily}" == "6" ];then
+      family_of_ip_need_get=4    
+    fi
+    
+    anotherIP=`trident get-default-route-ip --ip-family ${family_of_ip_need_get}`
+    echo "KUBELET_EXTRA_ARGS=--node-ip=${HostIP},${anotherIP}" > /etc/sysconfig/kubelet
+
+---
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: configure_kubelet_on_node # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: PreInit|PreJoin # PreInit PreInstall PostInstall
+  'on': node
+  data: |
+    set -e; set -x
+    sysctl -w net.ipv6.conf.all.forwarding=1
+
+    if [ "${HostIP}" == "" ];then
+      echo "Can't find HostIP in env"
+      exit 1
+    fi
+    
+    # if not IPv6DualStack, just write one ip
+    if [ "${IPv6DualStack}" != "true" ];then
+      echo "KUBELET_EXTRA_ARGS=--node-ip=${HostIP}" > /etc/sysconfig/kubelet
+      exit 0
+    fi
+    
+    family_of_ip_need_get=6
+    if [ "${HostIPFamily}" == "6" ];then
+      family_of_ip_need_get=4    
+    fi
+    
+    anotherIP=`trident get-default-route-ip --ip-family ${family_of_ip_need_get}`
+    echo "KUBELET_EXTRA_ARGS=--node-ip=${HostIP},${anotherIP}" > /etc/sysconfig/kubelet

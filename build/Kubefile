@@ -1,32 +1,16 @@
-FROM registry.cn-qingdao.aliyuncs.com/sealer-io/ackdistro-multi:v0.1.0
+FROM registry.cn-qingdao.aliyuncs.com/sealer-io/ackdistro-multi:v0.2.0
 
 COPY Metadata .
-
-COPY ${ARCH}/trident ./bin
-COPY ${ARCH}/kubectl ./bin
-COPY ${ARCH}/kubeadm ./bin
-COPY ${ARCH}/kubelet ./bin
-COPY ${ARCH}/helm ./bin
-
-COPY scripts/disk_init.sh scripts
-COPY scripts/disk_init_rollback.sh scripts
-COPY scripts/install_addons.sh scripts
-COPY plugins/disk_init_rollback_on_master_shell_plugin.yaml plugins
-COPY plugins/disk_init_rollback_shell_plugin.yaml plugins
-COPY plugins/preflight_shell_plugin.yaml plugins
-COPY plugins/install_addons_shell_plugin.yaml plugins
-
+COPY VERSION VERSION
 COPY imageList manifests
-COPY kubeadm.yml ./etc
-COPY kubeadm.yml.tmpl ./etc
-COPY statics/audit-policy.yml ./statics
 
-COPY charts/kube-core chart
-COPY charts/hybridnet chart
-COPY charts/open-local chart
-COPY charts/l-zero chart
-COPY charts/l-zero-library chart
-COPY charts/calico chart
-COPY charts/etcd-backup chart
-COPY charts/csi-minio chart
+COPY ${ARCH}/bin ./bin
+COPY ${ARCH}/rpm ./rpm
+COPY ${ARCH}/tgz ./tgz
+
+COPY scripts scripts
+COPY plugins plugins
+COPY etc etc
+COPY chart chart
+COPY statics statics
 COPY yamls ack-distro-yamls

@@ -1,0 +1,17 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+images:
+  lzero:
+    image: ecp_builder/l-zero
+    tag: v1.1.0-6829307
+  httpd:
+    image: ecp_builder/httpd
+    tag: alpine3.15
+  opsbasealpine:
+    image: ecp_builder/opsbase-alpine
+    tag: v0.2
+k8s_namespace: kube-system
+domain: "l-zero-ingress.paas.com"
+globalconfig:
+  DisableFailureDomain: false
+  RegistryURL: sea.hub:5000
