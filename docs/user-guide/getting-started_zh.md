@@ -170,7 +170,7 @@ spec:
     - PodCIDR=5408:4003:10bb:6a01:83b9:6360:c66d:0000/112,101.64.0.0/16
     - SvcCIDR=6408:4003:10bb:6a01:83b9:6360:c66d:0000/112,11.96.0.0/16
     - IPv6DualStack=true
-    - LvsImage=ecp_builder/lvscare:v1.1.3-beta.3
+    - LvsImage=ecp_builder/lvscare:v1.1.3-beta.8
   ssh:
     passwd: "passwd"
   hosts:
