@@ -2,11 +2,11 @@
 # Declare variables to be passed into your templates.
 images:
   npd:
-    image: oecp/node-problem-detector
+    image: ecp_builder/node-problem-detector
     tag: v0.2
 k8s_namespace: kube-system
 globalconfig:
-  RegistryURL: registry.cn-hangzhou.aliyuncs.com
+  RegistryURL: ack-agility-registry.cn-shanghai.cr.aliyuncs.com
 
 npd:
   # Custom monitor definitions to add to Node Problem Detector - to be
