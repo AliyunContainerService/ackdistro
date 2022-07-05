@@ -90,6 +90,7 @@ spec:
     - EnableLocalDNSCache=false # enable local dns cache component, default is false
     - IPv6DualStack=false # enable IPv6DualStack mode, default is false
     - RemoveMasterTaint=false # remove master taint or not, default is false
+    - DockerLimitNOFILE=infinity # set LimitNOFILE for docker.service, default is 1048576
   ssh:
     passwd: "password"
     #user: root # default is root

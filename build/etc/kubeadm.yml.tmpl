@@ -152,6 +152,9 @@ readOnlyPort: 10255
 kubeReserved:
   memory: 400Mi
   pid: "10000"
+{{ if and (.HostIPFamily) (eq .HostIPFamily "6") }}
+healthzBindAddress: "::1"
+{{ end }}
 systemReserved:
   memory: 300Mi
   pid: "10000"

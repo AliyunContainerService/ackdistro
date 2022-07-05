@@ -13,7 +13,7 @@ ExecStartPost=/usr/sbin/iptables -P FORWARD ACCEPT
 ExecReload=/bin/kill -s HUP $MAINPID
 # Having non-zero Limit*s causes performance problems due to accounting overhead
 # in the kernel. We recommend using cgroups to do container-local accounting.
-LimitNOFILE={{or .LimitNOFILE "1048576"}}
+LimitNOFILE={{or .DockerLimitNOFILE "1048576"}}
 LimitNPROC=infinity
 LimitCORE=infinity
 # Uncomment TasksMax if your systemd version supports it.

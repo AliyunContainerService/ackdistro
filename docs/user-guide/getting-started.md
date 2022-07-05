@@ -149,10 +149,10 @@ trident health-check --trigger-all
 trident health-check --help
 ```
 
-#### 4) 使用ipv6双栈模式
+#### 4) IPv6 dual stack
 > This section is about ipv6 dual stack configuration, if you just need ipv6 only, please use the method described in the previous section.
 
-IPv6双栈的配置说明：
+How to configure for IPv6 dual stack mode:
 
 1. Node ip: all node should communicate within the cluster using the same family ip.
 2. SvcCIDR: must give ipv4 cidr and ipv6 cidr, using ',' to join them(no space), and the first cidr should be in the same family as the node IP.
