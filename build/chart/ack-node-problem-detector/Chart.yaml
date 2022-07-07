@@ -1,0 +1,20 @@
+apiVersion: v2
+name: ack-node-problem-detector
+description: this chart  aims to make various node problems visible to the upstream layers in cluster management stack,and  told people where is the problem on time.
+appVersion: "0.8.0"
+version: 1.2.6
+kubeVersion: ">=1.8.0-0"
+keywords:
+  - ack-node-problem-detector
+  - eventer
+  - namespace:kube-system
+  - releaseName:ack-node-problem-detector
+  - category:ops
+home: https://github.com/AliyunContainerService/node-problem-detector
+maintainers:
+  - name: carson
+    email: wb-gq555900@alibaba-inc.com
+  - name: 莫源
+    email: zhongwei.lzw@alibaba-inc.com
+  - name: 行疾
+    email: shichun.fsc@alibaba-inc.com
