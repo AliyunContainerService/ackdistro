@@ -1,5 +1,29 @@
 # Release Note
 
+## v1-20-4-ack-5
+Features:
+
+- [Installation] Support install cluster on ipv6-only, ipv6-dual-stack hosts
+- [Installation] Support configure DNSDomain/ServiceNodePortRange for k8s
+- [Installation] Use lvm, Logical Volume Manager, to manage partition of docker and kubelet
+- [CNI] Upgrade hybridnet from v0.4.2 to v0.6.0, which support ipv6 dual stack, introduce GlobalBGP type Network etc. [CHANGELOG](https://github.com/alibaba/hybridnet/blob/main/CHANGELOG.md)
+- [CSI] Upgrade open-local v0.5.4 to v0.5.5. [CHANGELOG](https://github.com/alibaba/open-local/releases)
+- [CRI] Support nvidia-docker, which will be automatically installed when GPU driver has been detected
+- [CRI] Support configure LimitNOFILE for docker.service
+- [Addon] Add local dns cache and paralb
+- [Test] Add E2E auto test
+
+Usage:
+
+```bash
+wget -c https://sealer.oss-cn-beijing.aliyuncs.com/sealers/sealer-v0.8.5-linux-amd64.tar.gz && \
+      tar -xvf sealer-v0.8.5-linux-amd64.tar.gz -C /usr/bin
+
+sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-3 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+
+trident health-check
+```
+
 ## v1-20-4-ack-3
 Features:
 

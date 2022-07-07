@@ -31,7 +31,7 @@
 - take over trident
 - k8s upgrade from 1.20 to 1.22
 - Non-root in sealer
-- sealer release new version 
+- sealer release new version
 - GPU(shared)
 - Prometheus rules
 - change ip

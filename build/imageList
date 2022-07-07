@@ -10,7 +10,7 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/l-zero:v1.1.0-68293
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/httpd:alpine3.15
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/opsbase-alpine:v0.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/debug:ubuntu
-ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/hybridnet:v0.5.1
+ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/hybridnet:v0.6.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/paralb:v0.1.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/open-local:v0.5.5
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-node-driver-registrar:v2.3.0
@@ -20,7 +20,7 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-snapshotter:v4.
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/k8s-dns-node-cache:1.17.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/snapshot-controller:v4.2.1
 registry.cn-zhangjiakou.aliyuncs.com/acs/coredns:v1.8.4.5-2ce07fd2-aliyun
-ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/lvscare:v1.1.3-beta.3
+ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/lvscare:v1.1.3-beta.8
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-typha:v3.23.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-kube-controllers:v3.23.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-cni:v3.23.0

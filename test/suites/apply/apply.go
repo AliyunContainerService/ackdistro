@@ -4,15 +4,16 @@ import (
 	"ackdistro/test/testhelper"
 	"ackdistro/test/testhelper/settings"
 	"fmt"
+	"path/filepath"
+	"strconv"
+	"strings"
+
 	"github.com/alibaba/sealer/pkg/infra"
 	v1 "github.com/alibaba/sealer/types/api/v1"
 	"github.com/alibaba/sealer/utils"
 	"github.com/onsi/gomega"
 	"gopkg.in/yaml.v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"path/filepath"
-	"strconv"
-	"strings"
 )
 
 func LoadClusterFileFromDisk(clusterFilePath string) *v1.Cluster {
@@ -34,7 +35,7 @@ func GetRawClusterFilePath() string {
 
 func GetLoadFile() string {
 	path := settings.LoadPath
-	return filepath.Join(path,"load.sh")
+	return filepath.Join(path, "load.sh")
 }
 
 func CreateAliCloudInfraAndSave(cluster *v1.Cluster, clusterFile string) *v1.Cluster {
@@ -106,7 +107,7 @@ func SealerRunCalicoCmd(masters, nodes, passwd string, provider string) string {
 	if provider != "" {
 		provider = fmt.Sprintf("--provider %s", provider)
 	}
-	return fmt.Sprintf("%s run %s -e %s %s %s %s %s -d", settings.DefaultSealerBin, settings.TestImageName, settings.CustomCalicoEnv , masters, nodes, passwd, provider)
+	return fmt.Sprintf("%s run %s -e %s %s %s %s %s -d", settings.DefaultSealerBin, settings.TestImageName, settings.CustomCalicoEnv, masters, nodes, passwd, provider)
 }
 
 func SealerRunHybridnetCmd(masters, nodes, passwd string, provider string) string {
@@ -122,7 +123,7 @@ func SealerRunHybridnetCmd(masters, nodes, passwd string, provider string) strin
 	if provider != "" {
 		provider = fmt.Sprintf("--provider %s", provider)
 	}
-	return fmt.Sprintf("%s run %s -e %s %s %s %s %s -d", settings.DefaultSealerBin, settings.TestImageName, settings.CustomhybridnetEnv , masters, nodes, passwd, provider)
+	return fmt.Sprintf("%s run %s -e %s %s %s %s %s -d", settings.DefaultSealerBin, settings.TestImageName, settings.CustomhybridnetEnv, masters, nodes, passwd, provider)
 }
 
 // CheckNodeNumWithSSH check node mum of remote cluster;for bare metal apply
@@ -154,5 +155,5 @@ func SealerApplyCmd(clusterFile string) string {
 }
 
 func SealerDeleteCmd(clusterFile string) string {
-	return fmt.Sprintf("%s delete -f %s --force -d", settings.DefaultSealerBin,clusterFile)
+	return fmt.Sprintf("%s delete -f %s --force -d", settings.DefaultSealerBin, clusterFile)
 }

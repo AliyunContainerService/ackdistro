@@ -21,17 +21,18 @@ sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistr
 ```
 
 If you want install ACK-D on an air-gap cluster, you can:
+
 ```bash
-----------------------------------------
+##########################################################
 # The following command should be run on machine with internet access
 # Use sealer to pull ACK-D cluster image,
 # Also you can use --platform to specify the arch of cluster image you want to pull, if you want pull multi archs, please use ',' to join them, for example: --platform amd64,arm64
-sealer --platform amd64 pull ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5
+sealer --platform amd64 pull ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-3-ack-3
 
 # Save cluster image as a tar
-sealer save ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5 -o ackdistro.tar
+sealer save ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-3-ack-3 -o ackdistro.tar
 
-----------------------------------------
+##########################################################
 # The following command should be run on the target air gap cluster
 copy ackdistro.tar to the air-gap machine.
 
@@ -57,6 +58,7 @@ ACK Distro has extensive production-level cluster management experience, and we 
 5. Support cluster auditing, which only record WRITE request and can use only 1GiB storage to save audit logs for the last 72h on a 3m+3w cluster
 
 #### 1) automatically manage disk capacity for k8s daemons
+
 If you want ACK Distro to better manage the disks it uses, prepare raw data disks as needed (no partitioning and mounting required):
 
 - EtcdDevice: the disk allocated to etcd must be larger than 20GiB and IOPS>3300, only required by the Master node
@@ -71,7 +73,7 @@ kind: Cluster
 metadata:
   name: my-cluster
 spec:
-  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5
+  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-3-ack-3
   env: # all env are NOT necessary
     - PodCIDR=172.45.0.0/16 # pod subnet, support ipv6 cidr, default is 100.64.0.0/16
     - SvcCIDR=10.96.0.0/16 # service subnet, support ipv6 cidr default is 10.96.0.0/16
@@ -147,12 +149,11 @@ trident health-check --trigger-all
 trident health-check --help
 ```
 
-#### 4) 使用ipv6双栈模式
+#### 4) IPv6 dual stack
 > This section is about ipv6 dual stack configuration, if you just need ipv6 only, please use the method described in the previous section.
 
-```yaml
+How to configure for IPv6 dual stack mode:
 
-IPv6双栈的配置说明：
 1. Node ip: all node should communicate within the cluster using the same family ip.
 2. SvcCIDR: must give ipv4 cidr and ipv6 cidr, using ',' to join them(no space), and the first cidr should be in the same family as the node IP.
 3. PodCIDR: same as SvcCIDR.
@@ -164,12 +165,12 @@ kind: Cluster
 metadata:
   name: my-cluster
 spec:
-  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5-pre
+  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-3-ack-3
   env:
     - PodCIDR=5408:4003:10bb:6a01:83b9:6360:c66d:0000/112,101.64.0.0/16
     - SvcCIDR=6408:4003:10bb:6a01:83b9:6360:c66d:0000/112,11.96.0.0/16
     - IPv6DualStack=true
-    - LvsImage=ecp_builder/lvscare:v1.1.3-beta.3
+    - LvsImage=ecp_builder/lvscare:v1.1.3-beta.8
   ssh:
     passwd: "passwd"
   hosts:
