@@ -37,6 +37,7 @@ webhook:
       - "hybridnet-manager"
       - "ack-distro-dependency-installer"
       - "open-local"
+      - "yoda"
     - key: k8s-app
       operator: NotIn
       values: [ "kube-dns" ]
