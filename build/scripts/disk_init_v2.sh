@@ -134,11 +134,11 @@ sleep 1s
 # Step 4: umount before mkfs
 umount /var/lib/kubelet
 if [ "$?" != "0" ]; then
-  utils_error "failed to umount, maybe you should clean this node before join"
+  utils_info "failed to umount, maybe you should clean this node before join"
 fi
 umount /var/lib/${container_runtime}
 if [ "$?" != "0" ]; then
-  utils_error "failed to umount, maybe you should clean this node before join"
+  utils_info "failed to umount, maybe you should clean this node before join"
 fi
 
 # Step 5: make filesystem
@@ -158,11 +158,11 @@ fi
 # Step 6: umount before mount
 umount /var/lib/kubelet
 if [ "$?" != "0" ]; then
-  utils_error "failed to umount, maybe you should clean this node before join"
+  utils_info "failed to umount, maybe you should clean this node before join"
 fi
 umount /var/lib/${container_runtime}
 if [ "$?" != "0" ]; then
-  utils_error "failed to umount, maybe you should clean this node before join"
+  utils_info "failed to umount, maybe you should clean this node before join"
 fi
 
 # https://unix.stackexchange.com/a/474749

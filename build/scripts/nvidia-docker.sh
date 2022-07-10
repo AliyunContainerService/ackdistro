@@ -31,7 +31,6 @@ public::nvidia::enable_gpu_capability(){
     kube::nvidia::detect_gpu
     if [[ "1" == "$GPU_FOUNDED" ]]; then
         public::nvidia::install_nvidia_docker2
-        public::nvidia::enable_gpu_in_node
     fi
 }
 
@@ -112,45 +111,9 @@ public::nvidia::install_nvidia_docker2(){
     set -e
 }
 
-public::nvidia::enable_gpu_in_node(){
-    cfg=/etc/sysconfig/kubelet
-    if grep "aliyun\.accelerator\/nvidia_name" ${cfg};then
-        utils_info 'nvidia-gpu is already enabled'
-        return
-    fi
-
-    NVIDIA_GPU_NAME=$(nvidia-smi --query-gpu=gpu_name --format=csv,noheader --id=0 | sed -e 's/ /-/g')
-    if [[ "$NVIDIA_GPU_NAME" == "" ]]; then
-        utils_error 'nvidia GPU name query failed, please check using `nvidia-smi --query-gpu=gpu_name  --format=csv,noheader --id=0 `'
-        exit 1
-    fi
-
-    NVIDIA_GPU_COUNT=$(nvidia-smi -L | wc -l)
-    if [[ "$NVIDIA_GPU_COUNT" == "0" ]]; then
-        utils_error 'nvidia GPU count query failed, please check using `nvidia-smi -L | wc -l`'
-        exit 1
-    fi
-
-    NVIDIA_GPU_MEMORY=$(nvidia-smi --id=0 --query-gpu=memory.total --format=csv,noheader | sed -e 's/ //g')
-    if [[ "$NVIDIA_GPU_MEMORY" == "" ]]; then
-        utils_error 'nvidia GPU memory resource query failed, please check using `nvidia-smi --id=0 --query-gpu=memory.total  --format=csv,noheader`'
-        exit 1
-    fi
-
-    KUBELET_EXTRA_ARGS="--node-labels=aliyun.accelerator/nvidia_name=$NVIDIA_GPU_NAME,aliyun.accelerator/nvidia_count=$NVIDIA_GPU_COUNT,aliyun.accelerator/nvidia_mem=$NVIDIA_GPU_MEMORY"
-    #sed -i '/^ExecStart=$/iEnvironment="KUBELET_EXTRA_ARGS=--feature-gates=DevicePlugins=true"' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
-    sed -i "s@KUBELET_EXTRA_ARGS=@KUBELET_EXTRA_ARGS=$KUBELET_EXTRA_ARGS\ @g" ${cfg}
-
-    systemctl daemon-reload
-    systemctl restart kubelet
-
-    nodename=$(hostname | tr A-Z a-z)
-    utils_info "if you are run $0 by yourself, please run (kubectl label node $nodename aliyun.accelerator/nvidia_name=$NVIDIA_GPU_NAME aliyun.accelerator/nvidia_count=$NVIDIA_GPU_COUNT aliyun.accelerator/nvidia_mem=$NVIDIA_GPU_MEMORY)"
-}
-
-
 # deploy nvidia plugin in static pod
 public::nvidia::deploy_static_pod() {
+    mkdir -p /etc/kubernetes/manifests
     cp -f ${scripts_path}/../statics/nvidia-device-plugin.yml /etc/kubernetes/manifests/nvidia-device-plugin.yml
 
     utils_info "nvidia-device-plugin yaml succefully deployed ..."

@@ -10,8 +10,9 @@ spec:
     listConfig:
       vgs:
         include:
-        - {{ .Values.name }}-pool-[0-9]+
+        - yoda-pool-[0-9]+
         - yoda-pool[0-9]+
+        - open-local-pool-[0-9]+
         - ackdistro-pool
 {{- if .Values.agent.device }}
     resourceToBeInited:
