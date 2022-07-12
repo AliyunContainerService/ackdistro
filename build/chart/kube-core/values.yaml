@@ -21,7 +21,7 @@ images:
     tag: v1.1.3-beta.8
   k8sdeviceplugin:
     image: ecp_builder/k8s-device-plugin
-    tag: 1.11
+    tag: v1.0.0.3-bd49899-aliyun
   metricsserver:
     image: ecp_builder/metrics-server
     tag: v0.3.8.5-307cf45-aliyun
