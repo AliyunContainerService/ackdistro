@@ -18,8 +18,7 @@ source "${scripts_path}"/utils.sh
 
 set -e;set -x
 
-rootfs=$(dirname "$(pwd)")
-image_dir="$rootfs/images"
+image_dir="$scripts_path/../images"
 
 get_distribution() {
   lsb_dist=""
@@ -55,7 +54,7 @@ if ! utils_command_exists docker; then
   echo "current system is $lsb_dist"
   case "$lsb_dist" in
   ubuntu | deepin | debian | raspbian | kylin)
-    cp /var/lib/sealer/data/my-cluster/rootfs/etc/docker.service /lib/systemd/system/docker.service
+    cp "${scripts_path}"/../etc/docker.service /lib/systemd/system/docker.service
     ;;
   centos | rhel | ol | sles | kylin | neokylin)
     RPM_DIR=${scripts_path}/../rpm/
@@ -63,7 +62,7 @@ if ! utils_command_exists docker; then
     if ! rpm -qa | grep ${rpm};then
       rpm -ivh --force --nodeps ${RPM_DIR}/${rpm}*.rpm
     fi
-    cp ../etc/docker.service /usr/lib/systemd/system/docker.service
+    cp "${scripts_path}"/../etc/docker.service /usr/lib/systemd/system/docker.service
     ;;
   alios)
     docker0=$(ip addr show docker0 | head -1|tr " " "\n"|grep "<"|grep -iwo "UP"|wc -l)
@@ -76,24 +75,24 @@ if ! utils_command_exists docker; then
     if ! rpm -qa | grep ${rpm};then
       rpm -ivh --force --nodeps ${RPM_DIR}/${rpm}*.rpm
     fi
-    cp ../etc/docker.service /usr/lib/systemd/system/docker.service
+    cp "${scripts_path}"/../etc/docker.service /usr/lib/systemd/system/docker.service
     ;;
   *)
     utils_error "unknown system to use /lib/systemd/system/docker.service"
-    cp /var/lib/sealer/data/my-cluster/rootfs/etc/docker.service /lib/systemd/system/docker.service
+    cp "${scripts_path}"/../etc/docker.service /lib/systemd/system/docker.service
     ;;
   esac
 
   [ -d /etc/docker/ ] || mkdir /etc/docker/ -p
 
-  chmod -R 755 /var/lib/sealer/data/my-cluster/rootfs/cri
-  tar -zxvf /var/lib/sealer/data/my-cluster/rootfs/cri/docker.tar.gz -C /usr/bin
+  chmod -R 755 "${scripts_path}"/../cri
+  tar -zxvf "${scripts_path}"/../cri/docker.tar.gz -C /usr/bin
   chmod a+x /usr/bin
   chmod a+x /usr/bin/docker
   chmod a+x /usr/bin/dockerd
   systemctl enable docker.service
   systemctl restart docker.service
-  cp ../etc/daemon.json /etc/docker
+  cp "${scripts_path}"/../etc/daemon.json /etc/docker
   if [[ -n $1 && -n $2 ]]; then
     sed -i "s/sea.hub:5000/$2:$3/g" /etc/docker/daemon.json
   fi
