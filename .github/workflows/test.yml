@@ -1,4 +1,4 @@
-name: Sealer-Test-Apply
+name: Ack-Distro-Test
 
 on:
   issue_comment:
@@ -56,10 +56,12 @@ jobs:
         run: |
           set -x
           commentbody="${{github.event.comment.body}}"
-          network=`echo "$commentbody"|cut -d" " -f2`
+          imageName=`echo "$commentbody"|cut -d" " -f2`
+          export imageName=$imageName
+          network=`echo "$commentbody"|cut -d" " -f3`
           export network=$network
-          e2e=`echo "$commentbody"|cut -d" " -f3`
+          e2e=`echo "$commentbody"|cut -d" " -f4`
           export e2e=$e2e
-          clean=`echo "$commentbody"|cut -d" " -f4`
+          clean=`echo "$commentbody"|cut -d" " -f5`
           export clean=$clean
           ginkgo -v --focus="test" test
