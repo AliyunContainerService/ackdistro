@@ -16,13 +16,13 @@ disable_selinux() {
 }
 
 set_modules() {
-  if [ ! -d /etc/sysconfig/modules/ ]; then
-    error "we can't find dir /etc/sysconfig/modules/, so linux mod can't be reloaded after reboot, please check"
+  if [ ! -d /etc/modprobe.d/ ]; then
+    echo "we can't find dir /etc/sysconfig/modules/, so linux mod can't be reloaded after reboot, please check"
     exit 1
   fi
 
   # put modprobe configuration into ackdistro.modules
-  modfile=/etc/sysconfig/modules/ackdistro.modules
+  modfile=/etc/modprobe.d/ackdistro.modules
   cat <<EOF >${modfile}
 modprobe -- ip_vs
 modprobe -- ip_vs_rr

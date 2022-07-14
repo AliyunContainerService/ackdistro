@@ -31,7 +31,7 @@ spec:
     export DockerRunDiskSize=${DockerRunDiskSize}
     export KubeletRunDiskSize=${KubeletRunDiskSize}
     bash scripts/disk_init_v2.sh
-    sh scripts/docker.sh
+    bash scripts/docker.sh
 ---
 apiVersion: sealer.aliyun.com/v1alpha1
 kind: Plugin
@@ -47,4 +47,4 @@ spec:
     export DockerRunDiskSize=${DockerRunDiskSize}
     export KubeletRunDiskSize=${KubeletRunDiskSize}
     bash scripts/disk_init_v2.sh
-    sh scripts/docker.sh
+    bash scripts/docker.sh
