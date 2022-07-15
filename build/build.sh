@@ -33,6 +33,7 @@ if [[ "$MULTI_ARCH" == "true" ]];then
     archs="amd64,arm64"
 fi
 
+trident_version=1.14.0
 if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
     IFS=","
     for arch in $archs;do
@@ -46,10 +47,12 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
             wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${KUBE_VERSION}/${bin} -O ${arch}/bin/${bin}
         done
 
-        bins=(helm trident seautil mc etcdctl)
+        bins=(helm seautil mc etcdctl)
         for bin in ${bins[@]};do
             wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${bin} -O ${arch}/bin/${bin}
         done
+
+        wget "https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/trident/release/trident_license_off-linux-${arch}_${trident_version}.bin" -O ${arch}/bin/trident
 
         if [ "$arch" == "amd64" ];then
           rpm_suffix=x86_64

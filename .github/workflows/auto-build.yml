@@ -39,7 +39,9 @@ jobs:
           fi
 
           sudo sealer tag ack-distro:$tag ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag
-          sudo sealer push ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag
+          if ! sudo sealer push ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag;then
+            sudo sealer push ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag
+          fi
           echo "::set-output name=version::$tag"
       - name: Auto build image
         uses: peter-evans/create-or-update-comment@v1

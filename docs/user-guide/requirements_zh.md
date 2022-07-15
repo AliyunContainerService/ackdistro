@@ -11,8 +11,9 @@
 ### os：
 
 - CentOS/RHEL 7.5/7.6/7.7/7.8/7.9/8.0
-- Ubuntu 18.04
+- Ubuntu 18.04/20.04
 - Anolis 7.\*, 8.\*
+- AliOS 7 (kernel>=4.19.91-013.ali4000)
 - 麒麟V10（Kylin V10）
 
 ### Architecture：
