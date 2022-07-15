@@ -98,7 +98,7 @@ then
             exit 1
         fi
     done
-else
+elif [ "$dev" != "" ];then
     vgName=$dev
 fi
 
@@ -150,13 +150,15 @@ utils_info "umount done!"
 # Step 6: clean ackdistro pool
 if [ "$vgName" = "ackdistro-pool" ];then
     clean_vg_pool "ackdistro-pool"
-    utils_info "wipefs $dev"
-    output=$(wipefs -a $dev)
-    if [ "$?" != "0" ]; then
-        utils_error "failed to exec [wipefs -a $dev]: $output"
-        exit 1
+    if [ "$dev" != "" ];then
+        utils_info "wipefs $dev"
+        output=$(wipefs -a $dev)
+        if [ "$?" != "0" ]; then
+            utils_error "failed to exec [wipefs -a $dev]: $output"
+            exit 1
+        fi
+        utils_info "wipefs $dev done!"
     fi
-    utils_info "wipefs $dev done!"
 else
     # TODO, why not need wipefs
     lv_container_name="container"
