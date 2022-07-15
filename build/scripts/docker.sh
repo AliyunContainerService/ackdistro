@@ -55,6 +55,14 @@ if ! utils_command_exists docker; then
   case "$lsb_dist" in
   ubuntu | deepin | debian | raspbian | kylin)
     cp "${scripts_path}"/../etc/docker.service /lib/systemd/system/docker.service
+    if [ ! -f /usr/sbin/iptables ];then
+      if [ -f /sbin/iptables ];then
+        ln -s /sbin/iptables /usr/sbin/iptables
+      else
+        echo "iptables not found, please check"
+        exit 1
+      fi
+    fi
     ;;
   centos | rhel | ol | sles | kylin | neokylin)
     RPM_DIR=${scripts_path}/../rpm/
