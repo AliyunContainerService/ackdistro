@@ -41,8 +41,8 @@ EOF
     echo "modprobe -- nf_conntrack_ipv4" >>${modfile}
   fi
 
-  chmod 755 /etc/sysconfig/modules/ackdistro.modules
-  /etc/sysconfig/modules/ackdistro.modules
+  chmod 755 /etc/modprobe.d/ackdistro.modules
+  /etc/modprobe.d/ackdistro.modules
 }
 
 set_sysctl() {
