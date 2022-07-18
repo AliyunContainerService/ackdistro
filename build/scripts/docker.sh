@@ -101,6 +101,8 @@ if ! utils_command_exists docker; then
   systemctl enable docker.service
   systemctl restart docker.service
   cp "${scripts_path}"/../etc/daemon.json /etc/docker
+  mkdir -p /root/.docker/
+  cp "${scripts_path}"/../etc/docker-cli-config.json /root/.docker/config.json
   if [[ -n $1 && -n $2 ]]; then
     sed -i "s/sea.hub:5000/$2:$3/g" /etc/docker/daemon.json
   fi

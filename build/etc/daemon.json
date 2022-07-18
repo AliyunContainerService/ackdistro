@@ -1,0 +1,19 @@
+{
+  "experimental": true,
+  "oom-score-adjust": -1000,
+  "max-concurrent-downloads": 20,
+  "log-driver": "json-file",
+  "log-level": "warn",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  },
+  "exec-opts": [
+    "native.cgroupdriver=systemd"
+  ],
+  "insecure-registries": ["0.0.0.0/0", "::/0"],
+  "storage-driver": "overlay2",
+  "storage-opts":["overlay2.override_kernel_check=true"],
+  "live-restore": true,
+  "data-root": "/var/lib/docker"
+}
