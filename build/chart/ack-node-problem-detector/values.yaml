@@ -3,7 +3,7 @@
 images:
   npd:
     image: ecp_builder/node-problem-detector
-    tag: v0.2
+    tag: v0.2-71bd5f8
 k8s_namespace: kube-system
 globalconfig:
   RegistryURL: sea.hub:5000
