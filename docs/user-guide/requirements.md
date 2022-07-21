@@ -26,7 +26,7 @@ To successfully install ACK Distro, you need to ensure that the following requir
 
 - 4.18.*
 - 4.19.*
-- 3.10.*
+- 3.10.* (must >=3.10.0-1160)
 
 ### IaaS：
 
@@ -75,3 +75,20 @@ Underlay network:
 | --- | --- | --- |
 | **CPU** |  2core | 1core |
 | **Memory** | 4GiB | 2GiB |
+
+OS:linux windows unix
+Distribution: Redhat/CentOS
+
+## Explicitly verified OS list
+
+| **Arch**                    | **Distribution** | **Version**                     |
+|-----------------------------|------------------|---------------------------------|
+| amd64                       | CentOS           | 7.5-7.9, 8.0-8.2                |
+| amd64                       | RedHat           | 7.6-7.9                         |
+| amd64                       | AliOS            | 7(kernel >=4.19.91-013.ali4000) |
+| amd64                       | Anolis           | 7.5-7.9, 8.0-8.2                |
+| amd64                       | Ubuntu           | 18.04.\*, 20.04.\*              |
+| amd64                       | Kylin            | V10                             |
+| arm64                       | CentOS           | 7.6-7.9                         |
+| arm64                       | AliOS            | 7(kernel >=4.19.91-013.ali4000) |
+| arm64                       | Kylin            | V10                             |

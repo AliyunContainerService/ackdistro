@@ -30,6 +30,7 @@ spec:
     export StorageDevice=${StorageDevice}
     export DockerRunDiskSize=${DockerRunDiskSize}
     export KubeletRunDiskSize=${KubeletRunDiskSize}
+    export DaemonFileSystem=${DaemonFileSystem}
     bash scripts/disk_init_v2.sh
     bash scripts/docker.sh
 ---
@@ -46,5 +47,6 @@ spec:
     export StorageDevice=${StorageDevice}
     export DockerRunDiskSize=${DockerRunDiskSize}
     export KubeletRunDiskSize=${KubeletRunDiskSize}
+    export DaemonFileSystem=${DaemonFileSystem}
     bash scripts/disk_init_v2.sh
     bash scripts/docker.sh

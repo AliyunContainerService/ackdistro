@@ -30,6 +30,10 @@ EOF
 
 set_logrotate
 
+# copy generate adp license script
+cp "${scripts_path}/../etc/generate-adp-license.sh" /usr/bin/ || true
+chmod +x /usr/bin/generate-adp-license.sh || true
+
 # Prepare envs
 CoreDnsIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 10` || exit 1
 

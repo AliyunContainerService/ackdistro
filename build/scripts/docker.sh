@@ -53,7 +53,7 @@ if ! utils_command_exists docker; then
   lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
   echo "current system is $lsb_dist"
   case "$lsb_dist" in
-  ubuntu | deepin | debian | raspbian | kylin)
+  ubuntu | deepin | debian | raspbian)
     cp "${scripts_path}"/../etc/docker.service /lib/systemd/system/docker.service
     if [ ! -f /usr/sbin/iptables ];then
       if [ -f /sbin/iptables ];then
@@ -64,7 +64,7 @@ if ! utils_command_exists docker; then
       fi
     fi
     ;;
-  centos | rhel | ol | sles | kylin | neokylin)
+  centos | rhel | anolis | ol | sles | kylin | neokylin)
     RPM_DIR=${scripts_path}/../rpm/
     rpm=libseccomp
     if ! rpm -qa | grep ${rpm};then
@@ -101,6 +101,8 @@ if ! utils_command_exists docker; then
   systemctl enable docker.service
   systemctl restart docker.service
   cp "${scripts_path}"/../etc/daemon.json /etc/docker
+  mkdir -p /root/.docker/
+  cp "${scripts_path}"/../etc/docker-cli-config.json /root/.docker/config.json
   if [[ -n $1 && -n $2 ]]; then
     sed -i "s/sea.hub:5000/$2:$3/g" /etc/docker/daemon.json
   fi

@@ -11,7 +11,24 @@ dev=${StorageDevice}
 etcdDev=${EtcdDevice}
 container_runtime_size=${DockerRunDiskSize}
 kubelet_size=${KubeletRunDiskSize}
+file_system=${DaemonFileSystem}
 container_runtime="docker"
+
+if [ -z "$file_system" ]; then
+    file_system="ext4"
+    utils_info "set file system to default value - ${file_system}"
+fi
+
+mkfsForce() {
+  if [ "$file_system" = "ext4" ];then
+    mkfs.ext4 -F "$1"
+  elif [ "$file_system" = "xfs" ];then
+    mkfs.xfs -f "$1"
+  else
+    utils_error "file system $file_system is not supported now"
+    return 1
+  fi
+}
 
 mountEtcd() {
     if [[ $etcdDev == *"nvme"* ]]; then
@@ -29,13 +46,13 @@ mountEtcd() {
     fi
 
     set -e
-    mkfs.ext4 -F $etcdDev
+    mkfsForce $etcdDev
     mkdir -p /var/lib/etcd
     mount $etcdDev /var/lib/etcd
     now=`date +'%Y-%m-%d-%H-%M-%S'`
     cp -r /var/lib/etcd/ /tmp/etcd-data-backup-${now}
     rm -rf /var/lib/etcd/*
-    echo "$etcdDev /var/lib/etcd ext4 defaults 0 0" >> /etc/fstab
+    echo "$etcdDev /var/lib/etcd ${file_system} defaults 0 0" >> /etc/fstab
     set +e
 }
 
@@ -142,15 +159,14 @@ if [ "$?" != "0" ]; then
 fi
 
 # Step 5: make filesystem
-blkid|grep $lv_container_name|grep ext4
-if [ "$?" != "0" ]; then
-    mkfs.ext4 -F /dev/$vgName/$lv_container_name
+if ! blkid|grep $lv_container_name|grep ${file_system}; then
+    mkfsForce /dev/$vgName/$lv_container_name || exit 1
 else
     utils_info "lv /dev/$vgName/$lv_container_name has file system"
 fi
-blkid|grep $lv_kubelet_name|grep ext4
-if [ "$?" != "0" ]; then
-    mkfs.ext4 -F /dev/$vgName/$lv_kubelet_name
+
+if ! blkid|grep $lv_kubelet_name|grep ${file_system}; then
+    mkfsForce /dev/$vgName/$lv_kubelet_name || exit 1
 else
     utils_info "lv /dev/$vgName/$lv_kubelet_name has file system"
 fi
@@ -202,7 +218,7 @@ if [ "$?" != "0" ]; then
 fi
 
 # Step 9: make mount persistent
-echo "/dev/$vgName/$lv_container_name /var/lib/${container_runtime} ext4 defaults 0 0" >> /etc/fstab
-echo "/dev/$vgName/$lv_kubelet_name /var/lib/kubelet ext4 defaults 0 0" >> /etc/fstab
+echo "/dev/$vgName/$lv_container_name /var/lib/${container_runtime} ${file_system} defaults 0 0" >> /etc/fstab
+echo "/dev/$vgName/$lv_kubelet_name /var/lib/kubelet ${file_system} defaults 0 0" >> /etc/fstab
 
 utils_info "disk_init success!"
