@@ -62,6 +62,6 @@ jobs:
           export network=$network
           e2e=`echo "$commentbody"|cut -d" " -f4`
           export e2e=$e2e
-          clean=`echo "$commentbody"|cut -d" " -f5`
-          export clean=$clean
+          hold=`echo "$commentbody"|cut -d" " -f5`
+          export hold=$hold
           ginkgo -v --focus="test" test
