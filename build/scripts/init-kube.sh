@@ -15,7 +15,7 @@ get_distribution() {
 }
 
 disable_firewalld() {
-  lsb_dist=$(get_distribution)
+  lsb_dist=$(utils_get_distribution)
   lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
   case "$lsb_dist" in
   ubuntu | deepin | debian | raspbian)

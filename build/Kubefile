@@ -7,6 +7,7 @@ COPY imageList manifests
 COPY ${ARCH}/bin ./bin
 COPY ${ARCH}/rpm ./rpm
 COPY ${ARCH}/tgz ./tgz
+COPY ${ARCH}/cri ./cri
 
 COPY scripts scripts
 COPY plugins plugins

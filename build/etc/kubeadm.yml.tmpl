@@ -8,7 +8,11 @@ localAPIEndpoint:
   advertiseAddress: 0.0.0.0
   {{ end }}
 nodeRegistration:
+  {{ if and (.ContainerRuntime) (eq .ContainerRuntime "containerd") }}
+  criSocket: /run/containerd/containerd.sock
+  {{else}}
   criSocket: /var/run/dockershim.sock
+  {{ end }}
 
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
