@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"sync"
@@ -94,6 +95,8 @@ var _ = Describe("test", func() {
 
 				if e2e == "e2e" {
 					e2eTest(sshClient, cluster)
+				} else if e2e == "noe2e" {
+					fmt.Println("no e2e test")
 				}
 			})
 		})
