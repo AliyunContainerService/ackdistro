@@ -56,8 +56,14 @@ var _ = Describe("test", func() {
 					defer apply.CleanUpAliCloudInfra(cluster)
 				}
 				sshClient := testhelper.NewSSHClientByCluster(cluster)
+
 				testhelper.CheckFuncBeTrue(func() bool {
 					err := sshClient.SSH.Copy(sshClient.RemoteHostIP, settings.DefaultSealerBin, settings.DefaultSealerBin)
+					return err == nil
+				}, settings.MaxWaiteTime)
+
+				testhelper.CheckFuncBeTrue(func() bool {
+					err := sshClient.SSH.Copy(sshClient.RemoteHostIP, settings.Clusterfile, "/root")
 					return err == nil
 				}, settings.MaxWaiteTime)
 
@@ -79,7 +85,7 @@ var _ = Describe("test", func() {
 				if network == "calico" {
 					apply.SendAndRunCluster(sshClient, tempFile, masters, nodes, cluster.Spec.SSH.Passwd)
 				} else {
-					apply.SendAndRunHybirdnetCluster(sshClient, tempFile, masters, nodes, cluster.Spec.SSH.Passwd)
+					apply.SendAndRunHybridnetCluster(sshClient, tempFile, masters, nodes, cluster.Spec.SSH.Passwd)
 				}
 				apply.CheckNodeNumWithSSH(sshClient, 4)
 
