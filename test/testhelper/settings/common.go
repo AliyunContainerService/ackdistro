@@ -23,6 +23,7 @@ var (
 	DefaultTestEnvDir      = ""
 	CustomImageName        = os.Getenv("IMAGE_NAME")
 	LoadPath               = ""
+	Clusterfile            = "/root/.sealer/my-cluster/Clusterfile"
 
 	TestImageName      = os.Getenv("imageName")
 	CustomCalicoEnv    = "Network=calico"

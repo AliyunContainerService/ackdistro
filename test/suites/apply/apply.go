@@ -80,7 +80,7 @@ func SendAndRunCluster(sshClient *testhelper.SSHClient, clusterFile string, join
 	SendAndRemoteExecCluster(sshClient, clusterFile, SealerRunCalicoCmd(joinMasters, joinNodes, passwd, ""))
 }
 
-func SendAndRunHybirdnetCluster(sshClient *testhelper.SSHClient, clusterFile string, joinMasters, joinNodes, passwd string) {
+func SendAndRunHybridnetCluster(sshClient *testhelper.SSHClient, clusterFile string, joinMasters, joinNodes, passwd string) {
 	SendAndRemoteExecCluster(sshClient, clusterFile, SealerRunHybridnetCmd(joinMasters, joinNodes, passwd, ""))
 }
 
