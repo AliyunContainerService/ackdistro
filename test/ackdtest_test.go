@@ -26,7 +26,7 @@ var _ = Describe("test", func() {
 		network := os.Getenv("network")
 		if network == "calico" {
 			rawCluster.Spec.Env = settings.CalicoEnv
-		} else {
+		} else if network == "hybridnet" {
 			rawCluster.Spec.Env = settings.HybridnetEnv
 		}
 		BeforeEach(func() {
@@ -51,8 +51,8 @@ var _ = Describe("test", func() {
 				cluster.Spec.Provider = settings.AliCloud
 				cluster.Spec.Image = settings.TestImageName
 				cluster = apply.CreateAliCloudInfraAndSave(cluster, tempFile)
-				clean := os.Getenv("clean")
-				if clean == "clean" {
+				hold := os.Getenv("hold")
+				if hold != "hold" {
 					defer apply.CleanUpAliCloudInfra(cluster)
 				}
 				sshClient := testhelper.NewSSHClientByCluster(cluster)
