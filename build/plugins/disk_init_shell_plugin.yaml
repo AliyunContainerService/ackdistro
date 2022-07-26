@@ -14,6 +14,7 @@ spec:
     export DockerRunDiskSize=${DockerRunDiskSize}
     export KubeletRunDiskSize=${KubeletRunDiskSize}
     export DaemonFileSystem=${DaemonFileSystem}
+    export ContainerRuntime=${ContainerRuntime}
     bash scripts/disk_init_v2.sh
     if [ "$ContainerRuntime" == "containerd" ];then
       bash scripts/containerd.sh
@@ -35,6 +36,7 @@ spec:
     export DockerRunDiskSize=${DockerRunDiskSize}
     export KubeletRunDiskSize=${KubeletRunDiskSize}
     export DaemonFileSystem=${DaemonFileSystem}
+    export ContainerRuntime=${ContainerRuntime}
     bash scripts/disk_init_v2.sh
     if [ "$ContainerRuntime" == "containerd" ];then
       bash scripts/containerd.sh

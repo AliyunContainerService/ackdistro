@@ -79,7 +79,10 @@ lsblk
 # Step 1: get device
 etcdDev=${EtcdDevice}
 dev=${StorageDevice}
-container_runtime="docker"
+container_runtime=${ContainerRuntime}
+if [ "$container_runtime" == "" ];then
+  container_runtime=docker
+fi
 
 vgName="ackdistro-pool"
 devPrefix="/dev"
@@ -103,7 +106,9 @@ elif [ "$dev" != "" ];then
 fi
 
 # Step 2: prune docker mount
-prune_docker_mount
+if [ "${container_runtime}" == "docker" ];then
+  prune_docker_mount
+fi
 
 # Step 3: clean yoda pools
 clean_vg_pool "yoda-pool"
