@@ -30,12 +30,14 @@ jobs:
           git checkout ${branch}
           cd build
 
-          if [ "$multi_arch" == "multiarch" ]
-          then
-          sudo bash build.sh $tag true
-          echo "::set-output name=multiarch::$multi_arch"
-          else
-          sudo bash build.sh $tag
+          if [ "$multi_arch" == "multiarch" ];then
+            flag="true"
+            echo "::set-output name=multiarch::$multi_arch"
+          fi
+
+          sudo bash build.sh $tag ${flag}
+          if [ $? -ne 0 ];then
+            sudo bash build.sh $tag ${flag}
           fi
 
           sudo sealer tag ack-distro:$tag ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag
