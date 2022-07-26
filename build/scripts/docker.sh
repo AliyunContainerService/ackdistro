@@ -16,7 +16,7 @@
 scripts_path=$(cd `dirname $0`; pwd)
 source "${scripts_path}"/utils.sh
 
-set -e;set -x
+set -x
 
 image_dir="$scripts_path/../images"
 
@@ -59,8 +59,7 @@ if ! utils_command_exists docker; then
       if [ -f /sbin/iptables ];then
         ln -s /sbin/iptables /usr/sbin/iptables
       else
-        echo "iptables not found, please check"
-        exit 1
+        panic "iptables not found, please check"
       fi
     fi
     ;;
@@ -86,7 +85,7 @@ if ! utils_command_exists docker; then
     cp "${scripts_path}"/../etc/docker.service /usr/lib/systemd/system/docker.service
     ;;
   *)
-    utils_error "unknown system to use /lib/systemd/system/docker.service"
+    utils_info "unknown system to use /lib/systemd/system/docker.service"
     cp "${scripts_path}"/../etc/docker.service /lib/systemd/system/docker.service
     ;;
   esac

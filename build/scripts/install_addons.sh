@@ -35,9 +35,9 @@ cp "${scripts_path}/../etc/generate-adp-license.sh" /usr/bin/ || true
 chmod +x /usr/bin/generate-adp-license.sh || true
 
 # Prepare envs
-CoreDnsIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 10` || exit 1
+CoreDnsIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 10` || panic "failed to get coredns svc ip"
 
-YodaSchedulerSvcIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 4` || exit 1
+YodaSchedulerSvcIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 4` || panic "failed to get yoda svc ip"
 
 # Apply yamls
 for f in `ls ack-distro-yamls/yamls`;do
@@ -87,8 +87,7 @@ for i in `seq 1 12`;do
   kubectl get ns && break
 done
 if [ $? -ne 0 ];then
-  echo "failed to wait for apiserver ready"
-  exit 1
+  panic "failed to wait for apiserver ready"
 fi
 
 # install kube core addons
@@ -104,8 +103,7 @@ for NS in kube-system acs-system;do
 	if ! kubectl create secret generic etcd-client-cert  \
     --from-file=ca.pem=/etc/kubernetes/pki/etcd/ca.crt --from-file=etcd-client.pem=/etc/kubernetes/pki/apiserver-etcd-client.crt  \
     --from-file=etcd-client-key.pem=/etc/kubernetes/pki/apiserver-etcd-client.key -n ${NS};then
-    echo "failed to create etcd secret"
-    exit 1
+    panic "failed to create etcd secret"
   fi
 done
 

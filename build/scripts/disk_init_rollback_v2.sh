@@ -57,8 +57,7 @@ clean_vg_pool()
           sleep 10
         done
         if [ "$suc" != "true" ];then
-          utils_error "failed to do vgremove, please run (vgremove -f $value) by yourself"
-          exit 1
+          panic "failed to do vgremove, please run (vgremove -f $value) by yourself"
         fi
     done
     # step 3: pvremove
@@ -94,8 +93,7 @@ then
         if [[ $temp =~ $devPrefix ]];then
             echo "input device is "$temp
         else
-            utils_error "invalid input device name, it must be /dev/***"
-            exit 1
+            panic "invalid input device name, it must be /dev/***"
         fi
     done
 elif [ "$dev" != "" ];then
@@ -141,8 +139,7 @@ for i in `seq 1 10`;do
     break
 done
 if [ "$suc" != "true" ];then
-    utils_error "failed to umount [/var/lib/kubelet /var/lib/docker], some unknown error occurs, please run [umount /var/lib/kubelet;umount /var/lib/docker;umount /var/lib/docker/logs] on that node by yourself."
-    exit 1
+    panic "failed to umount [/var/lib/kubelet /var/lib/docker], some unknown error occurs, please run [umount /var/lib/kubelet;umount /var/lib/docker;umount /var/lib/docker/logs] on that node by yourself."
 fi
 utils_info "umount done!"
 
@@ -154,8 +151,7 @@ if [ "$vgName" = "ackdistro-pool" ];then
         utils_info "wipefs $dev"
         output=$(wipefs -a $dev)
         if [ "$?" != "0" ]; then
-            utils_error "failed to exec [wipefs -a $dev]: $output"
-            exit 1
+            panic "failed to exec [wipefs -a $dev]: $output"
         fi
         utils_info "wipefs $dev done!"
     fi
@@ -175,8 +171,7 @@ else
     utils_info "wipefs $etcdDev"
     output=$(wipefs -a $etcdDev)
     if [ "$?" != "0" ]; then
-        utils_error "failed to exec [wipefs -a $etcdDev]: $output"
-        exit 1
+        panic "failed to exec [wipefs -a $etcdDev]: $output"
     fi
     utils_info "wipefs $etcdDev done!"
 fi
