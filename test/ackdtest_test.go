@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"sync"
@@ -26,7 +27,7 @@ var _ = Describe("test", func() {
 		network := os.Getenv("network")
 		if network == "calico" {
 			rawCluster.Spec.Env = settings.CalicoEnv
-		} else {
+		} else if network == "hybridnet" {
 			rawCluster.Spec.Env = settings.HybridnetEnv
 		}
 		BeforeEach(func() {
@@ -51,13 +52,19 @@ var _ = Describe("test", func() {
 				cluster.Spec.Provider = settings.AliCloud
 				cluster.Spec.Image = settings.TestImageName
 				cluster = apply.CreateAliCloudInfraAndSave(cluster, tempFile)
-				clean := os.Getenv("clean")
-				if clean == "clean" {
+				hold := os.Getenv("hold")
+				if hold != "hold" {
 					defer apply.CleanUpAliCloudInfra(cluster)
 				}
 				sshClient := testhelper.NewSSHClientByCluster(cluster)
+
 				testhelper.CheckFuncBeTrue(func() bool {
 					err := sshClient.SSH.Copy(sshClient.RemoteHostIP, settings.DefaultSealerBin, settings.DefaultSealerBin)
+					return err == nil
+				}, settings.MaxWaiteTime)
+
+				testhelper.CheckFuncBeTrue(func() bool {
+					err := sshClient.SSH.Copy(sshClient.RemoteHostIP, settings.Clusterfile, "/root")
 					return err == nil
 				}, settings.MaxWaiteTime)
 
@@ -79,7 +86,7 @@ var _ = Describe("test", func() {
 				if network == "calico" {
 					apply.SendAndRunCluster(sshClient, tempFile, masters, nodes, cluster.Spec.SSH.Passwd)
 				} else {
-					apply.SendAndRunHybirdnetCluster(sshClient, tempFile, masters, nodes, cluster.Spec.SSH.Passwd)
+					apply.SendAndRunHybridnetCluster(sshClient, tempFile, masters, nodes, cluster.Spec.SSH.Passwd)
 				}
 				apply.CheckNodeNumWithSSH(sshClient, 4)
 
@@ -88,6 +95,8 @@ var _ = Describe("test", func() {
 
 				if e2e == "e2e" {
 					e2eTest(sshClient, cluster)
+				} else if e2e == "noe2e" {
+					fmt.Println("no e2e test")
 				}
 			})
 		})
