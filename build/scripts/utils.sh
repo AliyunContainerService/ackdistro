@@ -8,7 +8,7 @@ utils_version_ge() {
 panic()
 {
     set +x
-    echo -e "\033[1;31m$@\033[0m"
+    echo -e "\033[1;31mPanic error: $@, please check this panic\033[0m"
     exit 1
     set -x
 }

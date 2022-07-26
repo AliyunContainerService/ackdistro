@@ -3,6 +3,8 @@
 scripts_path=$(cd `dirname $0`; pwd)
 source "${scripts_path}"/utils.sh
 
+set -x
+
 # NVIDIA_VERSION=v1.0.1
 GPU_FOUNDED=0
 

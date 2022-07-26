@@ -3,6 +3,8 @@
 scripts_path=$(cd `dirname $0`; pwd)
 source "${scripts_path}"/utils.sh
 
+set -x
+
 get_distribution() {
   lsb_dist=""
   # Every system that we officially support has /etc/os-release
