@@ -44,15 +44,12 @@ public::nvidia::enable_gpu_device_plugin() {
 }
 
 kube::nvidia::detect_gpu(){
-    set +e
-
     tar -xvf ${scripts_path}/../tgz/nvidia.tgz -C ${scripts_path}/../rpm/
     kube::nvidia::setup_lspci
     lspci | grep -i nvidia > /dev/null 2>&1
     if [[ "$?" == "0" ]]; then
         export GPU_FOUNDED=1
     fi
-    set -e
 }
 
 kube::nvidia::setup_lspci(){
@@ -62,8 +59,7 @@ kube::nvidia::setup_lspci(){
     utils_info "lspci command not exist, install it"
     rpm -ivh --force --nodeps ${RPM_DIR}/pciutils*.rpm
     if [[ "$?" != "0" ]]; then
-        utils_error "failed to install pciutils via command (rpm -ivh --force --nodeps ${RPM_DIR}/pciutils*.rpm) in dir ${PWD}, please run it for debug"
-        exit 1
+        panic "failed to install pciutils via command (rpm -ivh --force --nodeps ${RPM_DIR}/pciutils*.rpm) in dir ${PWD}, please run it for debug"
     fi
 }
 
@@ -76,7 +72,6 @@ public::nvidia::install_nvidia_driver(){
 
 
 public::nvidia::install_nvidia_docker2(){
-    set +e
     sleep 3
     if  `which nvidia-container-runtime > /dev/null 2>&1` && [ $(echo $((docker info | grep nvidia) | wc -l)) -gt 1 ] ; then
         utils_info 'nvidia-container-runtime is already insatlled'
@@ -85,8 +80,7 @@ public::nvidia::install_nvidia_docker2(){
 
     # 1. Install nvidia-container-runtime
     if ! output=$(rpm -ivh --force --nodeps `ls ${RPM_DIR}/*.rpm` 2>&1);then
-        utils_error "failed to install rpm, output:${output}, maybe your rpm db was broken, please see https://cloudlinux.zendesk.com/hc/en-us/articles/115004075294-Fix-rpmdb-Thread-died-in-Berkeley-DB-library for help"
-        exit 1
+        panic "failed to install rpm, output:${output}, maybe your rpm db was broken, please see https://cloudlinux.zendesk.com/hc/en-us/articles/115004075294-Fix-rpmdb-Thread-died-in-Berkeley-DB-library for help"
     fi
 
     # 2. Update docker daemon.json and reload docker daemon
@@ -107,8 +101,6 @@ public::nvidia::install_nvidia_docker2(){
     # To do: we need make sure if it's better to reload rather than restart, e.g. service docker restart
     pkill -SIGHUP dockerd
     utils_info 'nvidia-docker2 installed'
-
-    set -e
 }
 
 # deploy nvidia plugin in static pod

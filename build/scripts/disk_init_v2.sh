@@ -25,8 +25,7 @@ mkfsForce() {
   elif [ "$file_system" = "xfs" ];then
     mkfs.xfs -f "$1"
   else
-    utils_error "file system $file_system is not supported now"
-    return 1
+    panic "file system $file_system is not supported now"
   fi
 }
 
@@ -45,15 +44,13 @@ mountEtcd() {
         fi
     fi
 
-    set -e
     mkfsForce $etcdDev
     mkdir -p /var/lib/etcd
-    mount $etcdDev /var/lib/etcd
+    output=$(mount $etcdDev /var/lib/etcd 2>&1); [[ $? -ne 0 ]] && panic "failed to mount $etcdDev: $output"
     now=`date +'%Y-%m-%d-%H-%M-%S'`
     cp -r /var/lib/etcd/ /tmp/etcd-data-backup-${now}
-    rm -rf /var/lib/etcd/*
+    output=$(rm -rf /var/lib/etcd/* 2>&1); [[ $? -ne 0 ]] && panic "failed to rm /var/lib/etcd/*: $output"
     echo "$etcdDev /var/lib/etcd ${file_system} defaults 0 0" >> /etc/fstab
-    set +e
 }
 
 # Step 0: init etcd device
@@ -90,8 +87,7 @@ then
         if [[ $temp =~ $devPrefix ]];then
             echo "input device is "$temp
         else
-            utils_error "input device name is error, must be /dev/***"
-            exit 1
+            panic "input device name is error, must be /dev/***"
         fi
         devForVG=$devForVG" "$temp
     done
@@ -101,8 +97,7 @@ then
         echo "create a VG called "$vgName
         output0=$(vgcreate -f $vgName $devForVG 2>&1)
         if [ "$?" != "0" ]; then
-            utils_error "failed to create vg: $output0"
-            exit 1
+            panic "failed to create vg: $output0"
         fi
     else
         echo "vg "$vgName" exists!"
@@ -127,8 +122,7 @@ lvs|grep $lv_container_name
 if [ "$?" != "0" ]; then
     output1=$(lvcreate --name $lv_container_name --size $container_runtime_size $vgName -y 2>&1)
     if [ "$?" != "0" ]; then
-        utils_error "failed to create $lv_container_name lv: $output1"
-        exit 1
+        panic "failed to create $lv_container_name lv: $output1"
     fi
 else
     utils_info "lv $lv_container_name exists!"
@@ -138,9 +132,8 @@ lvs|grep $lv_kubelet_name
 if [ "$?" != "0" ]; then
     output2=$(lvcreate --name $lv_kubelet_name --size $kubelet_size $vgName -y 2>&1)
     if [ "$?" != "0" ]; then
-        utils_error "failed to create $lv_kubelet_name lv: $output2"
-        exit 1
-    fi
+        panic "failed to create $lv_kubelet_name lv: $output2"
+]    fi
 else
     utils_info "lv $lv_kubelet_name exists!"
 fi
@@ -160,13 +153,15 @@ fi
 
 # Step 5: make filesystem
 if ! blkid|grep $lv_container_name|grep ${file_system}; then
-    mkfsForce /dev/$vgName/$lv_container_name || exit 1
+    # This func will exit when fail
+    mkfsForce /dev/$vgName/$lv_container_name
 else
     utils_info "lv /dev/$vgName/$lv_container_name has file system"
 fi
 
 if ! blkid|grep $lv_kubelet_name|grep ${file_system}; then
-    mkfsForce /dev/$vgName/$lv_kubelet_name || exit 1
+    # This func will exit when fail
+    mkfsForce /dev/$vgName/$lv_kubelet_name
 else
     utils_info "lv /dev/$vgName/$lv_kubelet_name has file system"
 fi
@@ -191,12 +186,11 @@ if [ "$?" != "0" ]; then
   if echo "$output5" |grep "is already mounted";then
     utils_info "already mounted, continue"
   else
-    utils_error "disk_init.sh lsblk result:"
+    utils_info "disk_init.sh lsblk result:"
     lsblk
-    utils_error "disk_init.sh mount -a result:"
+    utils_info "disk_init.sh mount -a result:"
     mount -a
-    utils_error "failed to exec [mount /dev/$vgName/$lv_container_name /var/lib/docker]: $output5"
-    exit 1
+    panic "failed to exec [mount /dev/$vgName/$lv_container_name /var/lib/docker]: $output5"
   fi
 fi
 mkdir -p /var/lib/${container_runtime}/logs
@@ -208,12 +202,11 @@ if [ "$?" != "0" ]; then
   if echo "$output6" |grep "is already mounted";then
     utils_info "already mounted, continue"
   else
-    utils_error "disk_init.sh lsblk result:"
+    utils_info "disk_init.sh lsblk result:"
     lsblk
-    utils_error "disk_init.sh mount -a result:"
+    utils_info "disk_init.sh mount -a result:"
     mount -a
-    utils_error "failed to exec [mount /dev/$vgName/$lv_kubelet_name /var/lib/kubelet]: $output6"
-    exit 1
+    panic "failed to exec [mount /dev/$vgName/$lv_kubelet_name /var/lib/kubelet]: $output6"
   fi
 fi
 

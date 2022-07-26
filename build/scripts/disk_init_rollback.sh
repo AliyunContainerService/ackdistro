@@ -100,8 +100,7 @@ for i in `seq 1 10`;do
     break
 done
 if [ "$suc" != "true" ];then
-    utils_error "failed to umount [/var/lib/kubelet /var/lib/docker], some unknown error occurs, please run [umount /var/lib/kubelet;umount /var/lib/docker;umount /var/lib/docker/logs] on that node by yourself."
-    exit 1
+    panic "failed to umount [/var/lib/kubelet /var/lib/docker], some unknown error occurs, please run [umount /var/lib/kubelet;umount /var/lib/docker;umount /var/lib/docker/logs] on that node by yourself."
 fi
 utils_info "umount done!"
 
@@ -112,8 +111,7 @@ else
     utils_info "wipefs $dev"
     output=$(wipefs -a $dev)
     if [ "$?" != "0" ]; then
-        utils_error "failed to exec [wipefs -a $dev]: $output"
-        exit 1
+        panic "failed to exec [wipefs -a $dev]: $output"
     fi
     utils_info "wipefs $dev done!"
 fi
@@ -124,8 +122,7 @@ else
     utils_info "wipefs $etcdDev"
     output=$(wipefs -a $etcdDev)
     if [ "$?" != "0" ]; then
-        utils_error "failed to exec [wipefs -a $etcdDev]: $output"
-        exit 1
+        panic "failed to exec [wipefs -a $etcdDev]: $output"
     fi
     utils_info "wipefs $etcdDev done!"
 fi

@@ -4,10 +4,12 @@ utils_version_ge() {
   test "$(echo "$@" | tr ' ' '\n' | sort -rV | head -n 1)" == "$1"
 }
 
-utils_error()
+# This function will display the message in red, and exit immediately.
+panic()
 {
     set +x
     echo -e "\033[1;31m$@\033[0m"
+    exit 1
     set -x
 }
 
@@ -57,8 +59,7 @@ utils_os_env() {
     elif [ "$anolis" == 1 ];then
         export OS="Anolis"
     else
-       echo "unkown os...   exit"
-       exit 1
+       panic "unkown os...   exit"
     fi
 
     case "$OS" in
