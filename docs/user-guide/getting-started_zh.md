@@ -78,6 +78,7 @@ spec:
     - PodCIDR=172.45.0.0/16 # pod subnet, support ipv6 cidr, default is 100.64.0.0/16
     - SvcCIDR=10.96.0.0/16 # service subnet, support ipv6 cidr default is 10.96.0.0/16
     - Network=hybridnet # support hybridnet/calico, default is hybridnet
+    - ContainerRuntime=docker # support docker/containerd, default is docker
     - EtcdDevice=/dev/vdb # EtcdDevice is device for etcd, default is "", which will use system disk
     - StorageDevice=/dev/vdc # StorageDevice is device for kubelet and container daemon, default is "", which will use system disk
     - DockerRunDiskSize=100 # unit is GiB, capacity for /var/lib/docker, default is 100

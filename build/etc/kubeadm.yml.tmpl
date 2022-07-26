@@ -138,7 +138,11 @@ caCertPath: /etc/kubernetes/pki/ca.crt
 discovery:
   timeout: 5m0s
 nodeRegistration:
+  {{ if and (.ContainerRuntime) (eq .ContainerRuntime "containerd") }}
+  criSocket: /run/containerd/containerd.sock
+  {{else}}
   criSocket: /var/run/dockershim.sock
+  {{ end }}
 controlPlane:
   localAPIEndpoint:
     bindPort: 6443
