@@ -3,6 +3,8 @@
 scripts_path=$(cd `dirname $0`; pwd)
 source "${scripts_path}"/utils.sh
 
+set -x
+
 get_distribution() {
   lsb_dist=""
   # Every system that we officially support has /etc/os-release
@@ -58,7 +60,7 @@ copy_kubelet_service
 [ -d /var/lib/kubelet ] || mkdir -p /var/lib/kubelet/
 /usr/bin/kubelet-pre-start.sh
 systemctl enable kubelet
-bash install-lvm.sh || exit 1
+bash ${scripts_path}/install-lvm.sh || exit 1
 
 # nvidia-docker.sh need set kubelet labels, it should be run after kubelet
-bash ${scripts_path}/nvidia-docker.sh
+bash ${scripts_path}/nvidia-docker.sh || exit 1

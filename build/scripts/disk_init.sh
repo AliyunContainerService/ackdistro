@@ -28,15 +28,13 @@ mountEtcd() {
         fi
     fi
 
-    set -e
-    mkfs.ext4 -F $etcdDev
+    mkfsForce $etcdDev
     mkdir -p /var/lib/etcd
-    mount $etcdDev /var/lib/etcd
+    output=$(mount $etcdDev /var/lib/etcd 2>&1); [[ $? -ne 0 ]] && panic "failed to mount $etcdDev: $output"
     now=`date +'%Y-%m-%d-%H-%M-%S'`
     cp -r /var/lib/etcd/ /tmp/etcd-data-backup-${now}
-    rm -rf /var/lib/etcd/*
-    echo "$etcdDev /var/lib/etcd ext4 defaults 0 0" >> /etc/fstab
-    set +e
+    output=$(rm -rf /var/lib/etcd/* 2>&1); [[ $? -ne 0 ]] && panic "failed to rm /var/lib/etcd/*: $output"
+    echo "$etcdDev /var/lib/etcd ${file_system} defaults 0 0" >> /etc/fstab
 }
 
 # Step 0: init etcd device
@@ -70,8 +68,7 @@ fi
 exist_container_runtime_size=""
 exist_kubelet_size=""
 if [[ $part_count == "0" ]]; then
-    utils_error "$dev does not exist"
-    exit 1
+    panic "$dev does not exist"
 elif [[ $part_count == "1" ]]; then
     utils_info "part device $dev"
     # part device
@@ -83,30 +80,25 @@ elif [[ $part_count == "1" ]]; then
     utils_info "wipefs $dev"
     output0=$(wipefs -a $dev)
     if [ "$?" != "0" ]; then
-        utils_error "failed to exec [wipefs -a $dev]: $output0"
-        exit 1
+        panic "failed to exec [wipefs -a $dev]: $output0"
     fi
 
     all_end=`expr $container_runtime_size + $kubelet_size`
     output1=$(parted $dev mklabel gpt -s 2>&1)
     if [ "$?" != "0" ]; then
-        utils_error "failed to exec [parted $dev mklabel gpt -s]: $output1"
-        exit 1
+        panic "failed to exec [parted $dev mklabel gpt -s]: $output1"
     fi
     output2=$(parted $dev mkpart extended ext4 0 ${container_runtime_size}GiB -s 2>&1)
     if [ "$?" != "0" ]; then
-        utils_error "failed to exec [parted $dev mkpart extended ext4 0 ${docker_size}GiB -s]: $output2"
-        exit 1
+        panic "failed to exec [parted $dev mkpart extended ext4 0 ${docker_size}GiB -s]: $output2"
     fi
     output3=$(parted $dev mkpart extended ext4 ${container_runtime_size}GiB ${all_end}GiB -s 2>&1)
     if [ "$?" != "0" ]; then
-        utils_error "failed to exec [parted $dev mkpart extended ext4 ${docker_size}GiB ${all_end}GiB -s]: $output3"
-        exit 1
+        panic "failed to exec [parted $dev mkpart extended ext4 ${docker_size}GiB ${all_end}GiB -s]: $output3"
     fi
     output4=$(parted $dev mkpart extended ext4 ${all_end}GiB 100% -s 2>&1)
     if [ "$?" != "0" ]; then
-        utils_error "failed to exec [parted $dev mkpart extended ext4 ${all_end}GiB 100% -s]: $output4"
-        exit 1
+        panic "failed to exec [parted $dev mkpart extended ext4 ${all_end}GiB 100% -s]: $output4"
     fi
     utils_info "parted done!"
 elif [[ $part_count == "2" ]]; then
@@ -116,32 +108,27 @@ elif [[ $part_count == "2" ]]; then
     else
         part=`lsblk -l|awk '{print $1}'|grep ^$device_name[0-9]`
     fi
-    utils_error "$dev has been parted already, but NOT in correct way: only one partition $part found"
-    exit 1
+    panic "$dev has been parted already, but NOT in correct way: only one partition $part found"
 else
     utils_info "$dev has been parted already"
     # check mountpoint
     if [[ $dev == *"nvme"* ]]; then
         mount |grep ^$dev[p0-9]*|grep /var/lib/kubelet
         if [ "$?" != "0" ]; then
-            utils_error "no mountpoint /var/lib/kubelet found!"
-            exit 1
+            panic "no mountpoint /var/lib/kubelet found!"
         fi
         mount |grep ^$dev[p0-9]*|grep /var/lib/${container_runtime}
         if [ "$?" != "0" ]; then
-            utils_error "no mountpoint /var/lib/${container_runtime} found!"
-            exit 1
+            panic "no mountpoint /var/lib/${container_runtime} found!"
         fi
     else
         mount |grep ^$dev[0-9]*|grep /var/lib/kubelet
         if [ "$?" != "0" ]; then
-            utils_error "no mountpoint /var/lib/kubelet found!"
-            exit 1
+            panic "no mountpoint /var/lib/kubelet found!"
         fi
         mount |grep ^$dev[0-9]*|grep /var/lib/${container_runtime}
         if [ "$?" != "0" ]; then
-            utils_error "no mountpoint /var/lib/${container_runtime} found!"
-            exit 1
+            panic "no mountpoint /var/lib/${container_runtime} found!"
         fi
     fi
     utils_info "$dev has been mounted already, and in correct way~"
@@ -161,21 +148,17 @@ else
     exist_kubelet_size=${exist_kubelet_size%G*}
     re='^[0-9]+$'
     if ! [[ $exist_container_runtime_size =~ $re ]] ; then
-        utils_error "$exist_container_runtime_size is not a number, we only support G"
-        exit 1
+        panic "$exist_container_runtime_size is not a number, we only support G"
     fi
     if ! [[ $exist_kubelet_size =~ $re ]] ; then
-        utils_error "$exist_container_runtime_size is not a number, we only support G"
-        exit 1
+        panic "$exist_container_runtime_size is not a number, we only support G"
     fi
 
     if [[ $exist_container_runtime_size -lt $container_runtime_size ]]; then
-        utils_error "$dev has been mounted already, but size of /var/lib/${container_runtime} is $exist_container_runtime_size, we want $container_runtime_size!"
-        exit 1
+        panic "$dev has been mounted already, but size of /var/lib/${container_runtime} is $exist_container_runtime_size, we want $container_runtime_size!"
     fi
     if [[ $exist_kubelet_size -lt $kubelet_size ]]; then
-        utils_error "$dev has been mounted already, but size of /var/lib/kubelet is $exist_kubelet_size, we want $kubelet_size!"
-        exit 1
+        panic "$dev has been mounted already, but size of /var/lib/kubelet is $exist_kubelet_size, we want $kubelet_size!"
     fi
     utils_info "$dev has been parted already, and in correct way~"
     exit 0
@@ -213,8 +196,7 @@ if [[ $dev == *"nvme"* ]]; then
         lsblk
         utils_info "disk_init.sh mount -a result:"
         mount -a
-        utils_error "failed to exec [mount ${dev}p1 /var/lib/docker]: $output5"
-        exit 1
+        panic "failed to exec [mount ${dev}p1 /var/lib/docker]: $output5"
     fi
 else
     output5=$(mount ${dev}1 /var/lib/${container_runtime} 2>&1)
@@ -223,8 +205,7 @@ else
         lsblk
         utils_info "disk_init.sh mount -a result:"
         mount -a
-        utils_error "failed to exec [mount ${dev}1 /var/lib/docker]: $output5"
-        exit 1
+        panic "failed to exec [mount ${dev}1 /var/lib/docker]: $output5"
     fi
 fi
 mkdir -p /var/lib/${container_runtime}/logs
@@ -238,8 +219,7 @@ if [[ $dev == *"nvme"* ]]; then
         lsblk
         utils_info "disk_init.sh mount -a result:"
         mount -a
-        utils_error "failed to exec [mount ${dev}p2 /var/lib/kubelet]: $output6"
-        exit 1
+        panic "failed to exec [mount ${dev}p2 /var/lib/kubelet]: $output6"
     fi
 else
     output6=$(mount ${dev}2 /var/lib/kubelet 2>&1)
@@ -248,8 +228,7 @@ else
         lsblk
         utils_info "disk_init.sh mount -a result:"
         mount -a
-        utils_error "failed to exec [mount ${dev}2 /var/lib/kubelet]: $output6"
-        exit 1
+        panic "failed to exec [mount ${dev}2 /var/lib/kubelet]: $output6"
     fi
 fi
 
