@@ -36,8 +36,8 @@ jobs:
       - name: Install sealer and ginkgo
         shell: bash
         run: |
-          wget https://sealer.oss-cn-beijing.aliyuncs.com/ack-k8s1.22/sealer-ipv6/sealer.tar.gz
-          sudo tar -xvf sealer.tar.gz -C /usr/bin/
+          wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/amd64/sealer-latest-linux-amd64.tar.gz -O sealer-latest.tar.gz
+          sudo tar -xvf sealer-latest.tar.gz -C /usr/bin/
           go get github.com/onsi/ginkgo/ginkgo@v1.16.2
           go get github.com/onsi/gomega/...@v1.12.0
           GOPATH=`go env GOPATH`
