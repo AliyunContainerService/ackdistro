@@ -19,6 +19,7 @@ source "${scripts_path}"/utils.sh
 set -x
 
 image_dir="$scripts_path/../images"
+DOCKER_VERSION="19.03.15"
 
 get_distribution() {
   lsb_dist=""
@@ -44,6 +45,17 @@ load_images() {
       docker load -q -i "${image}"
     fi
   done
+}
+
+check_docker_valid() {
+  if ! docker info 2>&1; then
+    panic "docker is not healthy: $(docker info 2>&1), please check"
+  fi
+
+  dockerVersion=`docker info --format '{{json .ServerVersion}}' | tr -d '"'`
+  if [ "${dockerVersion}" != "${DOCKER_VERSION}" ]; then
+    panic "docker version is ${dockerVersion}, should be 19.03.15, please check"
+  fi
 }
 
 storage=${1:-/var/lib/docker}
@@ -110,4 +122,6 @@ fi
 disable_selinux
 systemctl daemon-reload
 systemctl restart docker.service
+check_docker_valid
+
 load_images
