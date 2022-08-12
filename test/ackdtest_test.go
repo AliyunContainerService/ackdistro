@@ -63,10 +63,10 @@ var _ = Describe("test", func() {
 					return err == nil
 				}, settings.MaxWaiteTime)
 
-				testhelper.CheckFuncBeTrue(func() bool {
-					err := sshClient.SSH.Copy(sshClient.RemoteHostIP, settings.Clusterfile, "/root")
-					return err == nil
-				}, settings.MaxWaiteTime)
+				//testhelper.CheckFuncBeTrue(func() bool {
+				//	err := sshClient.SSH.Copy(sshClient.RemoteHostIP, settings.Clusterfile, "/root")
+				//	return err == nil
+				//}, settings.MaxWaiteTime)
 
 				By("start to init cluster")
 				apply.GenerateClusterfile(tempFile)
