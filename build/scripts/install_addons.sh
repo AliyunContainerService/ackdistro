@@ -73,6 +73,7 @@ init:
   cidr: ${PodCIDR%,*}
   ipVersion: "${HostIPFamily}"
 defaultIPFamily: IPv${HostIPFamily}
+multiCluster: true
 daemon:
   vtepAddressCIDRs: ${VtepAddressCIDRs}
 manager:
