@@ -4,64 +4,68 @@ on:
   issue_comment:
     types:
       - created
-#jobs:
-  #build:
-    #name: test
-    #runs-on: ubuntu-latest
-    #if: startswith(github.event.comment.body, '/test')
-    #env:
-      #GO111MODULE: on
-    #steps:
-      #- name: Github API Request
-        #id: request
-        #uses: octokit/request-action@v2.0.2
-        #with:
-         # route: ${{ github.event.issue.pull_request.url }}
-        #env:
-         # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #- name: Check out code into the Go module directory
-        #uses: actions/checkout@v2
-        #with:
-          #token: ${{ secrets.GITHUB_TOKEN }}
-          #repository: ${{fromJson(steps.request.outputs.data).head.repo.full_name}}
-          #ref: ${{fromJson(steps.request.outputs.data).head.ref}}
-          #path: src/github.com/alibaba/sealer
+jobs:
+  build:
+    name: test
+    runs-on: ubuntu-latest
+    if: startswith(github.event.comment.body, '/test')
+    env:
+      GO111MODULE: on
+    steps:
+      - name: Github API Request
+        id: request
+        uses: octokit/request-action@v2.0.2
+        with:
+          route: ${{ github.event.issue.pull_request.url }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{fromJson(steps.request.outputs.data).head.repo.full_name}}
+          ref: ${{fromJson(steps.request.outputs.data).head.ref}}
+          path: src/github.com/alibaba/sealer
 
-      #- name: Set up Go 1.16
-        #uses: actions/setup-go@v1
-        #with:
-         # go-version: 1.16
-        #id: go
+      - name: Set up Go 1.16
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.16
+        id: go
 
-      #- name: Install sealer and ginkgo
-        #shell: bash
-        #run: |
-          #wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/amd64/sealer-latest-linux-amd64.tar.gz -O sealer-latest.tar.gz
-          #sudo tar -xvf sealer-latest.tar.gz -C /usr/bin/
-          #go get github.com/onsi/ginkgo/ginkgo@v1.16.2
-          #go get github.com/onsi/gomega/...@v1.12.0
-          #GOPATH=`go env GOPATH`
-          #echo "$GOPATH/bin" >> $GITHUB_PATH
-        ##working-directory: src/github.com/alibaba/sealer
-
-      #- name: Run sealer run test
-        #shell: bash
+      - name: Install sealer and ginkgo
+        shell: bash
+        run: |
+          wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/amd64/sealer-latest-linux-amd64.tar.gz -O sealer-latest.tar.gz
+          sudo tar -xvf sealer-latest.tar.gz -C /usr/bin/
+          go get github.com/onsi/ginkgo/ginkgo@v1.16.2
+          go get github.com/onsi/gomega/...@v1.12.0
+          GOPATH=`go env GOPATH`
+          echo "$GOPATH/bin" >> $GITHUB_PATH
         #working-directory: src/github.com/alibaba/sealer
-        #env:
-          #IMAGE_NAME: ${{ secrets.IMAGE_NAME}}
-          #ACCESSKEYID: ${{ secrets.ACCESSKEYID }}
-          #ACCESSKEYSECRET: ${{ secrets.ACCESSKEYSECRET }}
-         # RegionID: ${{ secrets.RegionID }}
-        #if: startswith(github.event.comment.body, '/test')
-        #run: |
-          #set -x
-          #commentbody="${{github.event.comment.body}}"
-          #imageName=`echo "$commentbody"|cut -d" " -f2`
-          #export imageName=$imageName
-          #network=`echo "$commentbody"|cut -d" " -f3`
-          #export network=$network
-          #e2e=`echo "$commentbody"|cut -d" " -f4`
-          #export e2e=$e2e
-          #hold=`echo "$commentbody"|cut -d" " -f5`
-          #export hold=$hold
-          #ginkgo -v --focus="test" test
+
+      - name: Run sealer run test
+        shell: bash
+        working-directory: src/github.com/alibaba/sealer
+        env:
+          IMAGE_NAME: ${{ secrets.IMAGE_NAME}}
+          ACCESSKEYID: ${{ secrets.ACCESSKEYID }}
+          ACCESSKEYSECRET: ${{ secrets.ACCESSKEYSECRET }}
+          RegionID: ${{ secrets.RegionID }}
+        if: startswith(github.event.comment.body, '/test')
+        run: |
+          set -x
+          issuenumber=${{ github.event.issue.number }}
+          if [ $issuenumber == 80 ]; then
+            commentbody="${{github.event.comment.body}}"
+            imageName=`echo "$commentbody"|cut -d" " -f2`
+            export imageName=$imageName
+            network=`echo "$commentbody"|cut -d" " -f3`
+            export network=$network
+            e2e=`echo "$commentbody"|cut -d" " -f4`
+            export e2e=$e2e
+            hold=`echo "$commentbody"|cut -d" " -f5`
+            export hold=$hold
+            ginkgo -v --focus="test" test
+          fi
+
