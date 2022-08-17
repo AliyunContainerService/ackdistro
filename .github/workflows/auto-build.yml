@@ -46,13 +46,18 @@ jobs:
               if ! sudo sealer push ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag;then
                 sudo sealer push ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag
               fi
-              echo "::set-output name=version::$tag"
+              echo "::set-output name=image::[ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:"
+              echo "::set-output name=version::$tag ]"
+              echo "::set-output name=state::successfully"
+
+          else
+              echo "::set-output name=state::failed"
           fi
 
       - name: Auto build image
         uses: peter-evans/create-or-update-comment@v1
         with:
-          issue-number: ${{ github.event.issue.number }}
+          issue-number: 131
           body: |
-            ${{ steps.autobuild.outputs.multiarch }} Image:[ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${{ steps.autobuild.outputs.version }} ]  build successfully!
+            ${{ steps.autobuild.outputs.multiarch }} Image: ${{ steps.autobuild.outputs.image }}${{ steps.autobuild.outputs.version }}   build successfully!
             
