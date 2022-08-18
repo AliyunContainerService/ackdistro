@@ -88,11 +88,11 @@ fi
 
 echo -n `git log -1 --pretty=format:%h` > VERSION
 
-if [ "$(git branch --show-current)" == "main" ]; then
-  wget https://gosspublic.alicdn.com/ossutil/1.7.8/ossutil64?spm=a2c4g.11186623.0.0.bcbf1770zMJhXK -O ossutil64
-  chmod +x ossutil64
-  ./ossutil64 --endpoint http://oss-cn-hangzhou.aliyuncs.com cp -f build/imageList oss://acs-ecp/ack-agility/ack-distro-imagelist-main.info
-fi
+#if [ "$(git branch --show-current)" == "main" ]; then
+#  wget https://gosspublic.alicdn.com/ossutil/1.7.8/ossutil64?spm=a2c4g.11186623.0.0.bcbf1770zMJhXK -O ossutil64
+#  chmod +x ossutil64
+#  ./ossutil64 --endpoint http://oss-cn-hangzhou.aliyuncs.com cp -f build/imageList oss://acs-ecp/ack-agility/ack-distro-imagelist-main.info
+#fi
 
 # Build sealer image
 sealer build -f Kubefile -t ack-distro:${TAG} --platform ${archs} .

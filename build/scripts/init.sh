@@ -22,12 +22,12 @@ CONTAINER_RUNTIME=${4-docker}
 # Install container runtime
 if [ "$CONTAINER_RUNTIME" == "containerd" ];then
   chmod a+x containerd.sh
-  bash containerd.sh
+  bash containerd.sh || exit 1
 else
   chmod a+x docker.sh
-  bash docker.sh
+  bash docker.sh || exit 1
 fi
 
 chmod a+x init-kube.sh
 
-bash init-kube.sh
+bash init-kube.sh || exit 1

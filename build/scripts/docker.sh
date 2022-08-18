@@ -18,6 +18,19 @@ source "${scripts_path}"/utils.sh
 
 set -x
 
+DOCKER_VERSION="19.03.15"
+
+check_docker_valid() {
+  if ! docker info 2>&1; then
+    panic "docker is not healthy: $(docker info 2>&1), please check"
+  fi
+
+  dockerVersion=`docker info --format '{{json .ServerVersion}}' | tr -d '"'`
+  if [ "${dockerVersion}" != "${DOCKER_VERSION}" ]; then
+    panic "docker version is ${dockerVersion}, should be 19.03.15, please check"
+  fi
+}
+
 storage=${1:-/var/lib/docker}
 mkdir -p $storage
 if ! utils_command_exists docker; then
@@ -79,3 +92,4 @@ fi
 disable_selinux
 systemctl daemon-reload
 systemctl restart docker.service
+check_docker_valid

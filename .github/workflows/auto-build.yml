@@ -16,38 +16,48 @@ jobs:
         id: autobuild
         run: |
           set -x
-          commentbody="${{github.event.comment.body}}"
-          tag=`echo "$commentbody"|cut -d" " -f2`
-          branch=`echo "$commentbody"|cut -d" " -f3`
-          multi_arch=`echo "$commentbody"|cut -d" " -f4`
+          issuenumber="${{ github.event.issue.number }}"
+          if [ $issuenumber  == 73 ]; then
+              commentbody="${{github.event.comment.body}}"
+              tag=`echo "$commentbody"|cut -d" " -f2`
+              branch=`echo "$commentbody"|cut -d" " -f3`
+              multi_arch=`echo "$commentbody"|cut -d" " -f4`
 
-          wget https://sealer.oss-cn-beijing.aliyuncs.com/sealer-latest.tar.gz
-          sudo tar -xvf sealer-latest.tar.gz -C /usr/bin
-          sudo sealer login ${{secrets.PRIVATEWAREHOUSE}}
-          sudo apt install git
-          git clone https://github.com/AliyunContainerService/ackdistro.git
-          cd ackdistro
-          git checkout ${branch}
-          cd build
+              wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/amd64/sealer-latest-linux-amd64.tar.gz -O sealer-latest.tar.gz
+              sudo tar -xvf sealer-latest.tar.gz -C /usr/bin
+              sudo sealer login ${{secrets.PRIVATEWAREHOUSE}}
+              sudo apt install git
+              git clone https://github.com/AliyunContainerService/ackdistro.git
+              cd ackdistro
+              git checkout ${branch}
+              cd build
 
-          if [ "$multi_arch" == "multiarch" ];then
-            flag="true"
-            echo "::set-output name=multiarch::$multi_arch"
+              if [ "$multi_arch" == "multiarch" ];then
+                flag="true"
+                echo "::set-output name=multiarch::$multi_arch"
+              fi
+
+              sudo bash build.sh $tag ${flag}
+              if [ $? -ne 0 ];then
+                sudo bash build.sh $tag ${flag}
+              fi
+
+              sudo sealer tag ack-distro:$tag ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag
+              if ! sudo sealer push ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag;then
+                sudo sealer push ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag
+              fi
+              echo "::set-output name=image::[ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:"
+              echo "::set-output name=version::$tag ]"
+              echo "::set-output name=state::successfully"
+
+          else
+              echo "::set-output name=state::failed"
           fi
 
-          sudo bash build.sh $tag ${flag}
-          if [ $? -ne 0 ];then
-            sudo bash build.sh $tag ${flag}
-          fi
-
-          sudo sealer tag ack-distro:$tag ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag
-          if ! sudo sealer push ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag;then
-            sudo sealer push ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:$tag
-          fi
-          echo "::set-output name=version::$tag"
       - name: Auto build image
         uses: peter-evans/create-or-update-comment@v1
         with:
-          issue-number: ${{ github.event.issue.number }}
+          issue-number: 131
           body: |
-            ${{ steps.autobuild.outputs.multiarch }} Image:[ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${{ steps.autobuild.outputs.version }} ]  build successfully!
+            ${{ steps.autobuild.outputs.multiarch }} Image: ${{ steps.autobuild.outputs.image }}${{ steps.autobuild.outputs.version }}   build ${{ steps.autobuild.outputs.state }}!
+            
