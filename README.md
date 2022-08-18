@@ -80,7 +80,7 @@ Please refer to: [community](docs/community.md)
 
 <!-- markdownlint-disable -->
 <div align="">
-  <img src="https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/tmp/C99AB6D2-826D-4546-BEE1-63435972F2C8.png" width="300" title="dingtalk">
+  <img src="https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/6e13f507-51d0-48be-80e4-1929331f88ac.jpg" width="300" title="dingtalk">
 </div>
 <!-- markdownlint-restore -->
 
