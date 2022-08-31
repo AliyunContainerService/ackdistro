@@ -1,5 +1,0 @@
-apiVersion: v1
-description: ParaLB app chart
-name: paralb
-version: 0.1.0
-appVersion: 0.1.0
