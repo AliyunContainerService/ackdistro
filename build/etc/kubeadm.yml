@@ -80,7 +80,7 @@ etcd:
     extraArgs:
       listen-metrics-urls: http://0.0.0.0:2381
     imageRepository: sea.hub:5000/ecp_builder
-    imageTag: 3.4.3-0
+    imageTag: 3.5.4
 
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
