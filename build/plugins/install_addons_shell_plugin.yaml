@@ -37,7 +37,7 @@ spec:
     fi
 
     sleep 15
-    trident on-sealer -f /root/.sealer/my-cluster/Clusterfile --sealer
+    trident on-sealer -f /root/.sealer/my-cluster/Clusterfile --sealer --dump-managed-cluster
     if [ $? -ne 0 ];then
       exit 1
     fi
