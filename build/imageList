@@ -2,7 +2,7 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/pause:3.5
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/kube-apiserver:v1.22.3-aliyun.1
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/kube-controller-manager:v1.22.3-aliyun.1
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/kube-scheduler:v1.22.3-aliyun.1
-ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/etcd:3.5.0-0
+ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/etcd:3.5.4
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/metrics-server:v0.3.8.5-307cf45-aliyun
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/kube-proxy:v1.22.3-aliyun.1
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/coredns:1.7.0
@@ -10,8 +10,7 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/l-zero:v1.1.0-68293
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/httpd:alpine3.15
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/opsbase-alpine:v0.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/debug:ubuntu
-ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/hybridnet:v0.7.0
-ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/paralb:v0.1.0
+ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/hybridnet:v0.7.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/open-local:v0.5.5
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-node-driver-registrar:v2.3.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-provisioner:v2.2.2

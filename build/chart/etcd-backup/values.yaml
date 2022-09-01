@@ -4,7 +4,7 @@ imagePullPolicy: IfNotPresent
 images:
   etcd:
     image: ecp_builder/etcd
-    tag: 3.4.3-0
+    tag: 3.5.4
 
 cronJobInfo:
   namespace: acs-system
