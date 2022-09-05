@@ -42,3 +42,4 @@ globalconfig:
   RegistryURL: sea.hub:5000
   CoreDnsIP: 10.96.0.10
   IPv6DualStack: false
+  IPVSExcludeCIDRs: ""
