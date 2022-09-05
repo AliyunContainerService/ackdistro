@@ -69,6 +69,7 @@ globalconfig:
   SuspendPeriodHealthCheck: ${SuspendPeriodHealthCheck}
   SuspendPeriodBroadcastHealthCheck: ${SuspendPeriodBroadcastHealthCheck}
   NumOfMasters: ${NumOfMasters}
+  IPv6DualStack: ${IPv6DualStack}
 init:
   cidr: ${PodCIDR%,*}
   ipVersion: "${HostIPFamily}"
