@@ -4,6 +4,6 @@ images:
   paralb:
     image: ecp_builder/paralb
     tag: v0.1.0
-globalconfig:
+global:
   RegistryURL: sea.hub:5000
   ParaLBInterface: ""

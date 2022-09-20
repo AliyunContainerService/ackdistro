@@ -35,7 +35,7 @@ spec:
       hostPID: true
       containers:
         - name: paralb-daemon
-          image: {{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.paralb.image }}:{{ .Values.images.paralb.tag }}
+          image: {{ .Values.global.RegistryURL }}/{{ .Values.images.paralb.image }}:{{ .Values.images.paralb.tag }}
           imagePullPolicy: IfNotPresent
           resources:
             limits:
@@ -47,7 +47,7 @@ spec:
           command:
             - /paralb-daemon
           args:
-            - --prefer-interfaces={{ .Values.globalconfig.ParaLBInterface }}
+            - --prefer-interfaces={{ .Values.global.ParaLBInterface }}
           securityContext:
             runAsUser: 0
             privileged: true
@@ -107,7 +107,7 @@ spec:
       hostNetwork: true
       containers:
         - name: paralb-manager
-          image: {{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.paralb.image }}:{{ .Values.images.paralb.tag }}
+          image: {{ .Values.global.RegistryURL }}/{{ .Values.images.paralb.image }}:{{ .Values.images.paralb.tag }}
           imagePullPolicy: IfNotPresent
           command:
             - /paralb-manager
@@ -177,7 +177,7 @@ spec:
       hostNetwork: true
       containers:
         - name: paralb-webhook
-          image: {{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.paralb.image }}:{{ .Values.images.paralb.tag }}
+          image: {{ .Values.global.RegistryURL }}/{{ .Values.images.paralb.image }}:{{ .Values.images.paralb.tag }}
           imagePullPolicy: IfNotPresent
           command:
             - /paralb-webhook

@@ -28,7 +28,7 @@ spec:
       hostNetwork: true
       priorityClassName: system-cluster-critical
       dnsPolicy: ClusterFirstWithHostNet
-      {{- if not .Values.globalconfig.DisableFailureDomain }}
+      {{- if not .Values.global.DisableFailureDomain }}
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -38,7 +38,7 @@ spec:
               topologyKey: failure-domain.beta.kubernetes.io/zone
       {{- end }}
       containers:
-        - image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.lzero.image }}:{{ .Values.images.lzero.tag }}"
+        - image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.lzero.image }}:{{ .Values.images.lzero.tag }}"
           imagePullPolicy: IfNotPresent
           name: l-zero
           command:
@@ -47,7 +47,7 @@ spec:
             - --logtostderr=true
             - --server-addr=:16789
             - --metrics-addr=:16790
-            - --registry-url={{ .Values.globalconfig.RegistryURL }}
+            - --registry-url={{ .Values.global.RegistryURL }}
           resources:
             requests:
               cpu: 200m

@@ -56,5 +56,5 @@ monitor:
   enabled: false
   # grafana namespace
   namespace: monitoring
-globalconfig:
+global:
   RegistryURL: sea.hub:5000
