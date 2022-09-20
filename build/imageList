@@ -15,6 +15,7 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-node:v3.8.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-kube-controllers:v3.8.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/debug:ubuntu
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/hybridnet:v0.7.2
+ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/paralb:v0.1.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/open-local:v0.5.5
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-node-driver-registrar:v2.3.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-provisioner:v2.2.2
