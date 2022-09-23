@@ -13,13 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-scripts_path=$(cd `dirname $0`; pwd)
+scripts_path=$(
+  cd $(dirname $0)
+  pwd
+)
 source "${scripts_path}"/utils.sh
 
 set -x
 
+LimitNOFILE=${1-1048576}
 image_dir="$scripts_path/../images"
 DOCKER_VERSION="19.03.15"
+STORAGE="/var/lib/docker"
 
 get_distribution() {
   lsb_dist=""
@@ -52,23 +57,25 @@ check_docker_valid() {
     panic "docker is not healthy: $(docker info 2>&1), please check"
   fi
 
-  dockerVersion=`docker info --format '{{json .ServerVersion}}' | tr -d '"'`
+  dockerVersion=$(docker info --format '{{json .ServerVersion}}' | tr -d '"')
   if [ "${dockerVersion}" != "${DOCKER_VERSION}" ]; then
     panic "docker version is ${dockerVersion}, should be 19.03.15, please check"
   fi
 }
 
-storage=${1:-/var/lib/docker}
-mkdir -p $storage
+mkdir -p "${STORAGE}"
 if ! utils_command_exists docker; then
   lsb_dist=$(get_distribution)
   lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
   echo "current system is $lsb_dist"
+  if [[ $2 != "1048576" ]] ; then
+    sed -i "s/LimitNOFILE=1048576/LimitNOFILE=${LimitNOFILE}/g" "${scripts_path}"/../etc/docker.service
+  fi
   case "$lsb_dist" in
   ubuntu | deepin | debian | raspbian)
     cp "${scripts_path}"/../etc/docker.service /lib/systemd/system/docker.service
-    if [ ! -f /usr/sbin/iptables ];then
-      if [ -f /sbin/iptables ];then
+    if [ ! -f /usr/sbin/iptables ]; then
+      if [ -f /sbin/iptables ]; then
         ln -s /sbin/iptables /usr/sbin/iptables
       else
         panic "iptables not found, please check"
@@ -78,20 +85,20 @@ if ! utils_command_exists docker; then
   centos | rhel | anolis | ol | sles | kylin | neokylin)
     RPM_DIR=${scripts_path}/../rpm/
     rpm=libseccomp
-    if ! rpm -qa | grep ${rpm};then
+    if ! rpm -qa | grep ${rpm}; then
       rpm -ivh --force --nodeps ${RPM_DIR}/${rpm}*.rpm
     fi
     cp "${scripts_path}"/../etc/docker.service /usr/lib/systemd/system/docker.service
     ;;
   alios)
-    docker0=$(ip addr show docker0 | head -1|tr " " "\n"|grep "<"|grep -iwo "UP"|wc -l)
+    docker0=$(ip addr show docker0 | head -1 | tr " " "\n" | grep "<" | grep -iwo "UP" | wc -l)
     if [ "$docker0" != "1" ]; then
-        ip link add name docker0 type bridge
-        ip addr add dev docker0 172.17.0.1/16
+      ip link add name docker0 type bridge
+      ip addr add dev docker0 172.17.0.1/16
     fi
     RPM_DIR=${scripts_path}/../rpm/
     rpm=libseccomp
-    if ! rpm -qa | grep ${rpm};then
+    if ! rpm -qa | grep ${rpm}; then
       rpm -ivh --force --nodeps ${RPM_DIR}/${rpm}*.rpm
     fi
     cp "${scripts_path}"/../etc/docker.service /usr/lib/systemd/system/docker.service
@@ -114,9 +121,6 @@ if ! utils_command_exists docker; then
   cp "${scripts_path}"/../etc/daemon.json /etc/docker
   mkdir -p /root/.docker/
   cp "${scripts_path}"/../etc/docker-cli-config.json /root/.docker/config.json
-  if [[ -n $1 && -n $2 ]]; then
-    sed -i "s/sea.hub:5000/$2:$3/g" /etc/docker/daemon.json
-  fi
 fi
 
 disable_selinux
