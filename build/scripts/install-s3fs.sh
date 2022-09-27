@@ -8,19 +8,19 @@ source "${scripts_path}"/utils.sh
 
 set -x
 
-if vgcreate --version; then
+if s3fs --version; then
   exit 0
 fi
 
 utils_os_env
 
 if [ "$OSRelease" == "" ]; then
-  panic "install lvm now only support redhat like OS"
+  panic "install s3fs now only support redhat like OS"
 fi
 
-tar -xvf ${scripts_path}/../tgz/lvm-${OSRelease}.tgz -C ${scripts_path}/../rpm/
+tar -xvf ${scripts_path}/../tgz/s3fs-${OSRelease}.tgz -C ${scripts_path}/../rpm/
 
-dir=${scripts_path}/../rpm/lvm-${OSRelease}
+dir=${scripts_path}/../rpm/s3fs-${OSRelease}
 if ! output=$(rpm -ivh --force --nodeps $(ls ${dir}/*.rpm) 2>&1); then
   panic "failed to install rpm, output:${output}, maybe your rpm db was broken, please see https://cloudlinux.zendesk.com/hc/en-us/articles/115004075294-Fix-rpmdb-Thread-died-in-Berkeley-DB-library for help"
 fi

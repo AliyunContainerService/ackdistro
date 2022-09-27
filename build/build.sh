@@ -75,7 +75,7 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
         if [ "$arch" == "amd64" ];then
             wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/nvidia.tgz -O ${arch}/tgz/nvidia.tgz
         fi
-        tgzs=(lvm-el7.tgz lvm-el8.tgz)
+        tgzs=(lvm-el7.tgz lvm-el8.tgz s3fs-el7.tgz s3fs-el8.tgz)
         for tgz in ${tgzs[@]};do
             wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/${tgz} -O ${arch}/tgz/${tgz}
         done
