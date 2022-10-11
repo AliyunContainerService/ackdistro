@@ -1,0 +1,129 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Values.hostpath_name }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+      - update
+  - apiGroups:
+      - "coordination.k8s.io"
+    resources:
+      - leases
+    verbs:
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+      - pods
+      - pods/binding
+      - pods/status
+      - bindings
+      - replicationcontrollers
+      - services
+      - endpoints
+      - persistentvolumeclaims
+      - persistentvolumeclaims/status
+      - persistentvolumes
+      - persistentvolumes/status
+      - configmaps
+    verbs:
+      - create
+      - get
+      - list
+      - watch
+      - update
+      - delete
+      - patch
+  - apiGroups:
+      - apps
+      - extensions
+    resources:
+      - replicasets
+      - statefulsets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - policy
+    resources:
+      - poddisruptionbudgets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - authentication.k8s.io
+    resources:
+      - tokenreviews
+    verbs:
+      - create
+  - apiGroups:
+      - authorization.k8s.io
+    resources:
+      - subjectaccessreviews
+    verbs:
+      - create
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+      - csinodes
+      - volumeattachments
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - snapshot.storage.k8s.io
+    resources:
+      - volumesnapshotclasses
+      - volumesnapshots
+      - volumesnapshots/status
+      - volumesnapshotcontents
+      - volumesnapshotcontents/status
+    verbs:
+      - create
+      - get
+      - list
+      - watch
+      - update
+      - delete
+      - patch
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.hostpath_name }}
+  # replace with the same namespace name with plugin
+  namespace: {{ .Values.hostpath_namespace }}
+  labels:
+    app: {{ .Values.hostpath_name }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Values.hostpath_name }}-rolebinding
+  labels:
+    app: {{ .Values.hostpath_name }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Values.hostpath_name }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.hostpath_name }}
+  namespace: {{ .Values.hostpath_namespace }}
