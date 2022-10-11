@@ -1,10 +1,11 @@
 name: yoda
 namespace: kube-system
 driver: yodaplugin.csi.alibabacloud.com
+customLabels: {}
 images:
   local:
     image: ecp_builder/open-local
-    tag: v0.5.5
+    tag: v0.6.0-dev
   registrar:
     image: ecp_builder/csi-node-driver-registrar
     tag: v2.3.0
@@ -24,6 +25,7 @@ agent:
   name: yoda-agent
   kubelet_dir: /var/lib/kubelet
   volume_name_prefix: yoda
+  spdk: false
 extender:
   name: yoda-scheduler-extender
   # scheduling strategy: binpack/spread
@@ -34,6 +36,7 @@ extender:
   init_job: true
 controller:
   update_nls: "false"
+  framework_scheduler_names: ahe-scheduler
 storageclass:
   lvm:
     name: yoda-lvm-default
@@ -45,10 +48,6 @@ storageclass:
     name: yoda-device-ssd
   device_hdd:
     name: yoda-device-hdd
-  mountpoint_ssd:
-    name: yoda-mountpoint-ssd
-  mountpoint_hdd:
-    name: yoda-mountpoint-hdd
 monitor:
   # install grafana dashboard
   enabled: false
