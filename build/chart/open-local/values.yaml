@@ -1,10 +1,11 @@
 name: open-local
 namespace: kube-system
 driver: local.csi.aliyun.com
+customLabels: {}
 images:
   local:
     image: ecp_builder/open-local
-    tag: v0.5.5
+    tag: v0.6.0-dev
   registrar:
     image: ecp_builder/csi-node-driver-registrar
     tag: v2.3.0
@@ -24,8 +25,10 @@ agent:
   name: open-local-agent
   # This block device will be used to create as a Volume Group in every node
   # Open-Local does nothing if the device has been formatted or mountted
+  device: /dev/vdb
   kubelet_dir: /var/lib/kubelet
   volume_name_prefix: local
+  spdk: false
 extender:
   name: open-local-scheduler-extender
   # scheduling strategy: binpack/spread
@@ -47,14 +50,10 @@ storageclass:
     name: open-local-device-ssd
   device_hdd:
     name: open-local-device-hdd
-  mountpoint_ssd:
-    name: open-local-mountpoint-ssd
-  mountpoint_hdd:
-    name: open-local-mountpoint-hdd
 monitor:
   # install grafana dashboard
   enabled: false
   # grafana namespace
   namespace: monitoring
 global:
-  RegistryURL: sea.hub:5000
+  RegistryURL: ack-agility-registry.cn-shanghai.cr.aliyuncs.com
