@@ -92,4 +92,4 @@ echo -n `git log -1 --pretty=format:%h` > VERSION
 #fi
 
 # Build sealer image
-sealer build -f Kubefile -t ack-distro:${TAG} --platform ${archs} .
+sealer build -f Kubefile -t ack-distro:${TAG} --platform linux/${archs} .
