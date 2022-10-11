@@ -1,0 +1,9 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ .Values.hostpath_name }}
+  labels:
+    app: {{ .Values.hostpath_name }}
+provisioner: {{ .Values.driver_name }}
+volumeBindingMode: WaitForFirstConsumer
+parameters:
