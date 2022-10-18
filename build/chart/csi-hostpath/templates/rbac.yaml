@@ -1,23 +1,8 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ .Values.name }}
-{{ include "local.labels" . | indent 2 }}
+  name: {{ .Values.hostpath_name }}
 rules:
-  - apiGroups:
-      - csi.aliyun.com
-    resources:
-      - nodelocalstorages
-      - nodelocalstorages/status
-      - nodelocalstorageinitconfigs
-    verbs:
-      - create
-      - get
-      - list
-      - watch
-      - update
-      - delete
-      - patch
   - apiGroups:
       - ""
     resources:
@@ -26,6 +11,18 @@ rules:
       - create
       - patch
       - update
+  - apiGroups:
+      - "coordination.k8s.io"
+    resources:
+      - leases
+    verbs:
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+      - get
   - apiGroups:
       - ""
     resources:
@@ -106,37 +103,27 @@ rules:
       - update
       - delete
       - patch
-  - apiGroups:
-      - "coordination.k8s.io"
-    resources:
-      - leases
-    verbs:
-      - list
-      - watch
-      - create
-      - update
-      - patch
-      - delete
-      - get
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ .Values.name }}
-  namespace: {{ .Values.namespace }}
-{{ include "local.labels" . | indent 2 }}
+  name: {{ .Values.hostpath_name }}
+  # replace with the same namespace name with plugin
+  namespace: {{ .Values.hostpath_namespace }}
+  labels:
+    app: {{ .Values.hostpath_name }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ .Values.name }}
-{{ include "local.labels" . | indent 2 }}
+  name: {{ .Values.hostpath_name }}-rolebinding
+  labels:
+    app: {{ .Values.hostpath_name }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ .Values.name }}
+  name: {{ .Values.hostpath_name }}
 subjects:
 - kind: ServiceAccount
-  name: {{ .Values.name }}
-  namespace: {{ .Values.namespace }}
----
+  name: {{ .Values.hostpath_name }}
+  namespace: {{ .Values.hostpath_namespace }}

@@ -1,0 +1,135 @@
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: {{ .Values.hostpath_name }}
+  namespace: {{ .Values.hostpath_namespace }}
+  labels:
+    app: {{ .Values.hostpath_name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.hostpath_name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.hostpath_name }}
+    spec:
+      tolerations:
+      - operator: Exists
+      serviceAccountName: {{ .Values.hostpath_name }}
+      containers:
+        - name: csi-provisioner
+          image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.provisioner.image }}:{{ .Values.images.provisioner.tag }}"
+          args:
+            - -v=5
+            - --csi-address=/csi/csi.sock
+            - --feature-gates=Topology=true
+            - --capacity-ownerref-level=0 # pod is owner
+            - --node-deployment=true
+            - --strict-topology=true
+            - --immediate-topology=false
+            - --worker-threads=5
+            - --volume-name-prefix=host
+          env:
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: spec.nodeName
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          securityContext:
+            # This is necessary only for systems with SELinux, where
+            # non-privileged sidecar containers cannot access unix domain socket
+            # created by privileged CSI driver container.
+            privileged: true
+          volumeMounts:
+            - mountPath: /csi
+              name: socket-dir
+        - name: node-driver-registrar
+          image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.node_driver_register.image }}:{{ .Values.images.node_driver_register.tag }}"
+          args:
+            - --v=5
+            - --csi-address=/csi/csi.sock
+            - --kubelet-registration-path=/var/lib/kubelet/plugins/{{ .Values.hostpath_name }}/csi.sock
+          securityContext:
+            # This is necessary only for systems with SELinux, where
+            # non-privileged sidecar containers cannot access unix domain socket
+            # created by privileged CSI driver container.
+            privileged: true
+          env:
+            - name: KUBE_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+          volumeMounts:
+          - mountPath: /csi
+            name: socket-dir
+          - mountPath: /registration
+            name: registration-dir
+          - mountPath: /csi-data-dir
+            name: csi-data-dir
+        - name: hostpath
+          image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.driver.image }}:{{ .Values.images.driver.tag }}"
+          args:
+            - --drivername={{ .Values.driver_name }}
+            - --v=5
+            - --endpoint=$(CSI_ENDPOINT)
+            - --nodeid=$(KUBE_NODE_NAME)
+          env:
+            - name: CSI_ENDPOINT
+              value: unix:///csi/csi.sock
+            - name: KUBE_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /csi
+              name: socket-dir
+            - mountPath: /var/lib/kubelet/pods
+              mountPropagation: Bidirectional
+              name: mountpoint-dir
+            - mountPath: /var/lib/kubelet/plugins
+              mountPropagation: Bidirectional
+              name: plugins-dir
+            - mountPath: /csi-data-dir
+              name: csi-data-dir
+            - mountPath: /dev
+              name: dev-dir
+      volumes:
+        - hostPath:
+            path: /var/lib/kubelet/plugins/{{ .Values.hostpath_name }}
+            type: DirectoryOrCreate
+          name: socket-dir
+        - hostPath:
+            path: /var/lib/kubelet/pods
+            type: DirectoryOrCreate
+          name: mountpoint-dir
+        - hostPath:
+            path: /var/lib/kubelet/plugins_registry
+            type: Directory
+          name: registration-dir
+        - hostPath:
+            path: /var/lib/kubelet/plugins
+            type: Directory
+          name: plugins-dir
+        - hostPath:
+            # 'path' is where PV data is persisted on host.
+            # using /tmp is also possible while the PVs will not available after plugin container recreation or host reboot
+            path: /var/lib/{{ .Values.hostpath_name }}-data/
+            type: DirectoryOrCreate
+          name: csi-data-dir
+        - hostPath:
+            path: /dev
+            type: Directory
+          name: dev-dir
