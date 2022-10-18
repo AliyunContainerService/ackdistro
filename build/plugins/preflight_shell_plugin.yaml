@@ -4,7 +4,7 @@ metadata:
   name: preflight # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: pre-init-host
+  action: pre-install
   scope: master0
   data: |
     set -e; set -x
@@ -32,7 +32,6 @@ spec:
     export KubeletRunDiskSize=${KubeletRunDiskSize}
     export DaemonFileSystem=${DaemonFileSystem}
     bash scripts/disk_init_v2.sh
-    bash scripts/docker.sh
 ---
 apiVersion: sealer.aliyun.com/v1alpha1
 kind: Plugin
@@ -49,4 +48,3 @@ spec:
     export KubeletRunDiskSize=${KubeletRunDiskSize}
     export DaemonFileSystem=${DaemonFileSystem}
     bash scripts/disk_init_v2.sh
-    bash scripts/docker.sh
