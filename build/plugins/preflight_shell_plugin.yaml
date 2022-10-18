@@ -22,7 +22,7 @@ metadata:
   name: disk-init # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: pre-init-host
+  action: pre-install
   scope: master
   data: |
     set -e; set -x
@@ -31,7 +31,7 @@ spec:
     export DockerRunDiskSize=${DockerRunDiskSize}
     export KubeletRunDiskSize=${KubeletRunDiskSize}
     export DaemonFileSystem=${DaemonFileSystem}
-    bash scripts/disk_init_v2.sh
+    bash /var/lib/sealer/data/my-cluster/rootfs/scripts/disk_init_v2.sh
 ---
 apiVersion: sealer.aliyun.com/v1alpha1
 kind: Plugin
@@ -39,7 +39,7 @@ metadata:
   name: node_disk-init # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: pre-init-host
+  action: pre-install
   scope: node
   data: |
     set -e; set -x
@@ -47,4 +47,4 @@ spec:
     export DockerRunDiskSize=${DockerRunDiskSize}
     export KubeletRunDiskSize=${KubeletRunDiskSize}
     export DaemonFileSystem=${DaemonFileSystem}
-    bash scripts/disk_init_v2.sh
+    bash /var/lib/sealer/data/my-cluster/rootfs/scripts/disk_init_v2.sh

@@ -22,7 +22,7 @@ spec:
     export Network=${Network}
     export RemoveMasterTaint=${RemoveMasterTaint}
     export KUBECONFIG=/etc/kubernetes/admin.conf
-    
+
     if [ "$HostIPFamily" = "6" ];then
       export SvcCIDR=${SvcCIDR:-4408:4003:10bb:6a01:83b9:6360:c66d:0000/112}
       export PodCIDR=${PodCIDR:-3408:4003:10bb:6a01:83b9:6360:c66d:0000/112}
@@ -31,7 +31,7 @@ spec:
       export PodCIDR=${PodCIDR:-100.64.0.0/16}
     fi
 
-    bash scripts/install_addons.sh
+    bash /var/lib/sealer/data/my-cluster/rootfs/scripts/install_addons.sh
     if [ $? -ne 0 ];then
       exit 1
     fi
@@ -41,11 +41,11 @@ spec:
     if [ $? -ne 0 ];then
       exit 1
     fi
-    
+
     # set default storageclass and snapshot
     kubectl annotate storageclass yoda-lvm-default snapshot.storage.kubernetes.io/is-default-class="true" --overwrite
     kubectl annotate storageclass yoda-lvm-default storageclass.kubernetes.io/is-default-class="true" --overwrite
-    
+
     if [ "${RemoveMasterTaint}" = "true" ];then
       kubectl taint node node-role.kubernetes.io/master- --all || true
     fi

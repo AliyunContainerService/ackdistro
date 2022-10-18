@@ -92,7 +92,7 @@ if [ $? -ne 0 ];then
 fi
 
 # install kube core addons
-helm -n kube-system upgrade -i kube-core chart/kube-core -f /tmp/ackd-helmconfig.yaml
+helm -n kube-system upgrade -i kube-core /var/lib/sealer/data/my-cluster/rootfs/chart/kube-core -f /tmp/ackd-helmconfig.yaml
 kubectl create ns acs-system || true
 
 # create etcd secret
@@ -110,25 +110,25 @@ done
 
 # install net plugin
 if [ "$Network" == "calico" ];then
-  helm -n kube-system upgrade -i calico chart/calico -f /tmp/ackd-helmconfig.yaml
+  helm -n kube-system upgrade -i calico /var/lib/sealer/data/my-cluster/rootfs/chart/calico -f /tmp/ackd-helmconfig.yaml
 else
-  helm -n kube-system upgrade -i hybridnet chart/hybridnet -f /tmp/ackd-helmconfig.yaml
+  helm -n kube-system upgrade -i hybridnet /var/lib/sealer/data/my-cluster/rootfs/chart/hybridnet -f /tmp/ackd-helmconfig.yaml
 fi
 
 # install required addons
-helm -n kube-system upgrade -i l-zero chart/l-zero -f /tmp/ackd-helmconfig.yaml
-cp -f chart/open-local/values-acka.yaml chart/open-local/values.yaml
-helm -n kube-system upgrade -i open-local chart/open-local -f /tmp/ackd-helmconfig.yaml
-helm -n kube-system upgrade -i etcd-backup chart/etcd-backup -f /tmp/ackd-helmconfig.yaml
+helm -n kube-system upgrade -i l-zero /var/lib/sealer/data/my-cluster/rootfs/chart/l-zero -f /tmp/ackd-helmconfig.yaml
+cp -f chart/open-local/values-acka.yaml /var/lib/sealer/data/my-cluster/rootfs/chart/open-local/values.yaml
+helm -n kube-system upgrade -i open-local /var/lib/sealer/data/my-cluster/rootfs/chart/open-local -f /tmp/ackd-helmconfig.yaml
+helm -n kube-system upgrade -i etcd-backup /var/lib/sealer/data/my-cluster/rootfs/chart/etcd-backup -f /tmp/ackd-helmconfig.yaml
 
 echo "sleep 15 for l-zero crds ready"
 sleep 15
-helm -n acs-system upgrade -i l-zero-library chart/l-zero-library -f /tmp/ackd-helmconfig.yaml
+helm -n acs-system upgrade -i l-zero-library /var/lib/sealer/data/my-cluster/rootfs/chart/l-zero-library -f /tmp/ackd-helmconfig.yaml
 
 # install optional addons
 IFS=,
 for addon in ${Addons};do
-  helm -n acs-system upgrade -i ${addon} chart/${addon} -f /tmp/ackd-helmconfig.yaml
+  helm -n acs-system upgrade -i ${addon} /var/lib/sealer/data/my-cluster/rootfs/chart/${addon} -f /tmp/ackd-helmconfig.yaml
 done
 IFS="
 "
