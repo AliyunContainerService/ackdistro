@@ -5,8 +5,8 @@ metadata:
   name: disk-init-rollback # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: PostClean # PreInit PreInstall PostInstall
-  'on': master
+  action: post-clean-host # PreInit PreInstall PostInstall
+  scope: master
   data: |
     set -e; set -x
     export EtcdDevice=${EtcdDevice}
@@ -19,8 +19,8 @@ metadata:
   name: node_disk-init-rollback # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: PostClean # PreInit PreInstall PostInstall
-  'on': node
+  action: post-clean-host # PreInit PreInstall PostInstall
+  scope: node
   data: |
     set -e; set -x
     export StorageDevice=${StorageDevice}

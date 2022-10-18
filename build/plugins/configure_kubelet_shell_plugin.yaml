@@ -4,8 +4,8 @@ metadata:
   name: configure_kubelet # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: PreInit|PreJoin # PreInit PreInstall PostInstall
-  'on': master
+  action: pre-install|pre-scaleup # PreInit PreInstall PostInstall
+  scope: master
   data: |
     set -e; set -x
     sysctl -w net.ipv6.conf.all.forwarding=1
@@ -63,8 +63,8 @@ metadata:
   name: configure_kubelet_on_node # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: PreInit|PreJoin # PreInit PreInstall PostInstall
-  'on': node
+  action: pre-install|pre-scaleup # PreInit PreInstall PostInstall
+  scope: node
   data: |
     set -e; set -x
     sysctl -w net.ipv6.conf.all.forwarding=1

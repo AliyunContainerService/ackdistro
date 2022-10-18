@@ -4,8 +4,8 @@ metadata:
   name: install-addons # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: PreGuest # PreInit PreInstall PostInstall
-  'on': master0
+  action: pre-install # PreInit PreInstall PostInstall
+  scope: master0
   data: |
     export DNSDomain=${DNSDomain:-cluster.local}
     export HostIPFamily=${HostIPFamily:-4}
@@ -37,7 +37,7 @@ spec:
     fi
 
     sleep 15
-    trident on-sealer -f /root/.sealer/my-cluster/Clusterfile --sealer --dump-managed-cluster
+    trident on-sealer -f /root/.sealer/Clusterfile --sealer --dump-managed-cluster
     if [ $? -ne 0 ];then
       exit 1
     fi
