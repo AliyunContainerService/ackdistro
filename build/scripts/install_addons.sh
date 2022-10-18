@@ -117,7 +117,7 @@ fi
 
 # install required addons
 helm -n kube-system upgrade -i l-zero /var/lib/sealer/data/my-cluster/rootfs/chart/l-zero -f /tmp/ackd-helmconfig.yaml
-cp -f chart/open-local/values-acka.yaml /var/lib/sealer/data/my-cluster/rootfs/chart/open-local/values.yaml
+cp -f /var/lib/sealer/data/my-cluster/rootfs/chart/open-local/values-acka.yaml /var/lib/sealer/data/my-cluster/rootfs/chart/open-local/values.yaml
 helm -n kube-system upgrade -i open-local /var/lib/sealer/data/my-cluster/rootfs/chart/open-local -f /tmp/ackd-helmconfig.yaml
 helm -n kube-system upgrade -i etcd-backup /var/lib/sealer/data/my-cluster/rootfs/chart/etcd-backup -f /tmp/ackd-helmconfig.yaml
 

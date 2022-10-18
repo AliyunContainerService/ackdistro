@@ -1,0 +1,298 @@
+apiVersion: sealer.cloud/v2
+kind: Cluster
+metadata:
+  creationTimestamp: null
+  name: my-cluster
+spec:
+  env:
+  - PodCIDR=172.45.0.0/16
+  - SvcCIDR=10.96.0.0/16
+  - Network=calico
+  - EtcdDevice=/dev/vdb
+  - StorageDevice=/dev/vdc
+  - YodaDevice=/dev/vdd
+  - DockerRunDiskSize=200
+  - KubeletRunDiskSize=200
+  - DNSDomain=cluster.local
+  - ServiceNodePortRange=30000-32767
+  - MTU=1440
+  - IPAutoDetectionMethod=can-reach=8.8.8.8
+  - SuspendPeriodHealthCheck=false
+  - EnableLocalDNSCache=false
+  - IPv6DualStack=false
+  - RemoveMasterTaint=false
+  - DockerLimitNOFILE=infinity
+  hosts:
+  - ips:
+    - xxx
+    roles:
+    - master
+    env:
+    - HostIP=xxx
+    ssh: {}
+  image: xxx
+  ssh:
+    passwd: Seadent123
+    pk: /root/.ssh/id_rsa
+    port: "22"
+    user: root
+status: {}
+---
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: preflight # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: pre-install
+  scope: master0
+  data: |
+    set -e; set -x
+    if [ "${SkipPreflight}" = "true" ];then
+      exit 0
+    fi
+    if [ "${IgnoreErrors}" != "" ];then
+      IgnoreErrorsFlag="--ignore-errors ${IgnoreErrors}"
+    fi
+    trident preflight run -f /root/.sealer/Clusterfile --sealer ${IgnoreErrorsFlag} --ignore-errors OS
+---
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: disk-init # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: pre-install
+  scope: master
+  data: |
+    set -e; set -x
+    export EtcdDevice=${EtcdDevice}
+    export StorageDevice=${StorageDevice}
+    export DockerRunDiskSize=${DockerRunDiskSize}
+    export KubeletRunDiskSize=${KubeletRunDiskSize}
+    export DaemonFileSystem=${DaemonFileSystem}
+    bash /var/lib/sealer/data/my-cluster/rootfs/scripts/disk_init_v2.sh
+---
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: node_disk-init # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: pre-install
+  scope: node
+  data: |
+    set -e; set -x
+    export StorageDevice=${StorageDevice}
+    export DockerRunDiskSize=${DockerRunDiskSize}
+    export KubeletRunDiskSize=${KubeletRunDiskSize}
+    export DaemonFileSystem=${DaemonFileSystem}
+    bash /var/lib/sealer/data/my-cluster/rootfs/scripts/disk_init_v2.sh
+---
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: install-addons # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: post-install
+  scope: master0
+  data: |
+    export DNSDomain=${DNSDomain:-cluster.local}
+    export HostIPFamily=${HostIPFamily:-4}
+    export EnableLocalDNSCache=${EnableLocalDNSCache:-false}
+    export MTU=${MTU:-1440}
+    export IPIP=${IPIP:-Always}
+    export IPv6DualStack=${IPv6DualStack:-false}
+    export IPAutoDetectionMethod=${IPAutoDetectionMethod:-can-reach=8.8.8.8}
+    export DisableFailureDomain=${DisableFailureDomain:-false}
+    export RegistryURL=${RegistryURL:-sea.hub:5000}
+    export SuspendPeriodHealthCheck=${SuspendPeriodHealthCheck:-false}
+    export SuspendPeriodBroadcastHealthCheck=${SuspendPeriodBroadcastHealthCheck:-false}
+    export Addons=${Addons}
+    export Network=${Network}
+    export RemoveMasterTaint=${RemoveMasterTaint}
+    export KUBECONFIG=/etc/kubernetes/admin.conf
+
+    if [ "$HostIPFamily" = "6" ];then
+      export SvcCIDR=${SvcCIDR:-4408:4003:10bb:6a01:83b9:6360:c66d:0000/112}
+      export PodCIDR=${PodCIDR:-3408:4003:10bb:6a01:83b9:6360:c66d:0000/112}
+    else
+      export SvcCIDR=${SvcCIDR:-10.96.0.0/16}
+      export PodCIDR=${PodCIDR:-100.64.0.0/16}
+    fi
+
+    bash /var/lib/sealer/data/my-cluster/rootfs/scripts/install_addons.sh
+    if [ $? -ne 0 ];then
+      exit 1
+    fi
+
+    sleep 15
+    trident on-sealer -f /root/.sealer/Clusterfile --sealer --dump-managed-cluster
+    if [ $? -ne 0 ];then
+      exit 1
+    fi
+
+    # set default storageclass and snapshot
+    kubectl annotate storageclass yoda-lvm-default snapshot.storage.kubernetes.io/is-default-class="true" --overwrite
+    kubectl annotate storageclass yoda-lvm-default storageclass.kubernetes.io/is-default-class="true" --overwrite
+
+    if [ "${RemoveMasterTaint}" = "true" ];then
+      kubectl taint node node-role.kubernetes.io/master- --all || true
+    fi
+
+    if [ "${SkipHealthCheck}" = "true" ];then
+      exit 0
+    fi
+    sleep 15
+    trident health-check
+    if [ $? -eq 0 ];then
+      exit 0
+    fi
+    echo "First time health check fail, try again"
+    trident health-check --trigger-mode OnlyUnsuccessful
+    exit $?
+---
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: disk-init-rollback # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: post-clean-host
+  scope: master
+  data: |
+    set -e; set -x
+    export EtcdDevice=${EtcdDevice}
+    export StorageDevice=${StorageDevice}
+    bash disk_init_rollback_v2.sh
+---
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: node_disk-init-rollback # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: post-clean-host
+  scope: node
+  data: |
+    set -e; set -x
+    export StorageDevice=${StorageDevice}
+    bash scripts/disk_init_rollback_v2.sh
+---
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: configure_kubelet # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: pre-install
+  scope: master
+  data: |
+    set -e; set -x
+    sysctl -w net.ipv6.conf.all.forwarding=1
+
+    if [ "${HostIP}" = "" ];then
+      echo "Can't find HostIP in env"
+      exit 1
+    fi
+
+    KUBELET_EXTRA_ARGS="KUBELET_EXTRA_ARGS=--node-ip=${HostIP}"
+
+    if [ "${IPv6DualStack}" = "true" ];then
+      family_of_ip_need_get=6
+      if [ "${HostIPFamily}" = "6" ];then
+        family_of_ip_need_get=4
+      fi
+
+      anotherIP=`trident get-default-route-ip --ip-family ${family_of_ip_need_get}`
+
+      KUBELET_EXTRA_ARGS="${KUBELET_EXTRA_ARGS},${anotherIP}"
+    fi
+
+    ARCH=`arch`
+    if [ "$ARCH" = "x86_64" ];then
+      if lspci | grep -i nvidia > /dev/null 2>&1;then
+        NVIDIA_GPU_NAME=$(nvidia-smi --query-gpu=gpu_name --format=csv,noheader --id=0 | sed -e 's/ /-/g')
+        if [[ "$NVIDIA_GPU_NAME" = "" ]]; then
+          echo 'nvidia GPU name query failed, please check using `nvidia-smi --query-gpu=gpu_name  --format=csv,noheader --id=0 `'
+          exit 1
+        fi
+
+        NVIDIA_GPU_COUNT=$(nvidia-smi -L | wc -l)
+        if [[ "$NVIDIA_GPU_COUNT" = "0" ]]; then
+          echo 'nvidia GPU count query failed, please check using `nvidia-smi -L | wc -l`'
+          exit 1
+        fi
+
+        NVIDIA_GPU_MEMORY=$(nvidia-smi --id=0 --query-gpu=memory.total --format=csv,noheader | sed -e 's/ //g')
+        if [[ "$NVIDIA_GPU_MEMORY" = "" ]]; then
+          echo 'nvidia GPU memory resource query failed, please check using `nvidia-smi --id=0 --query-gpu=memory.total  --format=csv,noheader`'
+          exit 1
+        fi
+        KUBELET_EXTRA_ARGS="${KUBELET_EXTRA_ARGS} --node-labels=aliyun.accelerator/nvidia_name=$NVIDIA_GPU_NAME,aliyun.accelerator/nvidia_count=$NVIDIA_GPU_COUNT,aliyun.accelerator/nvidia_mem=$NVIDIA_GPU_MEMORY"
+      fi
+    fi
+
+    if ! echo $KUBELET_EXTRA_ARGS > /etc/sysconfig/kubelet;then
+      echo $KUBELET_EXTRA_ARGS > /etc/default/kubelet
+    fi
+
+---
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: configure_kubelet_on_node # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: pre-install
+  scope: node
+  data: |
+    set -e; set -x
+    sysctl -w net.ipv6.conf.all.forwarding=1
+
+    if [ "${HostIP}" = "" ];then
+      echo "Can't find HostIP in env"
+      exit 1
+    fi
+
+    KUBELET_EXTRA_ARGS="KUBELET_EXTRA_ARGS=--node-ip=${HostIP}"
+
+    if [ "${IPv6DualStack}" = "true" ];then
+      family_of_ip_need_get=6
+      if [ "${HostIPFamily}" = "6" ];then
+        family_of_ip_need_get=4
+      fi
+
+      anotherIP=`trident get-default-route-ip --ip-family ${family_of_ip_need_get}`
+
+      KUBELET_EXTRA_ARGS="${KUBELET_EXTRA_ARGS},${anotherIP}"
+    fi
+
+    ARCH=`arch`
+    if [ "$ARCH" = "x86_64" ];then
+      if lspci | grep -i nvidia > /dev/null 2>&1;then
+        NVIDIA_GPU_NAME=$(nvidia-smi --query-gpu=gpu_name --format=csv,noheader --id=0 | sed -e 's/ /-/g')
+        if [[ "$NVIDIA_GPU_NAME" = "" ]]; then
+          echo 'nvidia GPU name query failed, please check using `nvidia-smi --query-gpu=gpu_name  --format=csv,noheader --id=0 `'
+          exit 1
+        fi
+
+        NVIDIA_GPU_COUNT=$(nvidia-smi -L | wc -l)
+        if [[ "$NVIDIA_GPU_COUNT" = "0" ]]; then
+          echo 'nvidia GPU count query failed, please check using `nvidia-smi -L | wc -l`'
+          exit 1
+        fi
+
+        NVIDIA_GPU_MEMORY=$(nvidia-smi --id=0 --query-gpu=memory.total --format=csv,noheader | sed -e 's/ //g')
+        if [[ "$NVIDIA_GPU_MEMORY" = "" ]]; then
+          echo 'nvidia GPU memory resource query failed, please check using `nvidia-smi --id=0 --query-gpu=memory.total  --format=csv,noheader`'
+          exit 1
+        fi
+        KUBELET_EXTRA_ARGS="${KUBELET_EXTRA_ARGS} --node-labels=aliyun.accelerator/nvidia_name=$NVIDIA_GPU_NAME,aliyun.accelerator/nvidia_count=$NVIDIA_GPU_COUNT,aliyun.accelerator/nvidia_mem=$NVIDIA_GPU_MEMORY"
+      fi
+    fi
+
+    if ! echo $KUBELET_EXTRA_ARGS > /etc/sysconfig/kubelet;then
+      echo $KUBELET_EXTRA_ARGS > /etc/default/kubelet
+    fi
