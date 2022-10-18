@@ -4,7 +4,7 @@ metadata:
   name: install-addons # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: pre-install # PreInit PreInstall PostInstall
+  action: post-install
   scope: master0
   data: |
     export DNSDomain=${DNSDomain:-cluster.local}

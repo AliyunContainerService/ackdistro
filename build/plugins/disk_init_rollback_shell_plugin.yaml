@@ -5,7 +5,7 @@ metadata:
   name: disk-init-rollback # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: post-clean-host # PreInit PreInstall PostInstall
+  action: post-clean-host
   scope: master
   data: |
     set -e; set -x
@@ -19,7 +19,7 @@ metadata:
   name: node_disk-init-rollback # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: post-clean-host # PreInit PreInstall PostInstall
+  action: post-clean-host
   scope: node
   data: |
     set -e; set -x

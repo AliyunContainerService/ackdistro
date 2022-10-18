@@ -4,7 +4,7 @@ metadata:
   name: preflight # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: post-install # PreInit PreInstall PostInstall
+  action: pre-init-host
   scope: master0
   data: |
     set -e; set -x
@@ -22,7 +22,7 @@ metadata:
   name: disk-init # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: pre-init-host # PreInit PreInstall PostInstall
+  action: pre-init-host
   scope: master
   data: |
     set -e; set -x
@@ -40,7 +40,7 @@ metadata:
   name: node_disk-init # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: pre-init-host # PreInit PreInstall PostInstall
+  action: pre-init-host
   scope: node
   data: |
     set -e; set -x

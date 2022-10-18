@@ -91,5 +91,9 @@ echo -n `git log -1 --pretty=format:%h` > VERSION
 #  ./ossutil64 --endpoint http://oss-cn-hangzhou.aliyuncs.com cp -f build/imageList oss://acs-ecp/ack-agility/ack-distro-imagelist-main.info
 #fi
 
+#
+# shellcheck disable=SC2016
+sed 's/${ARCH}/${archs}/g' ./Kubefile
+
 # Build sealer image
 sealer build -f Kubefile -t ack-distro:${TAG} --platform linux/${archs} .
