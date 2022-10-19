@@ -31,7 +31,7 @@ spec:
       export PodCIDR=${PodCIDR:-100.64.0.0/16}
     fi
 
-    bash /var/lib/sealer/data/my-cluster/rootfs/scripts/install_addons.sh
+    bash scripts/install_addons.sh
     if [ $? -ne 0 ];then
       exit 1
     fi

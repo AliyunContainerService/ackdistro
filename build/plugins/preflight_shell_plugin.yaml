@@ -31,7 +31,7 @@ spec:
     export DockerRunDiskSize=${DockerRunDiskSize}
     export KubeletRunDiskSize=${KubeletRunDiskSize}
     export DaemonFileSystem=${DaemonFileSystem}
-    bash /var/lib/sealer/data/my-cluster/rootfs/scripts/disk_init_v2.sh
+    bash scripts/disk_init_v2.sh
 ---
 apiVersion: sealer.aliyun.com/v1alpha1
 kind: Plugin
@@ -47,4 +47,4 @@ spec:
     export DockerRunDiskSize=${DockerRunDiskSize}
     export KubeletRunDiskSize=${KubeletRunDiskSize}
     export DaemonFileSystem=${DaemonFileSystem}
-    bash /var/lib/sealer/data/my-cluster/rootfs/scripts/disk_init_v2.sh
+    bash scripts/disk_init_v2.sh
