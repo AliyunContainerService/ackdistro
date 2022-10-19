@@ -4,7 +4,7 @@ metadata:
   name: configure_kubelet # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: pre-install
+  action: pre-install|pre-scaleup
   scope: master
   data: |
     set -e; set -x
@@ -14,20 +14,20 @@ spec:
       echo "Can't find HostIP in env"
       exit 1
     fi
-    
+
     KUBELET_EXTRA_ARGS="KUBELET_EXTRA_ARGS=--node-ip=${HostIP}"
 
     if [ "${IPv6DualStack}" = "true" ];then
       family_of_ip_need_get=6
       if [ "${HostIPFamily}" = "6" ];then
-        family_of_ip_need_get=4    
+        family_of_ip_need_get=4
       fi
-    
+
       anotherIP=`trident get-default-route-ip --ip-family ${family_of_ip_need_get}`
-    
+
       KUBELET_EXTRA_ARGS="${KUBELET_EXTRA_ARGS},${anotherIP}"
     fi
-    
+
     ARCH=`arch`
     if [ "$ARCH" = "x86_64" ];then
       if lspci | grep -i nvidia > /dev/null 2>&1;then
@@ -36,13 +36,13 @@ spec:
           echo 'nvidia GPU name query failed, please check using `nvidia-smi --query-gpu=gpu_name  --format=csv,noheader --id=0 `'
           exit 1
         fi
-      
+
         NVIDIA_GPU_COUNT=$(nvidia-smi -L | wc -l)
         if [[ "$NVIDIA_GPU_COUNT" = "0" ]]; then
           echo 'nvidia GPU count query failed, please check using `nvidia-smi -L | wc -l`'
           exit 1
         fi
-  
+
         NVIDIA_GPU_MEMORY=$(nvidia-smi --id=0 --query-gpu=memory.total --format=csv,noheader | sed -e 's/ //g')
         if [[ "$NVIDIA_GPU_MEMORY" = "" ]]; then
           echo 'nvidia GPU memory resource query failed, please check using `nvidia-smi --id=0 --query-gpu=memory.total  --format=csv,noheader`'
@@ -63,7 +63,7 @@ metadata:
   name: configure_kubelet_on_node # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: pre-install
+  action: pre-install|pre-scaleup
   scope: node
   data: |
     set -e; set -x
