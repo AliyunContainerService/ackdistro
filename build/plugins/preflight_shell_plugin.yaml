@@ -15,36 +15,3 @@ spec:
       IgnoreErrorsFlag="--ignore-errors ${IgnoreErrors}"
     fi
     trident preflight run -f /root/.sealer/Clusterfile --sealer ${IgnoreErrorsFlag} --ignore-errors OS
----
-apiVersion: sealer.aliyun.com/v1alpha1
-kind: Plugin
-metadata:
-  name: disk-init # Specify this plugin name,will dump in $rootfs/plugin dir.
-spec:
-  type: SHELL
-  action: pre-install|pre-scaleup
-  scope: master
-  data: |
-    set -e; set -x
-    export EtcdDevice=${EtcdDevice}
-    export StorageDevice=${StorageDevice}
-    export DockerRunDiskSize=${DockerRunDiskSize}
-    export KubeletRunDiskSize=${KubeletRunDiskSize}
-    export DaemonFileSystem=${DaemonFileSystem}
-    bash scripts/disk_init_v2.sh
----
-apiVersion: sealer.aliyun.com/v1alpha1
-kind: Plugin
-metadata:
-  name: node_disk-init # Specify this plugin name,will dump in $rootfs/plugin dir.
-spec:
-  type: SHELL
-  action: pre-install|pre-scaleup
-  scope: node
-  data: |
-    set -e; set -x
-    export StorageDevice=${StorageDevice}
-    export DockerRunDiskSize=${DockerRunDiskSize}
-    export KubeletRunDiskSize=${KubeletRunDiskSize}
-    export DaemonFileSystem=${DaemonFileSystem}
-    bash scripts/disk_init_v2.sh

@@ -4,7 +4,7 @@ metadata:
   name: configure_kubelet # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: pre-install|pre-scaleup
+  action: pre-init-host
   scope: master
   data: |
     set -e; set -x
@@ -63,7 +63,7 @@ metadata:
   name: configure_kubelet_on_node # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
-  action: pre-install|pre-scaleup
+  action: pre-init-host
   scope: node
   data: |
     set -e; set -x

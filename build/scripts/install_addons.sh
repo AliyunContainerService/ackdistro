@@ -40,8 +40,8 @@ CoreDnsIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 10` || panic "fai
 YodaSchedulerSvcIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 4` || panic "failed to get yoda svc ip"
 
 # Apply yamls
-for f in `ls ack-distro-yamls/yamls`;do
-  sed "s/##DNSDomain##/${DNSDomain}/g" ack-distro-yamls/yamls/${f} | kubectl apply -f -
+for f in `ls ack-distro-yamls`;do
+  sed "s/##DNSDomain##/${DNSDomain}/g" ack-distro-yamls/${f} | kubectl apply -f -
 done
 
 #TODO
