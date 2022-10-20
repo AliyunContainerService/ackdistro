@@ -94,6 +94,7 @@ fi
 # install kube core addons
 helm -n kube-system upgrade -i kube-core chart/kube-core -f /tmp/ackd-helmconfig.yaml
 kubectl create ns acs-system || true
+kubectl create ns cluster-local || true
 
 # create etcd secret
 for NS in kube-system acs-system;do
