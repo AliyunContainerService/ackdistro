@@ -30,6 +30,10 @@ EOF
 
 set_logrotate
 
+# copy bins
+chmod +x ${scripts_path}/../bin/*
+cp -f ${scripts_path}/../bin/* /usr/bin/ || true
+
 # copy generate adp license script
 cp "${scripts_path}/../etc/generate-adp-license.sh" /usr/bin/ || true
 chmod +x /usr/bin/generate-adp-license.sh || true
