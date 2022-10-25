@@ -47,7 +47,7 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
             wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${KUBE_VERSION}/${bin} -O ${arch}/bin/${bin}
         done
 
-        bins=(helm seautil mc etcdctl)
+        bins=(helm seautil mc etcdctl velero)
         for bin in ${bins[@]};do
             wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${bin} -O ${arch}/bin/${bin}
         done
