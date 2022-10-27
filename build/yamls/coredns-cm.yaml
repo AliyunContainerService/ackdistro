@@ -17,6 +17,10 @@ data:
            fallthrough in-addr.arpa ip6.arpa
            ttl 30
         }
+        hosts {
+           ##REGISTRY_IP## registry-internal.adp.aliyuncs.com
+           fallthrough
+        }
         prometheus :9153
         forward . /etc/resolv.conf {
           prefer_udp

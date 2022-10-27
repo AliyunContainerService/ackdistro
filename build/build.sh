@@ -47,10 +47,12 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
             wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${KUBE_VERSION}/${bin} -O ${arch}/bin/${bin}
         done
 
-        bins=(helm seautil mc etcdctl velero)
+        bins=(helm mc etcdctl velero)
         for bin in ${bins[@]};do
             wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${bin} -O ${arch}/bin/${bin}
         done
+
+        wget "https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/seautil-new" -O ${arch}/bin/seautil
 
         wget "https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/trident/release/trident_license_off-linux-${arch}_${trident_version}.bin" -O ${arch}/bin/trident
 

@@ -7,7 +7,7 @@ spec:
   action: pre-init-host
   scope: master | node
   data: |
-    set -e; set -x
+    set -x
     sysctl -w net.ipv6.conf.all.forwarding=1
 
     if [ "${HostIP}" = "" ];then
@@ -23,8 +23,9 @@ spec:
         chmod +x ./bin/trident
         cp -f ./bin/trident /usr/bin/trident
         anotherIP=`trident get-default-route-ip --ip-family ${family_of_ip_need_get}`
-    
-        KUBELET_EXTRA_ARGS="${KUBELET_EXTRA_ARGS},${anotherIP}"
+        if [ $? -eq 0 ] && [ "${anotherIP}" != "" ];then
+          KUBELET_EXTRA_ARGS="${KUBELET_EXTRA_ARGS},${anotherIP}"
+        fi
       fi
     fi
 

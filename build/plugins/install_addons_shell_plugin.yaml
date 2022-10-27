@@ -9,6 +9,7 @@ spec:
   data: |
     export DNSDomain=${DNSDomain:-cluster.local}
     export HostIPFamily=${HostIPFamily:-4}
+    export RegistryIP=${RegistryIP}
     export EnableLocalDNSCache=${EnableLocalDNSCache:-false}
     export MTU=${MTU:-1440}
     export IPIP=${IPIP:-Always}

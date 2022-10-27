@@ -43,9 +43,14 @@ CoreDnsIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 10` || panic "fai
 
 YodaSchedulerSvcIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 4` || panic "failed to get yoda svc ip"
 
+if [ "$RegistryIP" == "" ];then
+  echo "RegistryIP is empty, use default ip address of master0"
+  RegistryIP=`trident get-default-route-ip --ip-family ${HostIPFamily}`
+fi
+
 # Apply yamls
 for f in `ls ack-distro-yamls`;do
-  sed "s/##DNSDomain##/${DNSDomain}/g" ack-distro-yamls/${f} | kubectl apply -f -
+  sed "s/##DNSDomain##/${DNSDomain}/g" ack-distro-yamls/${f} | sed "s/##REGISTRY_IP##/${RegistryIP}/g" | kubectl apply -f -
 done
 
 #TODO
