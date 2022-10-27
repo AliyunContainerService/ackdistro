@@ -87,6 +87,7 @@ controllerManager:
     {{ end }}
     port: '10252'
     profiling: 'false'
+    tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
     {{ if and (.IPv6DualStack) (eq .IPv6DualStack "true") }}
     node-cidr-mask-size-ipv6: "120"
     node-cidr-mask-size-ipv4: "24"
@@ -109,6 +110,7 @@ scheduler:
     {{ end }}
     port: '10251'
     profiling: 'false'
+    tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
   extraVolumes:
     - hostPath: /etc/localtime
       mountPath: /etc/localtime
@@ -123,6 +125,7 @@ etcd:
       {{else}}
       listen-metrics-urls: http://0.0.0.0:2381
       {{ end }}
+      cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
     imageRepository: sea.hub:5000/ecp_builder
     imageTag: 3.5.4
 featureGates:

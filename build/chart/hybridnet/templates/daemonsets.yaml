@@ -22,7 +22,7 @@ spec:
       hostPID: true
       initContainers:
         - name: install-cni
-          image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.hybridnet.image }}:{{ .Values.images.hybridnet.tag }}"
+          image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.hybridnet.image }}:{{ .Values.images.hybridnet.tag }}"
           imagePullPolicy: {{ .Values.images.hybridnet.imagePullPolicy }}
           command: ["/hybridnet/install-cni.sh"]
           securityContext:
@@ -41,7 +41,7 @@ spec:
               value: {{ .Values.daemon.neededCommunityCNIPlugins }}
       containers:
         - name: cni-daemon
-          image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.hybridnet.image }}:{{ .Values.images.hybridnet.tag }}"
+          image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.hybridnet.image }}:{{ .Values.images.hybridnet.tag }}"
           imagePullPolicy: {{ .Values.images.hybridnet.imagePullPolicy }}
           command:
             - sh
@@ -102,7 +102,7 @@ spec:
           # TODO: add liveness probe
         {{ if .Values.daemon.enableNetworkPolicy }}
         - name: policy
-          image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.hybridnet.image }}:{{ .Values.images.hybridnet.tag }}"
+          image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.hybridnet.image }}:{{ .Values.images.hybridnet.tag }}"
           imagePullPolicy: {{ .Values.images.hybridnet.imagePullPolicy }}
           command:
             - /hybridnet/policyinit.sh

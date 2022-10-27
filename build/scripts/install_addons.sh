@@ -55,7 +55,7 @@ NumOfMasters=$(kubectl get no -l node-role.kubernetes.io/master="" | grep -v NAM
 
 # Prepare helm config
 cat >/tmp/ackd-helmconfig.yaml <<EOF
-globalconfig:
+global:
   EnableLocalDNSCache: ${EnableLocalDNSCache}
   LocalDNSCacheIP: ${LocalDNSCacheIP}
   YodaSchedulerSvcIP: ${YodaSchedulerSvcIP}
@@ -96,6 +96,7 @@ fi
 # install kube core addons
 helm -n kube-system upgrade -i kube-core chart/kube-core -f /tmp/ackd-helmconfig.yaml
 kubectl create ns acs-system || true
+kubectl create ns cluster-local || true
 
 # create etcd secret
 for NS in kube-system acs-system;do

@@ -6,7 +6,7 @@ images:
     image: ecp_builder/debug
     tag: ubuntu
 k8s_namespace: acs-system
-globalconfig:
+global:
   RegistryURL: sea.hub:5000
   SuspendPeriodHealthCheck: false
   SuspendPeriodBroadcastHealthCheck: false

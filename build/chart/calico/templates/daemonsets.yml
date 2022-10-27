@@ -47,7 +47,7 @@ spec:
         # It can be deleted if this is a fresh installation, or if you have already
         # upgraded to use calico-ipam.
         - name: upgrade-ipam
-          image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.calicocni.image }}:{{ .Values.images.calicocni.tag }}"
+          image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.calicocni.image }}:{{ .Values.images.calicocni.tag }}"
           command: ["/opt/cni/bin/calico-ipam", "-upgrade"]
           env:
             - name: KUBERNETES_NODE_NAME
@@ -67,7 +67,7 @@ spec:
         # This container installs the CNI binaries
         # and CNI network config file on each node.
         - name: install-cni
-          image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.calicocni.image }}:{{ .Values.images.calicocni.tag }}"
+          image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.calicocni.image }}:{{ .Values.images.calicocni.tag }}"
           command: ["/install-cni.sh"]
           env:
             # Name of the CNI config file to create.
@@ -101,7 +101,7 @@ spec:
         # Adds a Flex Volume Driver that creates a per-pod Unix Domain Socket to allow Dikastes
         # to communicate with Felix over the Policy Sync API.
         - name: flexvol-driver
-          image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.calicoflexvol.image }}:{{ .Values.images.calicoflexvol.tag }}"
+          image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.calicoflexvol.image }}:{{ .Values.images.calicoflexvol.tag }}"
           volumeMounts:
             - name: flexvol-driver-host
               mountPath: /host/driver
@@ -110,7 +110,7 @@ spec:
         # container programs network policy and routes on each
         # host.
         - name: calico-node
-          image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.caliconode.image }}:{{ .Values.images.caliconode.tag }}"
+          image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.caliconode.image }}:{{ .Values.images.caliconode.tag }}"
           env:
             # Use Kubernetes API as the backing datastore.
             - name: DATASTORE_TYPE
@@ -136,10 +136,10 @@ spec:
             - name: IP
               value: "autodetect"
             - name: IP_AUTODETECTION_METHOD
-              value: "{{ .Values.globalconfig.IPAutoDetectionMethod }}"
+              value: "{{ .Values.global.IPAutoDetectionMethod }}"
             # Enable IPIP
             - name: CALICO_IPV4POOL_IPIP
-              value: "{{ .Values.globalconfig.IPIP }}"
+              value: "{{ .Values.global.IPIP }}"
             # Set MTU for tunnel device used if ipip is enabled
             - name: FELIX_IPINIPMTU
               valueFrom:
@@ -149,7 +149,7 @@ spec:
             # The default IPv4 pool to create on startup if none exists. Pod IPs will be
             # chosen from this range. Changing this value after installation will have
             - name: CALICO_IPV4POOL_CIDR
-              value: "{{ .Values.globalconfig.PodCIDR }}"
+              value: "{{ .Values.global.PodCIDR }}"
             - name: CALICO_DISABLE_FILE_LOGGING
               value: "true"
             # Set Felix endpoint to host default action to ACCEPT.

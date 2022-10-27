@@ -808,3 +808,23 @@ metadata:
   name: {{ .Values.name }}
   namespace: {{ .Values.monitor.namespace }}
 {{- end }}
+---
+{{- if .Values.monitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ .Values.monitor.namespace }}
+{{ include "local.labels" . | indent 2 }}
+spec:
+  endpoints:
+  - port: http-port
+    path: /metrics
+  jobLabel: app
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.namespace }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Values.name }}
+{{- end }}

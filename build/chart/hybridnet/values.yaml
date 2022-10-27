@@ -3,7 +3,7 @@ images:
     image: ecp_builder/hybridnet
     tag: v0.7.2
     imagePullPolicy: IfNotPresent
-globalconfig:
+global:
   RegistryURL: "sea.hub:5000"
 # -- It's always encouraged to use an overlay network to finish some general jobs in hybridnet. This
 # chart will always create an "init" overlay Network/Subnet to initialize the K8s cluster. "init" Network/Subnet

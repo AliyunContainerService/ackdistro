@@ -36,7 +36,7 @@ spec:
         beta.kubernetes.io/os: linux
       containers:
         - name: coredns
-          image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.coredns.image }}:{{ .Values.images.coredns.tag }}"
+          image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.coredns.image }}:{{ .Values.images.coredns.tag }}"
           imagePullPolicy: IfNotPresent
           resources:
             limits:
@@ -103,7 +103,7 @@ metadata:
   #   Service "kube-dns" is invalid: metadata.resourceVersion: Invalid value: "": must be specified for an update
 spec:
   sessionAffinity: ClientIP
-  clusterIP: {{ .Values.globalconfig.CoreDnsIP }}
+  clusterIP: {{ .Values.global.CoreDnsIP }}
   ports:
     - name: dns
       port: 53

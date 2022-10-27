@@ -80,6 +80,7 @@ spec:
     - Network=hybridnet # support hybridnet/calico, default is hybridnet
     - EtcdDevice=/dev/vdb # EtcdDevice is device for etcd, default is "", which will use system disk
     - StorageDevice=/dev/vdc # StorageDevice is device for kubelet and container daemon, default is "", which will use system disk
+    - YodaDevice=/dev/vdd # YodaDevice is device for open-local, if not specified, open local can't provision pv
     - DockerRunDiskSize=100 # unit is GiB, capacity for /var/lib/docker, default is 100
     - KubeletRunDiskSize=100 # unit is GiB, capacity for /var/lib/kubelet, default is 100
     - DNSDomain=cluster.local # default is cluster.local

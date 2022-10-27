@@ -19,7 +19,7 @@ spec:
       - -c
       - |
         {{- .Files.Get "files/kube-proxy/check-kube-proxy-pod/content.sh" | nindent 8}}
-      image: {{.Values.globalconfig.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}
+      image: {{.Values.global.RegistryURL}}/{{.Values.images.opsbasealpine.image}}:{{.Values.images.opsbasealpine.tag}}
       imagePullPolicy: IfNotPresent
       name: main
     dnsPolicy: ClusterFirstWithHostNet
@@ -30,5 +30,5 @@ spec:
     - effect: NoSchedule
       key: node-role.kubernetes.io/master
   privilegeLevel: Cluster
-  suspend: {{ .Values.globalconfig.SuspendPeriodHealthCheck }}
+  suspend: {{ .Values.global.SuspendPeriodHealthCheck }}
   timeout: 180

@@ -1,0 +1,16 @@
+hostpath_name: csi-hostpath
+hostpath_namespace: kube-system
+driver_name: hostpath.csi.k8s.io
+images:                       # 镜像
+  provisioner:
+    image: ecp_builder/csi-provisioner
+    tag: v2.2.2
+  node_driver_register:
+    image: ecp_builder/csi-node-driver-registrar
+    tag: v2.3.0
+  driver:
+    image: ecp_builder/hostpathplugin
+    tag: v1.7.1
+
+global:
+  RegistryURL: sea.hub:5000
