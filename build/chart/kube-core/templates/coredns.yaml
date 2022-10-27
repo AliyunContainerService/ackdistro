@@ -15,6 +15,10 @@ spec:
     metadata:
       labels:
         k8s-app: kube-dns
+      {{ if .Values.globalconfig.IPv6DualStack }}
+      annotations:
+        networking.alibaba.com/ip-family: DualStack
+      {{ end }}
     spec:
       priorityClassName: system-cluster-critical
       affinity:
