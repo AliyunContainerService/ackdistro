@@ -4,17 +4,15 @@ apiVersion: batch/v1
 metadata:
   name: {{ .Values.name }}-init-job
   namespace: {{ .Values.namespace }}
-  labels:
-    app: {{ .Values.name }}
-    component: {{ .Values.name }}-init-job
+{{ include "local.labels" . | indent 2 }}
+    app.kubernetes.io/component: {{ .Values.name }}-init-job
 spec:
-  completions: {{ .Values.globalconfig.NumOfMasters }}
-  parallelism: {{ .Values.globalconfig.NumOfMasters }}
+  completions: {{ or .Values.global.NumOfMasters 3 }}
+  parallelism: {{ or .Values.global.NumOfMasters 3 }}
   template:
     metadata:
-      labels:
-        app: {{ .Values.name }}
-        component: {{ .Values.name }}-init-job
+{{ include "local.labels" . | indent 6 }}
+        app.kubernetes.io/component: {{ .Values.name }}-init-job
     spec:
       hostNetwork: true
       tolerations:
@@ -33,14 +31,14 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
-              - key: component
+              - key: app.kubernetes.io/component
                 operator: In
                 values:
                 - {{ .Values.name }}-init-job
             topologyKey: "kubernetes.io/hostname"
       containers:
       - name: init
-        image: {{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.local.image }}:{{ .Values.images.local.tag }}
+        image: {{ .Values.global.RegistryURL }}/{{ .Values.images.local.image }}:{{ .Values.images.local.tag }}
         command:
         - sh
         - "-c"

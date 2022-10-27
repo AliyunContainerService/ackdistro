@@ -12,6 +12,6 @@ images:
     tag: v0.2
 k8s_namespace: kube-system
 domain: "l-zero-ingress.paas.com"
-globalconfig:
+global:
   DisableFailureDomain: false
   RegistryURL: sea.hub:5000

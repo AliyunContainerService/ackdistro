@@ -15,7 +15,7 @@ data:
   calico_backend: "bird"
 
   # Configure the MTU to use
-  veth_mtu: "{{ .Values.globalconfig.MTU }}"
+  veth_mtu: "{{ .Values.global.MTU }}"
 
   # The CNI network configuration to install on each node.  The special
   # values in this config will be automatically populated.

@@ -2,6 +2,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: {{ .Values.storageclass.lvm.name }}
+{{ include "local.labels" . | indent 2 }}
 provisioner: {{ .Values.driver }}
 parameters:
   volumeType: "LVM"
@@ -14,6 +15,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: {{ .Values.storageclass.lvm_xfs.name }}
+{{ include "local.labels" . | indent 2 }}
 provisioner: {{ .Values.driver }}
 parameters:
   volumeType: "LVM"
@@ -25,21 +27,8 @@ allowVolumeExpansion: true
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: {{ .Values.storageclass.lvm_io.name }}
-provisioner: {{ .Values.driver }}
-parameters:
-  csi.storage.k8s.io/fstype: ext4
-  volumeType: "LVM"
-  bps: "1048576"
-  iops: "1024"
-reclaimPolicy: Delete
-volumeBindingMode: WaitForFirstConsumer
-allowVolumeExpansion: true
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
   name: {{ .Values.storageclass.device_hdd.name }}
+{{ include "local.labels" . | indent 2 }}
 provisioner: {{ .Values.driver }}
 parameters:
   csi.storage.k8s.io/fstype: ext4
@@ -53,6 +42,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: {{ .Values.storageclass.device_ssd.name }}
+{{ include "local.labels" . | indent 2 }}
 provisioner: {{ .Values.driver }}
 parameters:
   csi.storage.k8s.io/fstype: ext4
@@ -62,26 +52,15 @@ reclaimPolicy: Delete
 volumeBindingMode: WaitForFirstConsumer
 allowVolumeExpansion: false
 ---
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
 metadata:
-   name: {{ .Values.storageclass.mountpoint_hdd.name }}
-provisioner: {{ .Values.driver }}
+  name: {{ .Values.storageclass.lvm.name }}
+{{ include "local.labels" . | indent 2 }}
+driver: {{ .Values.driver }}
+deletionPolicy: Delete
 parameters:
-  csi.storage.k8s.io/fstype: ext4
-  volumeType: MountPoint
-  mediaType: hdd
-reclaimPolicy: Delete
-volumeBindingMode: WaitForFirstConsumer
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-   name: {{ .Values.storageclass.mountpoint_ssd.name }}
-provisioner: {{ .Values.driver }}
-parameters:
-  csi.storage.k8s.io/fstype: ext4
-  volumeType: MountPoint
-  mediaType: ssd
-reclaimPolicy: Delete
-volumeBindingMode: WaitForFirstConsumer
+  csi.aliyun.com/readonly: "true"
+  csi.aliyun.com/snapshot-initial-size: 4Gi
+  csi.aliyun.com/snapshot-expansion-size: 1Gi
+  csi.aliyun.com/snapshot-expansion-threshold: 50%

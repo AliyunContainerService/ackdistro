@@ -32,7 +32,7 @@ spec:
       hostNetwork: true
       containers:
         - name: hybridnet-manager
-          image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.hybridnet.image }}:{{ .Values.images.hybridnet.tag }}"
+          image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.hybridnet.image }}:{{ .Values.images.hybridnet.tag }}"
           imagePullPolicy: {{ .Values.images.hybridnet.imagePullPolicy }}
           {{- if .Values.manager.resources }}
           resources:
@@ -85,7 +85,7 @@ spec:
       hostNetwork: true
       containers:
         - name: hybridnet-webhook
-          image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.hybridnet.image }}:{{ .Values.images.hybridnet.tag }}"
+          image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.hybridnet.image }}:{{ .Values.images.hybridnet.tag }}"
           imagePullPolicy: {{ .Values.images.hybridnet.imagePullPolicy }}
           {{- if .Values.webhook.resources }}
           resources:

@@ -13,7 +13,7 @@ images:
   calicocontrollers:
     image: ecp_builder/calico-kube-controllers
     tag: v3.8.2
-globalconfig:
+global:
   RegistryURL: sea.hub:5000
   MTU: "1440"
   PodCIDR: 100.64.0.0/16

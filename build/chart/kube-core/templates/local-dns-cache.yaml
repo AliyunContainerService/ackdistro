@@ -1,4 +1,4 @@
-{{- if .Values.globalconfig.EnableLocalDNSCache }}
+{{- if .Values.global.EnableLocalDNSCache }}
 # Copyright 2018 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,7 +55,7 @@ metadata:
     addonmanager.kubernetes.io/mode: Reconcile
 data:
   Corefile: |
-    {{ .Values.globalconfig.DNSDomain }}:53 {
+    {{ .Values.global.DNSDomain }}:53 {
           errors
           cache {
                   success 9984 30
@@ -63,20 +63,19 @@ data:
           }
           reload
           loop
-          bind {{ .Values.globalconfig.LocalDNSCacheIP }}
-          forward . {{ .Values.globalconfig.CoreDnsIP }} {
+          bind {{ .Values.global.LocalDNSCacheIP }}
+          forward . {{ .Values.global.CoreDnsIP }} {
                   force_tcp
           }
           prometheus :9253
-          health {{ .Values.globalconfig.LocalDNSCacheIP }}:8080
           }
       in-addr.arpa:53 {
           errors
           cache 30
           reload
           loop
-          bind {{ .Values.globalconfig.LocalDNSCacheIP }}
-          forward . {{ .Values.globalconfig.CoreDnsIP }} {
+          bind {{ .Values.global.LocalDNSCacheIP }}
+          forward . {{ .Values.global.CoreDnsIP }} {
                   force_tcp
           }
           prometheus :9253
@@ -86,8 +85,8 @@ data:
           cache 30
           reload
           loop
-          bind {{ .Values.globalconfig.LocalDNSCacheIP }}
-          forward . {{ .Values.globalconfig.CoreDnsIP }} {
+          bind {{ .Values.global.LocalDNSCacheIP }}
+          forward . {{ .Values.global.CoreDnsIP }} {
                   force_tcp
           }
           prometheus :9253
@@ -97,7 +96,7 @@ data:
           cache 30
           reload
           loop
-          bind {{ .Values.globalconfig.LocalDNSCacheIP }}
+          bind {{ .Values.global.LocalDNSCacheIP }}
           forward . __PILLAR__UPSTREAM__SERVERS__
           prometheus :9253
           }
@@ -139,12 +138,12 @@ spec:
           operator: "Exists"
       containers:
         - name: node-cache
-          image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.localdnscache.image }}:{{ .Values.images.localdnscache.tag }}"
+          image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.localdnscache.image }}:{{ .Values.images.localdnscache.tag }}"
           resources:
             requests:
               cpu: 25m
               memory: 5Mi
-          args: [ "-localip", "{{ .Values.globalconfig.LocalDNSCacheIP }}", "-conf", "/etc/Corefile", "-upstreamsvc", "kube-dns-upstream" ]
+          args: [ "-localip", "{{ .Values.global.LocalDNSCacheIP }}", "-conf", "/etc/Corefile", "-upstreamsvc", "kube-dns-upstream" ]
           securityContext:
             privileged: true
           ports:
@@ -159,7 +158,7 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              host: {{ .Values.globalconfig.LocalDNSCacheIP }}
+              host: {{ .Values.global.LocalDNSCacheIP }}
               path: /health
               port: 8080
             initialDelaySeconds: 60

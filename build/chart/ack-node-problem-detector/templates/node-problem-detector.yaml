@@ -62,7 +62,7 @@ spec:
                 fieldPath: spec.nodeName
           - name: SYSTEMD_OFFLINE
             value: "0"
-        image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.npd.image }}:{{ .Values.images.npd.tag }}"
+        image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.npd.image }}:{{ .Values.images.npd.tag }}"
         imagePullPolicy: IfNotPresent
         name: ack-node-problem-detector
         resources:

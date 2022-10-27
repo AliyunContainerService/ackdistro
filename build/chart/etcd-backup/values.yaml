@@ -14,7 +14,7 @@ cronJobInfo:
   completions: 3
   parallelism: 3
 
-globalconfig:
+global:
   RegistryURL: "sea.hub:5000"
   # 单master模式
   SingleMasterMode: false

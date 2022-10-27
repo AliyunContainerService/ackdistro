@@ -47,7 +47,7 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
             wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${KUBE_VERSION}/${bin} -O ${arch}/bin/${bin}
         done
 
-        bins=(helm seautil mc etcdctl)
+        bins=(helm seautil mc etcdctl velero)
         for bin in ${bins[@]};do
             wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${bin} -O ${arch}/bin/${bin}
         done
@@ -75,7 +75,7 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
         if [ "$arch" == "amd64" ];then
             wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/nvidia.tgz -O ${arch}/tgz/nvidia.tgz
         fi
-        tgzs=(lvm-el7.tgz lvm-el8.tgz)
+        tgzs=(lvm-el7.tgz lvm-el8.tgz s3fs-el7.tgz s3fs-el8.tgz)
         for tgz in ${tgzs[@]};do
             wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/${tgz} -O ${arch}/tgz/${tgz}
         done
@@ -92,4 +92,4 @@ echo -n `git log -1 --pretty=format:%h` > VERSION
 #fi
 
 # Build sealer image
-sealer build -f Kubefile -t ack-distro:${TAG} --platform ${archs} .
+sealer build -f Kubefile -t ack-distro:${TAG} --platform linux/${archs} .

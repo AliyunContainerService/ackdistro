@@ -13,7 +13,7 @@ spec:
       labels:
         job: backup-etcd
     spec:
-      {{- if .Values.globalconfig.SingleMasterMode }}
+      {{- if .Values.global.SingleMasterMode }}
       completions: 1
       parallelism: 1
       {{- else }}
@@ -48,7 +48,7 @@ spec:
           dnsPolicy: ClusterFirstWithHostNet
           containers:
           - name: backup-etcd
-            image: "{{ .Values.globalconfig.RegistryURL }}/{{ .Values.images.etcd.image }}:{{ .Values.images.etcd.tag }}"
+            image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.etcd.image }}:{{ .Values.images.etcd.tag }}"
             imagePullPolicy: {{ .Values.imagePullPolicy }}
             # 充分保障资源，让etcd backup job稳定运行
             resources:

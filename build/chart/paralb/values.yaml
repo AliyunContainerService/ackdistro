@@ -1,9 +1,9 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 images:
-  npd:
-    image: ecp_builder/node-problem-detector
-    tag: v0.2-71bd5f8
-k8s_namespace: kube-system
+  paralb:
+    image: ecp_builder/paralb
+    tag: v0.1.0
 global:
   RegistryURL: sea.hub:5000
+  ParaLBInterface: ""
