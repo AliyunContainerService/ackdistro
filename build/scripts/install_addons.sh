@@ -80,6 +80,10 @@ global:
   NumOfMasters: ${NumOfMasters}
   IPv6DualStack: ${IPv6DualStack}
   IPVSExcludeCIDRs: 10.103.97.2/32,1248:4003:10bb:6a01:83b9:6360:c66d:0002/128
+  ApiServerExternalIP: ${ApiServerExternalIP}
+  ApiServerExternalPort: ${ApiServerExternalPort}
+  IngressExternalIP: ${IngressExternalIP}
+  IngressExternalPort: ${IngressExternalPort}
 init:
   cidr: ${PodCIDR%,*}
   ipVersion: "${HostIPFamily}"
@@ -131,6 +135,7 @@ fi
 helm -n kube-system upgrade -i l-zero chart/l-zero -f /tmp/ackd-helmconfig.yaml
 cp -f chart/open-local/values-acka.yaml chart/open-local/values.yaml
 helm -n kube-system upgrade -i open-local chart/open-local -f /tmp/ackd-helmconfig.yaml
+helm -n kube-system upgrade -i csi-hostpath chart/csi-hostpath -f /tmp/ackd-helmconfig.yaml
 helm -n kube-system upgrade -i etcd-backup chart/etcd-backup -f /tmp/ackd-helmconfig.yaml
 
 echo "sleep 15 for l-zero crds ready"
@@ -179,4 +184,6 @@ EOF
   if [ $? -ne 0 ];then
     echo "failed to run kubectl apply -f /tmp/subnet2.yaml, ignore this, please apply it by yourself"
   fi
+
+  kubectl  -n kube-system delete pod -lk8s-app=kube-dns
 fi

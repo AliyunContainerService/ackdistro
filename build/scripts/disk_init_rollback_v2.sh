@@ -6,26 +6,6 @@ source "${scripts_path}"/utils.sh
 # how to use: `sh disk_init_rollback.sh -d${deviceName}`
 set -x
 
-prune_docker_mount() {
-  # remove the containers and images
-  docker ps -aq | xargs -I '{}' docker stop {}
-  docker ps -aq | xargs -I '{}' docker rm {}
-  docker image ls -aq | xargs -I '{}' docker image rm {}
-
-  # kill dockerd process and related processes
-  for pid in $(ps aux | awk '{ if ($11 == "dockerd" || $11 == "containerd" || $11 == "containerd-shim") print $2 }')
-  do
-    kill -9 ${pid}
-  done
-  for pid in $(ps aux | awk '{ if (match($11, ".*/dockerd$$") || match($11, ".*/containerd$$") || match($11, ".*/containerd-shim$$")) print $2 }')
-  do
-    kill -9 ${pid}
-  done
-
-  # umount and clean the docker related directories
-  rm -rf /var/lib/docker/*
-}
-
 clean_vg_pool()
 {
     tridentVGName="$1"
@@ -100,19 +80,16 @@ elif [ "$dev" != "" ];then
     vgName=$dev
 fi
 
-# Step 2: prune docker mount
-prune_docker_mount
-
-# Step 3: clean yoda pools
+# Step 2: clean yoda pools
 clean_vg_pool "yoda-pool"
 
-# Step 4: clean mount info in /etc/fstab
+# Step 3: clean mount info in /etc/fstab
 sed -i "/\\/var\\/lib\\/etcd/d"  /etc/fstab
 sed -i "/\\/var\\/lib\\/kubelet/d"  /etc/fstab
 sed -i "/\\/var\\/lib\\/${container_runtime}/d"  /etc/fstab
 sed -i "/\\/var\\/lib\\/${container_runtime}\\/logs/d"  /etc/fstab
 
-# Step 5: umount
+# Step 4: umount
 suc=false
 for i in `seq 1 10`;do
     sleep 1s
@@ -143,8 +120,7 @@ if [ "$suc" != "true" ];then
 fi
 utils_info "umount done!"
 
-
-# Step 6: clean ackdistro pool
+# Step 5: clean ackdistro pool
 if [ "$vgName" = "ackdistro-pool" ];then
     clean_vg_pool "ackdistro-pool"
     if [ "$dev" != "" ];then
@@ -164,7 +140,7 @@ else
     lvscan|awk "/$vgName/{print $2}"|xargs -I {} lvremove -f {}
 fi
 
-# Step 7: wipe etcd device
+# Step 6: wipe etcd device
 if ! utils_shouldMkFs $etcdDev; then
     utils_info "target etcd device is empty!"
 else

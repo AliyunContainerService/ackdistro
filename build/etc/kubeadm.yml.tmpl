@@ -15,7 +15,7 @@ apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
 kubernetesVersion: v1.20.4-aliyun.1
 controlPlaneEndpoint: "apiserver.cluster.local:6443"
-imageRepository: sea.hub:5000/ecp_builder
+imageRepository: {{or .RegistryURL "sea.hub:5000"}}/ecp_builder
 networking:
   dnsDomain: {{or .DNSDomain "cluster.local"}}
   {{ if .PodCIDR }}
@@ -126,7 +126,7 @@ etcd:
       listen-metrics-urls: http://0.0.0.0:2381
       {{ end }}
       cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
-    imageRepository: sea.hub:5000/ecp_builder
+    imageRepository: {{or .RegistryURL "sea.hub:5000"}}/ecp_builder
     imageTag: 3.5.4
 featureGates:
   IPv6DualStack: {{or .IPv6DualStack false}}
