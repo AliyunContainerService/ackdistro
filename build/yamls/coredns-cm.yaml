@@ -18,7 +18,7 @@ data:
            ttl 30
         }
         hosts {
-           ##REGISTRY_IP## registry-internal.adp.aliyuncs.com
+           ##REGISTRY_IP## ##REGISTRY_DOMAIN##
            fallthrough
         }
         prometheus :9153

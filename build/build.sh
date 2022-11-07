@@ -99,4 +99,4 @@ echo -n `git log -1 --pretty=format:%h` > VERSION
 sed -i "s/${ARCH}/${archs}/g" ./Kubefile
 
 # Build sealer image
-sealer build -f Kubefile -t ack-distro:${TAG} --platform linux/${archs} .
+sealer build -f Kubefile -t ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${TAG} --platform linux/${archs} .

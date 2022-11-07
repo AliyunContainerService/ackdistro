@@ -57,17 +57,23 @@ lsblk
 
 # Step 1: get device
 etcdDev=${EtcdDevice}
-dev=${StorageDevice}
+storageDev=${StorageDevice}
 container_runtime="docker"
+
+containAnd=$(echo ${storageDev} | grep "&")
+NEW_IFS=","
+if [ "$containAnd" != "" ];then
+   NEW_IFS="&"
+fi
 
 vgName="ackdistro-pool"
 devPrefix="/dev"
-if [[ $dev =~ $devPrefix ]]
+if [[ $storageDev =~ $devPrefix ]]
 then
     # check each dev name
     OLD_IFS="$IFS"
-    IFS=","
-    arr=($dev)
+    IFS=${NEW_IFS}
+    arr=($storageDev)
     IFS="$OLD_IFS"
     for temp in ${arr[@]};do
         if [[ $temp =~ $devPrefix ]];then
@@ -76,8 +82,8 @@ then
             panic "invalid input device name, it must be /dev/***"
         fi
     done
-elif [ "$dev" != "" ];then
-    vgName=$dev
+elif [ "$storageDev" != "" ];then
+    vgName=$storageDev
 fi
 
 # Step 2: clean yoda pools
@@ -123,13 +129,19 @@ utils_info "umount done!"
 # Step 5: clean ackdistro pool
 if [ "$vgName" = "ackdistro-pool" ];then
     clean_vg_pool "ackdistro-pool"
-    if [ "$dev" != "" ];then
-        utils_info "wipefs $dev"
-        output=$(wipefs -a $dev)
-        if [ "$?" != "0" ]; then
-            panic "failed to exec [wipefs -a $dev]: $output"
-        fi
-        utils_info "wipefs $dev done!"
+    if [ "$storageDev" != "" ];then
+        OLD_IFS="$IFS"
+        IFS=${NEW_IFS}
+        arr=($storageDev)
+        IFS="$OLD_IFS"
+        for temp in ${arr[@]};do
+            utils_info "wipefs $temp"
+            output=$(wipefs -a $temp)
+            if [ "$?" != "0" ]; then
+                panic "failed to exec [wipefs -a $temp]: $output"
+            fi
+            utils_info "wipefs $temp done!"
+        done
     fi
 else
     # TODO, why not need wipefs

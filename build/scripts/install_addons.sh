@@ -48,9 +48,10 @@ if [ "$RegistryIP" == "" ];then
   RegistryIP=`trident get-default-route-ip --ip-family ${HostIPFamily}`
 fi
 
+RegistryDomain=${RegistryURL%:*}
 # Apply yamls
 for f in `ls ack-distro-yamls`;do
-  sed "s/##DNSDomain##/${DNSDomain}/g" ack-distro-yamls/${f} | sed "s/##REGISTRY_IP##/${RegistryIP}/g" | kubectl apply -f -
+  sed "s/##DNSDomain##/${DNSDomain}/g" ack-distro-yamls/${f} | sed "s/##REGISTRY_IP##/${RegistryIP}/g" | sed "s/##REGISTRY_DOMAIN##/${RegistryDomain}/g" | kubectl apply -f -
 done
 
 #TODO
@@ -145,6 +146,9 @@ helm -n acs-system upgrade -i l-zero-library chart/l-zero-library -f /tmp/ackd-h
 # install optional addons
 IFS=,
 for addon in ${Addons};do
+  if [ "$addon" == "kube-prometheus-stack" ];then
+    addon="kube-prometheus-crds"
+  fi
   helm -n acs-system upgrade -i ${addon} chart/${addon} -f /tmp/ackd-helmconfig.yaml
 done
 IFS="

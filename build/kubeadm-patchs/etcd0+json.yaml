@@ -1,0 +1,2 @@
+- op: remove
+  path: '/spec/containers/0/resources/requests/ephemeral-storage'

@@ -11,6 +11,7 @@ COPY amd64/tgz ./tgz
 COPY scripts scripts
 COPY plugins plugins
 COPY etc etc
+COPY kubeadm-patchs kubeadm-patchs
 COPY chart chart
 COPY statics statics
 COPY yamls ack-distro-yamls
