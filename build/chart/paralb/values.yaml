@@ -3,7 +3,27 @@
 images:
   paralb:
     image: ecp_builder/paralb
-    tag: v0.1.0
+    tag: v0.1.1
 global:
   RegistryURL: sea.hub:5000
-  ParaLBInterface: ""
+
+daemon:
+  hostInterface: ""
+
+manager:
+  # -- The number of manager pods, which is supposed to be less than or equal to the number of master nodes
+  replicas: 3
+
+webhook:
+  # -- The number of manager pods, which is supposed to be less than or equal to the number of master nodes
+  replicas: 3
+
+init:
+  # labels
+  networkNodeSelector: {}
+
+  ingressControllerVIP: ""
+
+  iamGatewayVIP: ""
+
+  apiServerVIP: ""

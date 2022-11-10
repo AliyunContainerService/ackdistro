@@ -1,0 +1,118 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.1
+  creationTimestamp: null
+  name: vipinstances.networking.alibaba.com
+spec:
+  group: networking.alibaba.com
+  names:
+    kind: VIPInstance
+    listKind: VIPInstanceList
+    plural: vipinstances
+    singular: vipinstance
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.address.ip
+      name: IP
+      type: string
+    - jsonPath: .spec.address.gateway
+      name: Gateway
+      type: string
+    - jsonPath: .spec.vipSubnet
+      name: Subnet
+      type: string
+    - jsonPath: .spec.vipNetwork
+      name: Network
+      type: string
+    - jsonPath: .status.serviceName
+      name: Service
+      type: string
+    - jsonPath: .status.subjectedNodes
+      name: SubjectedNodes
+      type: string
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: VIPInstance is the Schema for the vipinstances API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: VIPInstanceSpec defines the desired state of VIPInstance
+            properties:
+              address:
+                description: Address is the address of vipinstance
+                properties:
+                  gateway:
+                    type: string
+                  ip:
+                    type: string
+                  mac:
+                    type: string
+                  netID:
+                    format: int32
+                    type: integer
+                  version:
+                    type: string
+                required:
+                - ip
+                - netID
+                - version
+                type: object
+              vipNetwork:
+                type: string
+              vipSubnet:
+                type: string
+            required:
+            - address
+            - vipNetwork
+            - vipSubnet
+            type: object
+          status:
+            description: VIPInstanceStatus defines the observed state of VIPInstance
+            properties:
+              message:
+                description: Message gives the error message of VIPInstance
+                type: string
+              phase:
+                description: Phase is the phase of VIPInstance
+                type: string
+              serviceName:
+                type: string
+              serviceNamespace:
+                type: string
+              subjectedNodes:
+                description: SubjectedNodes declares which node should be responsible
+                  for announcing VIPInstance to the network. VIPInstance is announced
+                  by only one node at the same time in ARP mode; while there could
+                  be multiple nodes announcing in BGP mode.
+                items:
+                  type: string
+                type: array
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

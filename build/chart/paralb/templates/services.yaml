@@ -12,6 +12,7 @@ spec:
       targetPort: webhook-port
   type: ClusterIP
   selector:
-    app: paralb-webhook
+    app: paralb
+    component: webhook
   sessionAffinity: None
 
