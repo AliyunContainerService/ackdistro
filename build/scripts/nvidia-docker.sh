@@ -108,7 +108,8 @@ public::nvidia::install_nvidia_docker2(){
 # deploy nvidia plugin in static pod
 public::nvidia::deploy_static_pod() {
     mkdir -p /etc/kubernetes/manifests
-    cp -f ${scripts_path}/../statics/nvidia-device-plugin.yml /etc/kubernetes/manifests/nvidia-device-plugin.yml
+    RegistryURL=${RegistryURL:-sea.hub:5000}
+    sed "s/sea\.hub:5000/${RegistryURL}/g" ${scripts_path}/../statics/nvidia-device-plugin.yml > /etc/kubernetes/manifests/nvidia-device-plugin.yml
 
     utils_info "nvidia-device-plugin yaml succefully deployed ..."
 }
