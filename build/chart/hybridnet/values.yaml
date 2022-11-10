@@ -1,7 +1,7 @@
 images:
   hybridnet:
     image: ecp_builder/hybridnet
-    tag: v0.7.4
+    tag: v0.7.5
     imagePullPolicy: IfNotPresent
 global:
   RegistryURL: "sea.hub:5000"
@@ -81,8 +81,11 @@ webhook:
     #   memory: 512Mi
 
 daemon:
-  # -- Whether enable the NetworkPolicy functions of hybridnet.
-  enableNetworkPolicy: true
+  # -- Whether enable the felix components for NetworkPolicy.
+  enableFelixPolicy: true
+
+  # -- Whether clean felix policy iptables rules while policy is disabled.
+  cleanFelixRulesWhilePolicyDisabled: true
 
   # -- The physical interfaces on each node to transmit vlan/vxlan/bgp packets, which should be confirmed
   # before network config is actually applied, or you might have to face the risk of rebooting the machine.
@@ -123,8 +126,8 @@ daemon:
     #   cpu: 100m
     #   memory: 128Mi
 
-  policy:
-    # -- Specifies the resources for the policy containers
+  felix:
+    # -- Specifies the resources for the felix container
     resources: {}
       # limits:
       #   cpu: 200m
@@ -144,6 +147,24 @@ daemon:
     timeoutSeconds: 5
     failureThreshold: 5
 
+typha:
+  # -- The number of typha pods
+  ## We recommend using Typha if you have more than 50 nodes.  Above 100 nodes it is essential.
+  ## Use one replica for every 100-200 nodes.  In production, we recommend running at least 3
+  ## replicas to reduce the impact of rolling upgrade.
+  replicas: 3
+
+  # -- The proxy server port of calico-typha on every node
+  serverPort: 5473
+
+  # -- Specifies the resources for the typha container
+  resources: {}
+    # limits:
+    #   cpu: 200m
+    #   memory: 256Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
 
 # -- Whether pod IP of stateful workloads will be retained by default. true or false
 ## Ref: https://github.com/alibaba/hybridnet/wiki/Static-pod-ip-addresses-for-StatefulSet

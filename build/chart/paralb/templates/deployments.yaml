@@ -1,0 +1,118 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: paralb-webhook
+  namespace: kube-system
+  annotations:
+    kubernetes.io/description: "paralb webhook"
+spec:
+  replicas: {{ .Values.webhook.replicas }}
+  selector:
+    matchLabels:
+      app: paralb
+      component: webhook
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: paralb
+        component: webhook
+    spec:
+      tolerations:
+        - operator: Exists
+          effect: NoSchedule
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      priorityClassName: system-cluster-critical
+      serviceAccountName: paralb
+      hostNetwork: true
+      containers:
+        - name: paralb-webhook
+          image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.paralb.image }}:{{ .Values.images.paralb.tag }}"
+          imagePullPolicy: IfNotPresent
+          command:
+            - /paralb-webhook
+          args:
+            - --port=9891
+          ports:
+            - containerPort: 9891
+              name: webhook-port
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: paralb-manager
+  namespace: kube-system
+  annotations:
+    kubernetes.io/description: "paralb manager"
+spec:
+  replicas: {{ .Values.manager.replicas }}
+  selector:
+    matchLabels:
+      app: paralb
+      component: manager
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: paralb
+        component: manager
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: paralb
+                  component: manager
+              topologyKey: kubernetes.io/hostname
+      priorityClassName: system-cluster-critical
+      serviceAccountName: paralb
+      hostNetwork: true
+      containers:
+        - name: paralb-manager
+          image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.paralb.image }}:{{ .Values.images.paralb.tag }}"
+          imagePullPolicy: IfNotPresent
+          command:
+            - /paralb-manager
+          args:
+            - --leader-election-namespace=kube-system
+            - --enable-class-filter=true
+            - --enable-leader-election=true
+            - --metrics-bind-address=:16800
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1Gi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: MEMBERLIST_BIND_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: MANAGER_SPEAKER_LABELS
+              value: "app=paralb,component=manager"
+            - name: PARTICIPANT_SPEAKER_LABELS
+              value: "app=paralb,component=daemon"
+            - name: COMPONENT-NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists

@@ -1,0 +1,57 @@
+{{ if and .Release.IsInstall .Values.init }}
+---
+apiVersion: networking.alibaba.com/v1
+kind: VIPNetwork
+metadata:
+  name: cnstack-proxy
+spec:
+  netID: 0
+  nodeSelector:
+    {{- toYaml .Values.init.networkNodeSelector | trim | nindent 4 }}
+
+{{ if .Values.init.ingressControllerVIP }}
+---
+apiVersion: networking.alibaba.com/v1
+kind: VIPSubnet
+metadata:
+  name: ingress-controller-vip
+spec:
+  vipNetwork: cnstack-proxy
+  netID: 0
+  range:
+    start: {{ .Values.init.ingressControllerVIP }}
+    end: {{ .Values.init.ingressControllerVIP }}
+    version: "4"
+{{ end }}
+
+{{ if .Values.init.iamGatewayVIP }}
+---
+apiVersion: networking.alibaba.com/v1
+kind: VIPSubnet
+metadata:
+  name: iam-gateway-vip
+spec:
+  vipNetwork: cnstack-proxy
+  netID: 0
+  range:
+    start: {{ .Values.init.iamGatewayVIP }}
+    end: {{ .Values.init.iamGatewayVIP }}
+    version: "4"
+{{ end }}
+
+{{ if .Values.init.apiServerVIP }}
+---
+apiVersion: networking.alibaba.com/v1
+kind: VIPSubnet
+metadata:
+  name: api-server-vip
+spec:
+  vipNetwork: cnstack-proxy
+  netID: 0
+  range:
+    start: {{ .Values.init.apiServerVIP }}
+    end: {{ .Values.init.apiServerVIP }}
+    version: "4"
+{{ end }}
+
+{{ end }}
