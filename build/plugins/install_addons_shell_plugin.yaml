@@ -35,6 +35,24 @@ spec:
       export SvcCIDR=${SvcCIDR:-10.96.0.0/16}
       export PodCIDR=${PodCIDR:-100.64.0.0/16}
     fi
+    
+    # process taints first
+    if [ "${RemoveMasterTaint}" == "true" ];then
+      kubectl taint node node-role.kubernetes.io/master- --all || true
+    fi
+    
+    if [ "${DeployMode}" = "cnstack" ];then
+      infra_nodes=`kubectl get node -l node-role.kubernetes.io/cnstack-infra=`
+      if [ "$infra_nodes" == "" ];then
+        kubectl label node -l node-role.kubernetes.io/master="" node-role.kubernetes.io/cnstack-infra=""
+      fi
+      proxy_nodes=`kubectl get node -l node-role.kubernetes.io/proxy=`
+      if [ "$proxy_nodes" == "" ];then
+        kubectl label node -l node-role.kubernetes.io/master="" node-role.kubernetes.io/proxy=""
+      fi
+      kubectl taint node -l node-role.kubernetes.io/cnstack-infra="" node-role.kubernetes.io/cnstack-infra:NoSchedule --overwrite || true
+      kubectl taint node -l node-role.kubernetes.io/proxy="" node-role.kubernetes.io/cnstack-infra:NoSchedule --overwrite || true
+    fi
 
     bash scripts/install_addons.sh
     if [ $? -ne 0 ];then
@@ -51,10 +69,6 @@ spec:
     kubectl annotate storageclass yoda-lvm-default snapshot.storage.kubernetes.io/is-default-class="true" --overwrite
     kubectl annotate storageclass yoda-lvm-default storageclass.kubernetes.io/is-default-class="true" --overwrite
 
-    if [ "${RemoveMasterTaint}" = "true" ];then
-      kubectl taint node node-role.kubernetes.io/master- --all || true
-    fi
-
     if [ "${SkipHealthCheck}" = "true" ];then
       exit 0
     fi
@@ -63,6 +77,13 @@ spec:
     if [ $? -eq 0 ];then
       exit 0
     fi
-    echo "First time health check fail, try again"
+    echo "First time health check fail, sleep 30 and try again"
+    sleep 30
+    trident health-check --trigger-mode OnlyUnsuccessful
+    if [ $? -eq 0 ];then
+      exit 0
+    fi
+    echo "Second time health check fail, sleep 60 and try again"
+    sleep 60
     trident health-check --trigger-mode OnlyUnsuccessful
     exit $?
