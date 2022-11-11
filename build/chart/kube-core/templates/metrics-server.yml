@@ -83,6 +83,8 @@ spec:
       - operator: Exists
         key: node-role.kubernetes.io/master
         effect: NoSchedule
+      - key: node-role.kubernetes.io/cnstack-infra
+        effect: NoSchedule
       containers:
       - name: metrics-server
         image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.metricsserver.image }}:{{ .Values.images.metricsserver.tag }}"

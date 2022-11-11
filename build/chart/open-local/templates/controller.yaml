@@ -162,6 +162,8 @@ spec:
       - effect: NoSchedule
         key: node-role.kubernetes.io/master
         operator: Exists
+      - key: node-role.kubernetes.io/cnstack-infra
+        effect: NoSchedule
       volumes:
       - emptyDir: {}
         name: socket-dir

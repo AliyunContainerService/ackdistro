@@ -83,6 +83,8 @@ spec:
         - effect: NoSchedule
           key: node-role.kubernetes.io/master
           operator: Exists
+        - key: node-role.kubernetes.io/cnstack-infra
+          effect: NoSchedule
       volumes:
         - hostPath:
             path: /etc/localtime
