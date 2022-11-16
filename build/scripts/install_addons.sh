@@ -43,11 +43,6 @@ CoreDnsIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 10` || panic "fai
 
 YodaSchedulerSvcIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 4` || panic "failed to get yoda svc ip"
 
-if [ "$RegistryIP" == "" ];then
-  echo "RegistryIP is empty, use default ip address of master0"
-  RegistryIP=`trident get-default-route-ip --ip-family ${HostIPFamily}`
-fi
-
 RegistryDomain=${RegistryURL%:*}
 # Apply yamls
 for f in `ls ack-distro-yamls`;do
@@ -97,6 +92,35 @@ manager:
 webhook:
   replicas: ${NumOfMasters}
 EOF
+
+# generate cluster info
+if [ "$GenerateClusterInfo" == "true" ];then
+  cat >/tmp/clusterinfo-cm.yaml <<EOF
+---
+apiVersion: v1
+data:
+  gatewayAddress: "${gatewayAddress}"
+  gatewayInternalIP: "${gatewayInternalIP}"
+  gatewayPort: "${gatewayPort}"
+  gatewayAPIServerPort: "${gatewayAPIServerPort}"
+  ingressAddress: "${ingressAddress}"
+  ingressInternalIP: "${ingressInternalIP}"
+  ingressHttpPort: "${ingressHttpPort}"
+  ingressHttpsPort: "${ingressHttpsPort}"
+  harborAddress: "${harborAddress}"
+  vcnsOssAddress: "${vcnsOssAddress}"
+  scale: "${scale}"
+  clusterDomain: "${DNSDomain}"
+  registryURL: "${RegistryURL}"
+  RegistryURL: "${RegistryURL}"
+kind: ConfigMap
+metadata:
+  name: clusterinfo
+  namespace: kube-public
+EOF
+
+  kubectl apply -f /tmp/clusterinfo-cm.yaml
+fi
 
 # wait 120s for apiserver ready
 for i in `seq 1 12`;do

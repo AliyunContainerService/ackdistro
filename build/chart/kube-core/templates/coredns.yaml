@@ -51,6 +51,9 @@ spec:
             - name: config-volume
               mountPath: /etc/coredns
               readOnly: true
+            - name: config-ackdistro
+              mountPath: /ackdistro
+              readOnly: true
           ports:
             - containerPort: 53
               name: dns
@@ -88,6 +91,9 @@ spec:
         - name: config-volume
           configMap:
             name: coredns
+        - name: config-ackdistro
+          configMap:
+            name: coredns-ackdistro
 ---
 apiVersion: v1
 kind: Service

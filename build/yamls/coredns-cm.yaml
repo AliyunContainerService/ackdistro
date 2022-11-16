@@ -17,8 +17,8 @@ data:
            fallthrough in-addr.arpa ip6.arpa
            ttl 30
         }
-        hosts {
-           ##REGISTRY_IP## ##REGISTRY_DOMAIN##
+        hosts /ackdistro/hosts {
+           reload 300ms
            fallthrough
         }
         prometheus :9153
@@ -30,3 +30,12 @@ data:
         reload
         loadbalance
     }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-ackdistro
+  namespace: kube-system
+data:
+  hosts: |
+    ##REGISTRY_IP## ##REGISTRY_DOMAIN##

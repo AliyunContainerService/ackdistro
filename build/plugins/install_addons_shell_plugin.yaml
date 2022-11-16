@@ -10,7 +10,8 @@ spec:
     set -x
     export DNSDomain=${DNSDomain:-cluster.local}
     export HostIPFamily=${HostIPFamily:-4}
-    export RegistryIP=${RegistryIP}
+    export Master0IP=`trident get-default-route-ip --ip-family ${HostIPFamily}`  
+    export RegistryIP=${RegistryIP:-${Master0IP}}
     export EnableLocalDNSCache=${EnableLocalDNSCache:-false}
     export MTU=${MTU:-1440}
     export IPIP=${IPIP:-Always}
@@ -29,7 +30,19 @@ spec:
     export IngressExternalPort=${IngressExternalPort}
     export KUBECONFIG=/etc/kubernetes/admin.conf
     export PlatformType=${PlatformType}
-    export ComponentToInstall=${ComponentToInstall:-logging,monitor,disaster-recovery}
+    export ComponentToInstall=${ComponentToInstall}
+    export GenerateClusterInfo=${GenerateClusterInfo:-true}
+    export gatewayAddress=${gatewayAddress:-${Master0IP}}
+    export gatewayInternalIP=${gatewayInternalIP:-${Master0IP}}
+    export gatewayPort=${gatewayPort:-30383}
+    export gatewayAPIServerPort=${gatewayAPIServerPort:-30384}
+    export ingressAddress=${ingressAddress:-${Master0IP}}
+    export ingressInternalIP=${ingressInternalIP:-${Master0IP}}
+    export ingressHttpPort=${ingressHttpPort:-80}
+    export ingressHttpsPort=${ingressHttpsPort:-443}
+    export scale=${scale:-small}
+    export harborAddress=${harborAddress:-harbor.cnstack.local}
+    export vcnsOssAddress=${vcnsOssAddress:-vcns-oss.cnstack.local}
 
     if [ "$HostIPFamily" = "6" ];then
       export SvcCIDR=${SvcCIDR:-4408:4003:10bb:6a01:83b9:6360:c66d:0000/112}
@@ -42,6 +55,16 @@ spec:
     # process taints first
     if [ "${RemoveMasterTaint}" == "true" ];then
       kubectl taint node node-role.kubernetes.io/master- --all || true
+    fi
+    
+    # hack
+    infra_nodes=`kubectl get node -l node-role.kubernetes.io/cnstack-infra=`
+    if [ "$infra_nodes" == "" ];then
+      kubectl label node -l node-role.kubernetes.io/master="" node-role.kubernetes.io/cnstack-infra=""
+    fi
+    proxy_nodes=`kubectl get node -l node-role.kubernetes.io/proxy=`
+    if [ "$proxy_nodes" == "" ];then
+      kubectl label node -l node-role.kubernetes.io/master="" node-role.kubernetes.io/proxy=""
     fi
     
     if [ "${PlatformType}" = "enterprise" ];then
