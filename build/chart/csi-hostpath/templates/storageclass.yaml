@@ -2,6 +2,8 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: {{ .Values.hostpath_name }}
+  annotations:
+    cnstack.alibabacloud.com/description: "用于创建hostpath类型本地存储卷"
   labels:
     app: {{ .Values.hostpath_name }}
 provisioner: {{ .Values.driver_name }}
