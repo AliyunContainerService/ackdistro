@@ -181,4 +181,4 @@ multiCluster: false
 defaultIPFamily: IPv4
 
 # -- Enable the support of retaining IP for kubevirt VM. true or false
-vmIPRetain: false
+vmIPRetain: true
