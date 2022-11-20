@@ -1,0 +1,18 @@
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: pre_init_host # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: pre-init-host
+  scope: master | node
+  data: |
+    set -x
+    export HostIPFamily=${HostIPFamily:-4}
+    export HostIP=${HostIP}
+    export IPv6DualStack=${IPv6DualStack:-false}
+
+    bash scripts/pre_init_host.sh
+    if [ $? -ne 0 ];then
+      exit 1
+    fi

@@ -1,0 +1,51 @@
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: post_scaleup # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: post-scaleup
+  data: |
+    set -x
+    export RemoveMasterTaint=${RemoveMasterTaint}
+    export PlatformType=${PlatformType}
+    export ComponentToInstall=${ComponentToInstall}
+    
+    export KUBECONFIG=/etc/kubernetes/admin.conf
+
+    # process taints first
+    if [ "${RemoveMasterTaint}" == "true" ];then
+      kubectl taint node node-role.kubernetes.io/master- --all || true
+    fi
+    
+    # hack
+    infra_nodes=`kubectl get node -l node-role.kubernetes.io/cnstack-infra=`
+    if [ "$infra_nodes" == "" ];then
+      kubectl label node -l node-role.kubernetes.io/master="" node-role.kubernetes.io/cnstack-infra=""
+    fi
+    proxy_nodes=`kubectl get node -l node-role.kubernetes.io/proxy=`
+    if [ "$proxy_nodes" == "" ];then
+      kubectl label node -l node-role.kubernetes.io/master="" node-role.kubernetes.io/proxy=""
+    fi
+    
+    if [ "${PlatformType}" = "enterprise" ];then
+      infra_nodes=`kubectl get node -l node-role.kubernetes.io/cnstack-infra=`
+      if [ "$infra_nodes" == "" ];then
+        kubectl label node -l node-role.kubernetes.io/master="" node-role.kubernetes.io/cnstack-infra=""
+      fi
+      proxy_nodes=`kubectl get node -l node-role.kubernetes.io/proxy=`
+      if [ "$proxy_nodes" == "" ];then
+        kubectl label node -l node-role.kubernetes.io/master="" node-role.kubernetes.io/proxy=""
+      fi
+      kubectl taint node -l node-role.kubernetes.io/cnstack-infra="" node-role.kubernetes.io/cnstack-infra:NoSchedule --overwrite || true
+      kubectl taint node -l node-role.kubernetes.io/proxy="" node-role.kubernetes.io/cnstack-infra:NoSchedule --overwrite || true
+    fi
+
+    sleep 15
+    if [ "${ComponentToInstall}" != "" ];then
+      ComponentToInstallFlag="--component-to-install ${ComponentToInstall}"
+    fi
+    trident on-sealer -f /root/.sealer/Clusterfile --sealer --dump-managed-cluster ${ComponentToInstallFlag}
+    if [ $? -ne 0 ];then
+      exit 1
+    fi

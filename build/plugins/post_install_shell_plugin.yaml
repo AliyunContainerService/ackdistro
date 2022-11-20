@@ -1,11 +1,10 @@
 apiVersion: sealer.aliyun.com/v1alpha1
 kind: Plugin
 metadata:
-  name: install-addons # Specify this plugin name,will dump in $rootfs/plugin dir.
+  name: post_install # Specify this plugin name,will dump in $rootfs/plugin dir.
 spec:
   type: SHELL
   action: post-install
-  scope: master0
   data: |
     set -x
     export DNSDomain=${DNSDomain:-cluster.local}
@@ -24,11 +23,6 @@ spec:
     export Addons=${Addons}
     export Network=${Network}
     export RemoveMasterTaint=${RemoveMasterTaint}
-    export ApiServerExternalIP=${ApiServerExternalIP}
-    export ApiServerExternalPort=${ApiServerExternalPort}
-    export IngressExternalIP=${IngressExternalIP}
-    export IngressExternalPort=${IngressExternalPort}
-    export KUBECONFIG=/etc/kubernetes/admin.conf
     export PlatformType=${PlatformType}
     export ComponentToInstall=${ComponentToInstall}
     export GenerateClusterInfo=${GenerateClusterInfo:-true}
@@ -43,6 +37,10 @@ spec:
     export scale=${scale:-small}
     export harborAddress=${harborAddress:-harbor.cnstack.local}
     export vcnsOssAddress=${vcnsOssAddress:-vcns-oss.cnstack.local}
+    export apiServerInternalIP=${apiServerInternalIP}
+    export apiServerInternalPort=${apiServerInternalPort}
+
+    export KUBECONFIG=/etc/kubernetes/admin.conf
 
     if [ "$HostIPFamily" = "6" ];then
       export SvcCIDR=${SvcCIDR:-4408:4003:10bb:6a01:83b9:6360:c66d:0000/112}

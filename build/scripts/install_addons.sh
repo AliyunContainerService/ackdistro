@@ -5,35 +5,6 @@ source "${scripts_path}"/utils.sh
 
 set -x
 
-set_logrotate() {
-  # logrotate
-  cat >/etc/logrotate.d/allvarlogs <<EOF
-/var/log/*.log
-/var/log/messages {
-    copytruncate
-    missingok
-    notifempty
-    compress
-    hourly
-    maxsize 100M
-    rotate 5
-    dateext
-    dateformat -%Y%m%d-%s
-    create 0644 root root
-}
-EOF
-
-  if [ ! -f "/etc/cron.hourly/logrotate" ]; then
-    cp "${scripts_path}"/logrotate /etc/cron.hourly/logrotate
-  fi
-}
-
-set_logrotate
-
-# copy bins
-chmod +x ${scripts_path}/../bin/*
-cp -f ${scripts_path}/../bin/* /usr/bin/ || true
-
 # copy generate adp license script
 cp "${scripts_path}/../etc/generate-adp-license.sh" /usr/bin/ || true
 chmod +x /usr/bin/generate-adp-license.sh || true
@@ -76,13 +47,11 @@ global:
   NumOfMasters: ${NumOfMasters}
   IPv6DualStack: ${IPv6DualStack}
   IPVSExcludeCIDRs: 10.103.97.2/32,1248:4003:10bb:6a01:83b9:6360:c66d:0002/128
-  ApiServerExternalIP: ${ApiServerExternalIP}
-  ApiServerExternalPort: ${ApiServerExternalPort}
-  IngressExternalIP: ${IngressExternalIP}
-  IngressExternalPort: ${IngressExternalPort}
 init:
   cidr: ${PodCIDR%,*}
   ipVersion: "${HostIPFamily}"
+  ingressControllerVIP: "${ingressInternalIP}"
+  apiServerVIP: "${apiServerInternalIP}"
 defaultIPFamily: IPv${HostIPFamily}
 multiCluster: true
 daemon:
@@ -165,7 +134,7 @@ helm -n kube-system upgrade -i etcd-backup chart/etcd-backup -f /tmp/ackd-helmco
 
 echo "sleep 15 for l-zero crds ready"
 sleep 15
-helm -n acs-system upgrade -i l-zero-library chart/l-zero-library -f /tmp/ackd-helmconfig.yaml
+helm -n kube-system upgrade -i l-zero-library chart/l-zero-library -f /tmp/ackd-helmconfig.yaml
 
 # install optional addons
 IFS=,
@@ -173,7 +142,7 @@ for addon in ${Addons};do
   if [ "$addon" == "kube-prometheus-stack" ];then
     addon="kube-prometheus-crds"
   fi
-  helm -n acs-system upgrade -i ${addon} chart/${addon} -f /tmp/ackd-helmconfig.yaml
+  helm -n kube-system upgrade -i ${addon} chart/${addon} -f /tmp/ackd-helmconfig.yaml
 done
 IFS="
 "
