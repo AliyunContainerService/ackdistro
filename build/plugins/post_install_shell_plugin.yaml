@@ -87,7 +87,10 @@ spec:
     if [ "${ComponentToInstall}" != "" ];then
       ComponentToInstallFlag="--component-to-install ${ComponentToInstall}"
     fi
-    trident on-sealer -f /root/.sealer/Clusterfile --sealer --dump-managed-cluster ${ComponentToInstallFlag}
+    if [ "${PlatformCAPath}" != "" ];then
+      PlatformCAFlag="--ca-path ${PlatformCAPath} --key-path ${PlatformCAKeyPath}"
+    fi
+    trident on-sealer -f /root/.sealer/Clusterfile --sealer --dump-managed-cluster ${ComponentToInstallFlag} ${PlatformCAFlag}
     if [ $? -ne 0 ];then
       exit 1
     fi
