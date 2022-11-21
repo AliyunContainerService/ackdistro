@@ -48,10 +48,12 @@ if [ "${IPv6DualStack}" = "true" ];then
   fi
 fi
 
+KUBELET_EXTRA_ARGS="KUBELET_EXTRA_ARGS=--node-labels=ack-d.alibabacloud.com/managed-node=true"
+
 if [ "${HostIP}" = "" ];then
   echo "Can't find HostIP in env, skip configure --node-ip"
 else
-  KUBELET_EXTRA_ARGS="KUBELET_EXTRA_ARGS=--node-ip=${HostIP}"
+  KUBELET_EXTRA_ARGS="${KUBELET_EXTRA_ARGS} --node-ip=${HostIP}"
   if [ "${IPv6DualStack}" = "true" ];then
     family_of_ip_need_get=6
     if [ "${HostIPFamily}" = "6" ];then
