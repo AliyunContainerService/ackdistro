@@ -62,35 +62,6 @@ webhook:
   replicas: ${NumOfMasters}
 EOF
 
-# generate cluster info
-if [ "$GenerateClusterInfo" == "true" ];then
-  cat >/tmp/clusterinfo-cm.yaml <<EOF
----
-apiVersion: v1
-data:
-  gatewayAddress: "${gatewayAddress}"
-  gatewayInternalIP: "${gatewayInternalIP}"
-  gatewayPort: "${gatewayPort}"
-  gatewayAPIServerPort: "${gatewayAPIServerPort}"
-  ingressAddress: "${ingressAddress}"
-  ingressInternalIP: "${ingressInternalIP}"
-  ingressHttpPort: "${ingressHttpPort}"
-  ingressHttpsPort: "${ingressHttpsPort}"
-  harborAddress: "${harborAddress}"
-  vcnsOssAddress: "${vcnsOssAddress}"
-  scale: "${scale}"
-  clusterDomain: "${DNSDomain}"
-  registryURL: "${RegistryURL}"
-  RegistryURL: "${RegistryURL}"
-kind: ConfigMap
-metadata:
-  name: clusterinfo
-  namespace: kube-public
-EOF
-
-  kubectl apply -f /tmp/clusterinfo-cm.yaml
-fi
-
 # wait 120s for apiserver ready
 for i in `seq 1 12`;do
   sleep 10

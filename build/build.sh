@@ -85,7 +85,10 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
     IFS=" "
 fi
 
-echo -n `git log -1 --pretty=format:%h` > VERSION
+version=`git log -1 --pretty=format:%h` || true
+if [ "$version" != "" ];then
+  echo -n  > VERSION
+fi
 
 #if [ "$(git branch --show-current)" == "main" ]; then
 #  wget https://gosspublic.alicdn.com/ossutil/1.7.8/ossutil64?spm=a2c4g.11186623.0.0.bcbf1770zMJhXK -O ossutil64

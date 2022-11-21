@@ -91,7 +91,40 @@ spec:
     if [ $? -ne 0 ];then
       exit 1
     fi
-
+    
+    rootCA=`kubectl -n kube-system get secret root-ca -ojsonpath='{.data.tls\.crt}'`
+    
+    # generate cluster info
+    if [ "$GenerateClusterInfo" == "true" ];then
+      cat >/tmp/clusterinfo-cm.yaml <<EOF
+    ---
+    apiVersion: v1
+    data:
+      gatewayAddress: "${gatewayAddress}"
+      gatewayInternalIP: "${gatewayInternalIP}"
+      gatewayPort: "${gatewayPort}"
+      gatewayAPIServerPort: "${gatewayAPIServerPort}"
+      ingressAddress: "${ingressAddress}"
+      ingressInternalIP: "${ingressInternalIP}"
+      ingressHttpPort: "${ingressHttpPort}"
+      ingressHttpsPort: "${ingressHttpsPort}"
+      harborAddress: "${harborAddress}"
+      vcnsOssAddress: "${vcnsOssAddress}"
+      scale: "${scale}"
+      clusterDomain: "${DNSDomain}"
+      registryURL: "${RegistryURL}"
+      RegistryURL: "${RegistryURL}"
+      ca-crt: "${rootCA}"
+      caCrt: "${rootCA}"
+    kind: ConfigMap
+    metadata:
+      name: clusterinfo
+      namespace: kube-public
+    EOF
+    
+      kubectl apply -f /tmp/clusterinfo-cm.yaml
+    fi
+    
     # set default storageclass and snapshot
     kubectl annotate storageclass yoda-lvm-default snapshot.storage.kubernetes.io/is-default-class="true" --overwrite
     kubectl annotate storageclass yoda-lvm-default storageclass.kubernetes.io/is-default-class="true" --overwrite
