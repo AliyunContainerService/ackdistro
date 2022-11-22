@@ -82,21 +82,7 @@ spec:
     if [ $? -ne 0 ];then
       exit 1
     fi
-
-    sleep 15
-    if [ "${ComponentToInstall}" != "" ];then
-      ComponentToInstallFlag="--component-to-install ${ComponentToInstall}"
-    fi
-    if [ "${PlatformCAPath}" != "" ];then
-      PlatformCAFlag="--ca-path ${PlatformCAPath} --key-path ${PlatformCAKeyPath}"
-    fi
-    trident on-sealer -f /root/.sealer/Clusterfile --sealer --dump-managed-cluster ${ComponentToInstallFlag} ${PlatformCAFlag}
-    if [ $? -ne 0 ];then
-      exit 1
-    fi
-    
-    rootCA=`kubectl -n kube-system get secret root-ca -ojsonpath='{.data.tls\.crt}'`
-    
+        
     # generate cluster info
     if [ "$GenerateClusterInfo" == "true" ];then
       cat >/tmp/clusterinfo-cm.yaml <<EOF
@@ -117,8 +103,6 @@ spec:
       clusterDomain: "${DNSDomain}"
       registryURL: "${RegistryURL}"
       RegistryURL: "${RegistryURL}"
-      ca-crt: "${rootCA}"
-      caCrt: "${rootCA}"
     kind: ConfigMap
     metadata:
       name: clusterinfo
@@ -126,6 +110,18 @@ spec:
     EOF
     
       kubectl apply -f /tmp/clusterinfo-cm.yaml
+    fi
+    
+    sleep 15
+    if [ "${ComponentToInstall}" != "" ];then
+      ComponentToInstallFlag="--component-to-install ${ComponentToInstall}"
+    fi
+    if [ "${PlatformCAPath}" != "" ];then
+      PlatformCAFlag="--ca-path ${PlatformCAPath} --key-path ${PlatformCAKeyPath}"
+    fi
+    trident on-sealer -f /root/.sealer/Clusterfile --sealer --dump-managed-cluster ${ComponentToInstallFlag} ${PlatformCAFlag}
+    if [ $? -ne 0 ];then
+      exit 1
     fi
     
     # set default storageclass and snapshot
