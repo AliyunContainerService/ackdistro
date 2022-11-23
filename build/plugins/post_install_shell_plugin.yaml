@@ -26,12 +26,14 @@ spec:
     export PlatformType=${PlatformType}
     export ComponentToInstall=${ComponentToInstall}
     export GenerateClusterInfo=${GenerateClusterInfo:-true}
-    export gatewayAddress=${gatewayAddress:-${Master0IP}}
+    export gatewayAddress=${gatewayAddress:-cnstack.local}
     export gatewayInternalIP=${gatewayInternalIP:-${Master0IP}}
+    export gatewayExternalIP=${gatewayExternalIP:-${Master0IP}}
     export gatewayPort=${gatewayPort:-30383}
     export gatewayAPIServerPort=${gatewayAPIServerPort:-30384}
-    export ingressAddress=${ingressAddress:-${Master0IP}}
+    export ingressAddress=${ingressAddress:-ingress.cnstack.local}
     export ingressInternalIP=${ingressInternalIP:-${Master0IP}}
+    export ingressExternalIP=${ingressExternalIP:-${Master0IP}}
     export ingressHttpPort=${ingressHttpPort:-80}
     export ingressHttpsPort=${ingressHttpsPort:-443}
     export scale=${scale:-small}
@@ -90,10 +92,12 @@ spec:
     apiVersion: v1
     data:
       gatewayAddress: "${gatewayAddress}"
+      gatewayExternalIP: "${gatewayExternalIP}"
       gatewayInternalIP: "${gatewayInternalIP}"
       gatewayPort: "${gatewayPort}"
       gatewayAPIServerPort: "${gatewayAPIServerPort}"
       ingressAddress: "${ingressAddress}"
+      ingressExternalIP: "${ingressExternalIP}"
       ingressInternalIP: "${ingressInternalIP}"
       ingressHttpPort: "${ingressHttpPort}"
       ingressHttpsPort: "${ingressHttpsPort}"
