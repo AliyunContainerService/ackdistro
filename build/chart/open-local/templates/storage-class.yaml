@@ -32,6 +32,8 @@ apiVersion: snapshot.storage.k8s.io/v1
 kind: VolumeSnapshotClass
 metadata:
   name: {{ .Values.storageclass.lvm.name }}
+  annotations:
+    velero.io/csi-volumesnapshot-class: "true"
 {{ include "local.labels" . | indent 2 }}
 driver: {{ .Values.driver }}
 deletionPolicy: Delete
