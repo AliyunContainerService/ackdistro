@@ -114,6 +114,7 @@ spec:
     EOF
     
       kubectl apply -f /tmp/clusterinfo-cm.yaml
+      GenerateCAFlag="--generate-ca"
     fi
     
     sleep 15
@@ -123,7 +124,7 @@ spec:
     if [ "${PlatformCAPath}" != "" ];then
       PlatformCAFlag="--ca-path ${PlatformCAPath} --key-path ${PlatformCAKeyPath}"
     fi
-    trident on-sealer -f /root/.sealer/Clusterfile --sealer --dump-managed-cluster --generate-ca $GenerateClusterInfo ${ComponentToInstallFlag} ${PlatformCAFlag}
+    trident on-sealer -f /root/.sealer/Clusterfile --sealer --dump-managed-cluster ${GenerateCAFlag} ${ComponentToInstallFlag} ${PlatformCAFlag}
     if [ $? -ne 0 ];then
       exit 1
     fi
