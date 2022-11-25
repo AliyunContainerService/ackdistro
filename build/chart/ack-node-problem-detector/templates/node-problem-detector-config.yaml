@@ -23,6 +23,11 @@ data:
             	"reason": "CPUTemperatureNormal",
             	"message": "CPU temperature normal"
             },
+            {
+            	"type": "Kernel.HardwareErr",
+            	"reason": "HardwareHasNoError",
+            	"message": "Hardware has no error"
+            },
         ],
         "rules": [
             {
@@ -73,6 +78,18 @@ data:
             	"condition": "Kernel.CPUTemperatureHigh",
             	"reason": "CPUTemperatureHigh",
             	"pattern": "temperature above threshold.*"
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.HardwareErr",
+            	"reason": "NvmeError",
+            	"pattern": "nvme.* Timeout I/O"
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.HardwareErr",
+            	"reason": "NvmeError",
+            	"pattern": "nvme.* timeout.*"
             },
         ]
     }
