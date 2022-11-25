@@ -1097,7 +1097,12 @@ data:
           "type": "Container.LogPermission",
           "reason": "LogDirectoryPermissionIsOK",
           "message": "/var/log directory permission is 755"
-        }
+        },
+        {
+          "type": "Node.DiskUnmount",
+          "reason": "DiskUnmount",
+          "message": "Disk mountpoints are ok"
+        },
       ],
       "rules": [
         {
@@ -1120,7 +1125,14 @@ data:
           "reason": "LogDirectoryPermissionUnhealthy",
           "path": "/config/plugin/check_log_directory_permission.sh",
           "timeout": "60s"
-        }
+        },
+        {
+          "type": "permanent",
+          "condition": "Node.DiskUnmount",
+          "reason": "DiskUnmount",
+          "path": "/config/plugin/check_disk_unmount.sh",
+          "timeout": "5s"
+        },
       ]
     }
   check_container_net.sh: |
@@ -1328,6 +1340,19 @@ data:
         echo ${UNKNOWN}
         return
     }
+  check_disk_mount.sh: |
+    #!/usr/bin/env bash
+
+    source "$(cd "$(dirname $0)/.." || exit 0; pwd)/lib/lib.sh"
+
+    mnt_check=$(cat /etc/fstab | grep '^UUID' | grep home | awk '{print $2}' | xargs -r -I {} mountpoint {})
+
+    if [[ $? ==  0 ]]; then
+        exit "${OK}"
+    else
+        echo "${mnt_check}"
+        exit "${NONOK}"
+    fi
 kind: ConfigMap
 metadata:
   name: node-problem-detector-config
