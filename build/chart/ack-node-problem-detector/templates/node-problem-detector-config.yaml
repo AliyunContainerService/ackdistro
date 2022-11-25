@@ -17,7 +17,12 @@ data:
                 "type": "ReadonlyFilesystem",
                 "reason": "FilesystemIsReadOnly",
                 "message": "Filesystem is read-only"
-            }
+            },
+            {
+            	"type": "Kernel.CPUTemperatureHigh",
+            	"reason": "CPUTemperatureNormal",
+            	"message": "CPU temperature normal"
+            },
         ],
         "rules": [
             {
@@ -62,7 +67,13 @@ data:
                 "condition": "ReadonlyFilesystem",
                 "reason": "FilesystemIsReadOnly",
                 "pattern": "Remounting filesystem read-only"
-            }
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.CPUTemperatureHigh",
+            	"reason": "CPUTemperatureHigh",
+            	"pattern": "temperature above threshold.*"
+            },
         ]
     }
   docker-monitor.json: |
