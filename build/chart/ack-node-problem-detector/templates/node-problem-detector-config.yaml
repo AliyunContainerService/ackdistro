@@ -28,6 +28,16 @@ data:
             	"reason": "HardwareHasNoError",
             	"message": "Hardware has no error"
             },
+            {
+            	"type": "Kernel.CPUSoftLockErr",
+            	"reason": "CPUHasNotSoftLockError",
+            	"message": "CPU has not soft lockup"
+            },
+            {
+            	"type": "Kernel.CPUHardLockErr",
+            	"reason": "CPUHasNotHardLockError",
+            	"message": "CPU has not hard lockup"
+            },
         ],
         "rules": [
             {
@@ -90,6 +100,18 @@ data:
             	"condition": "Kernel.HardwareErr",
             	"reason": "NvmeError",
             	"pattern": "nvme.* timeout.*"
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.CPUSoftLockErr",
+            	"reason": "CPUSoftLockup",
+            	"pattern": "BUG: soft lockup.*"
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.CPUHardLockErr",
+            	"reason": "CPUHardLockup",
+            	"pattern": "NMI watchdog: Watchdog detected hard LOCKUP.*"
             },
         ]
     }
@@ -851,7 +873,6 @@ data:
       },
       "source": "system-custom-plugin-monitor.json",
       "conditions": [
-
         {
           "type": "Node.IOPressureOK",
           "reason": "CPULoadOK",
@@ -861,7 +882,27 @@ data:
           "type": "Node.IOHang",
           "reason": "IOHangOK",
           "message": "IO hang is not happening"
-        }
+        },
+        {
+          "type": "Node.DiskUnmount",
+          "reason": "DiskUnmount",
+          "message": "Disk mountpoints are ok"
+        },
+        {
+          "type": "Node.CGroupPressure",
+          "reason": "CgroupInLimit",
+          "message": "Cgroup counts in limit"
+        },
+        {
+          "type": "Node.CGroupMountHealthy",
+          "reason": "CgroupMountHealthy",
+          "message": "Cgroup mount status is ok"
+        },
+        {
+          "type": "Node.SystemdCgroupExist",
+          "reason": "SystemdCgroupExist",
+          "message": "Systemd cgroup exists"
+        },
       ],
       "rules": [
         {
@@ -877,7 +918,35 @@ data:
           "reason": "IOHang",
           "path": "/config/plugin/check_io_hang.sh",
           "timeout": "60s"
-        }
+        },
+        {
+          "type": "permanent",
+          "condition": "Node.DiskUnmount",
+          "reason": "DiskUnmount",
+          "path": "/config/plugin/check_disk_unmount.sh",
+          "timeout": "5s"
+        },
+        {
+          "type": "permanent",
+          "condition": "Node.CGroupPressure",
+          "reason": "TooManyCGroups",
+          "path": "/config/plugin/check_cgroup_num.sh",
+          "timeout": "60s"
+        },
+        {
+          "type": "permanent",
+          "condition": "Node.CGroupMountHealthy",
+          "reason": "CgroupMountUnhealthy",
+          "path": "/config/plugin/check_cgroup_mount.sh",
+          "timeout": "60s"
+        },
+        {
+          "type": "permanent",
+          "condition": "Node.SystemdCgroupExist",
+          "reason": "SystemdCgroupNotExist",
+          "path": "/config/plugin/check_systemd_cgroup_exist.sh",
+          "timeout": "60s"
+        },
       ]
     }
   check_cpu_load.sh: |
@@ -1126,11 +1195,6 @@ data:
           "reason": "LogDirectoryPermissionIsOK",
           "message": "/var/log directory permission is 755"
         },
-        {
-          "type": "Node.DiskUnmount",
-          "reason": "DiskUnmount",
-          "message": "Disk mountpoints are ok"
-        },
       ],
       "rules": [
         {
@@ -1153,13 +1217,6 @@ data:
           "reason": "LogDirectoryPermissionUnhealthy",
           "path": "/config/plugin/check_log_directory_permission.sh",
           "timeout": "60s"
-        },
-        {
-          "type": "permanent",
-          "condition": "Node.DiskUnmount",
-          "reason": "DiskUnmount",
-          "path": "/config/plugin/check_disk_unmount.sh",
-          "timeout": "5s"
         },
       ]
     }
@@ -1381,6 +1438,134 @@ data:
         echo "${mnt_check}"
         exit "${NONOK}"
     fi
+  check_cgroup_num.sh: |
+    #!/bin/bash
+
+    source "$(cd $(dirname $0)/..;pwd)/lib/lib.sh"
+
+    consistency=0
+    errMsg=""
+
+    # cgroup过多
+    cgroupNumThreshold=1000
+
+    output() {
+      if [[ ${consistency} -eq 0 ]]; then
+        echo "cgroup num is normal"
+        exit ${OK}
+      elif [[ ${consistency} -eq 1 ]]; then
+        echo ${errMsg}
+        exit ${NONOK}
+      else
+        echo ${errMsg}
+        exit ${UNKNOWN}
+      fi
+    }
+
+    # content of /proc/cgroups:
+    #
+    # #subsys_name	hierarchy	num_cgroups	enabled
+    # cpuset	8	268	1
+    # cpu	8	268	1
+    # cpuacct	8	268	1
+    # blkio	5	377	1
+    # memory	2	307	1
+    #
+    # $4=="1" represents it's enabled
+
+    # check cpu cgroup num
+    cgroupNum=$(curl -sg 'localhost:9199/api/v1/query?query=node_num_cgroups{cgroup="cpu"}' | \
+    python -c "import sys, json, re; data=json.load(sys.stdin)['data']
+    resultNum=0
+    count=0
+    for r in data['result']:
+      resultKey=str(r['metric']['cgroup'])
+      resultValue=r['value']
+      if(resultKey == 'cpu' and len(resultValue) == 2):
+        resultNum=resultNum+float(resultValue[1])
+        count=count+1
+    print resultNum/count"
+    )
+
+    if [[ $(echo "${cgroupNum} > ${cgroupNumThreshold}" | bc) -eq 1 ]]; then
+      consistency=1
+      errMsg="number of cgroup is too many: ${cgroupNum}"
+      output
+    fi
+
+    output
+  check_cgroup_mount.sh: |
+    #!/bin/bash
+
+    source "$(cd $(dirname $0)/..;pwd)/lib/lib.sh"
+
+    consistency=0
+    errMsg=""
+
+    output() {
+      if [[ ${consistency} -eq 0 ]]; then
+        echo "cgroup mount is normal"
+        exit ${OK}
+      elif [[ ${consistency} -eq 1 ]]; then
+        echo ${errMsg}
+        exit ${NONOK}
+      fi
+    }
+
+    # `lssubsys -a` shows
+    # cpuset,cpu,cpuacct
+    # blkio
+    # memory
+    # ...
+    # `lssubsys -am` shows
+    # memory /cgroup/memory
+    # ...
+    # The cgroup counts from `lssubsys -a` and `lssubsys -am` should be consistent!
+
+    cgroupNumA=$(lssubsys -a | wc -l)
+    if [[ ! $? -eq 0 ]]; then
+        echo "Failed to exec lssubsys -a"
+        exit ${UNKNOWN}
+    fi
+
+    cgroupNumB=$(lssubsys -am | wc -l)
+    if [[ ! $? -eq 0 ]]; then
+        echo "Failed to exec lssubsys -am"
+        exit ${UNKNOWN}
+    fi
+
+    if [[ "${cgroupNumA}" != "${cgroupNumB}" ]]; then
+      consistency=1
+      errMsg="cgroup mount inconsistent - (lssubsys -a): ${cgroupNumA}, (lssubsys -am): ${cgroupNumB} "
+    fi
+
+    output
+  check_systemd_cgroup_exist.sh: |
+    #!/bin/bash
+
+    source "$(cd $(dirname $0)/..;pwd)/lib/lib.sh"
+
+    exist=1
+    errMsg=""
+    systemdCgroupDir="/sys/fs/cgroup/systemd"
+
+    output() {
+      if [[ ${exist} -eq 1 ]]; then
+        echo "${systemdCgroupDir} exists"
+        exit ${OK}
+      elif [[ ${exist} -eq 0 ]]; then
+        echo ${errMsg}
+        exit ${NONOK}
+      fi
+    }
+
+    if [[ ! -d ${systemdCgroupDir} ]]; then
+      exist=0
+      errMsg="${systemdCgroupDir} does not exist!"
+      output
+    fi
+
+    output
 kind: ConfigMap
 metadata:
   name: node-problem-detector-config
