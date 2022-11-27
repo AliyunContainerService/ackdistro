@@ -89,7 +89,6 @@ spec:
     - IPAutoDetectionMethod=can-reach=8.8.8.8 # calico ip auto-detection method, default is "can-reach=8.8.8.8", see https://projectcalico.docs.tigera.io/archive/v3.8/reference/node/configuration
     - SuspendPeriodHealthCheck=false # suspend period health-check, default is false
     - EnableLocalDNSCache=false # enable local dns cache component, default is false
-    - IPv6DualStack=false # enable IPv6DualStack mode, default is false
     - RemoveMasterTaint=false # remove master taint or not, default is false
     - DockerLimitNOFILE=infinity # set LimitNOFILE for docker.service, default is 1048576
   ssh:
@@ -156,7 +155,7 @@ trident health-check --help
 
 IPv6双栈的配置说明：
 
-1. 节点IP:部署时传入的所有节点地址的地址族需要保持一致，要么都是ipv4，要么都是ipv6，当打开双栈模式时(IPv6DualStack=true)，ACK—Distro 还会额外寻找每个节点上的另一个地址族的默认路由对应的ip，作为Second Host IP
+1. 节点IP:部署时传入的所有节点地址的地址族需要保持一致，要么都是ipv4，要么都是ipv6，ACK-Distro一定会打开双栈模式，因此会尝试额外寻找每个节点上的另一个地址族的默认路由对应的ip，作为Second Host IP
 2. SvcCIDR:部署时必须传入两个svc网段(ipv4段和ipv6段)，用,分隔，第一个svc网段的地址族需要与所有节点的地址族保持一致
 3. PodCIDR:与SvcCIDR一致
 4. 集群组件将使用第一个PodCIDR分配的IP
@@ -171,7 +170,6 @@ spec:
   env:
     - PodCIDR=5408:4003:10bb:6a01:83b9:6360:c66d:0000/112,101.64.0.0/16
     - SvcCIDR=6408:4003:10bb:6a01:83b9:6360:c66d:0000/112,11.96.0.0/16
-    - IPv6DualStack=true
     - LvsImage=ecp_builder/lvscare:v1.1.3-beta.8
   ssh:
     passwd: "passwd"

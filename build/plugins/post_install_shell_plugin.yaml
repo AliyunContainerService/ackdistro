@@ -14,7 +14,7 @@ spec:
     export EnableLocalDNSCache=${EnableLocalDNSCache:-false}
     export MTU=${MTU:-1440}
     export IPIP=${IPIP:-Always}
-    export IPv6DualStack=${IPv6DualStack:-false}
+    export IPv6DualStack=${IPv6DualStack:-true}
     export IPAutoDetectionMethod=${IPAutoDetectionMethod:-can-reach=8.8.8.8}
     export DisableFailureDomain=${DisableFailureDomain:-false}
     export RegistryURL=${RegistryURL:-sea.hub:5000}
@@ -57,27 +57,9 @@ spec:
       kubectl taint node node-role.kubernetes.io/master- --all || true
     fi
     
-    # hack
-    infra_nodes=`kubectl get node -l node-role.kubernetes.io/cnstack-infra=`
-    if [ "$infra_nodes" == "" ];then
-      kubectl label node -l node-role.kubernetes.io/master="" node-role.kubernetes.io/cnstack-infra=""
-    fi
-    proxy_nodes=`kubectl get node -l node-role.kubernetes.io/proxy=`
-    if [ "$proxy_nodes" == "" ];then
-      kubectl label node -l node-role.kubernetes.io/master="" node-role.kubernetes.io/proxy=""
-    fi
-    
-    if [ "${PlatformType}" = "enterprise" ];then
-      infra_nodes=`kubectl get node -l node-role.kubernetes.io/cnstack-infra=`
-      if [ "$infra_nodes" == "" ];then
-        kubectl label node -l node-role.kubernetes.io/master="" node-role.kubernetes.io/cnstack-infra=""
-      fi
-      proxy_nodes=`kubectl get node -l node-role.kubernetes.io/proxy=`
-      if [ "$proxy_nodes" == "" ];then
-        kubectl label node -l node-role.kubernetes.io/master="" node-role.kubernetes.io/proxy=""
-      fi
-      kubectl taint node -l node-role.kubernetes.io/cnstack-infra="" node-role.kubernetes.io/cnstack-infra:NoSchedule --overwrite || true
-      kubectl taint node -l node-role.kubernetes.io/proxy="" node-role.kubernetes.io/cnstack-infra:NoSchedule --overwrite || true
+    if [ "${PlatformType}" != "enterprise" ];then
+      kubectl label node node-role.kubernetes.io/cnstack-infra=""
+      kubectl label node node-role.kubernetes.io/proxy=""
     fi
 
     bash scripts/install_addons.sh

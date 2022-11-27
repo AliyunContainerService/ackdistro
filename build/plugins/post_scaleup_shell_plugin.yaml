@@ -19,26 +19,9 @@ spec:
     fi
     
     # hack
-    infra_nodes=`kubectl get node -l node-role.kubernetes.io/cnstack-infra=`
-    if [ "$infra_nodes" == "" ];then
-      kubectl label node -l node-role.kubernetes.io/master="" node-role.kubernetes.io/cnstack-infra=""
-    fi
-    proxy_nodes=`kubectl get node -l node-role.kubernetes.io/proxy=`
-    if [ "$proxy_nodes" == "" ];then
-      kubectl label node -l node-role.kubernetes.io/master="" node-role.kubernetes.io/proxy=""
-    fi
-    
-    if [ "${PlatformType}" = "enterprise" ];then
-      infra_nodes=`kubectl get node -l node-role.kubernetes.io/cnstack-infra=`
-      if [ "$infra_nodes" == "" ];then
-        kubectl label node -l node-role.kubernetes.io/master="" node-role.kubernetes.io/cnstack-infra=""
-      fi
-      proxy_nodes=`kubectl get node -l node-role.kubernetes.io/proxy=`
-      if [ "$proxy_nodes" == "" ];then
-        kubectl label node -l node-role.kubernetes.io/master="" node-role.kubernetes.io/proxy=""
-      fi
-      kubectl taint node -l node-role.kubernetes.io/cnstack-infra="" node-role.kubernetes.io/cnstack-infra:NoSchedule --overwrite || true
-      kubectl taint node -l node-role.kubernetes.io/proxy="" node-role.kubernetes.io/cnstack-infra:NoSchedule --overwrite || true
+    if [ "${PlatformType}" != "enterprise" ];then
+      kubectl label node node-role.kubernetes.io/cnstack-infra=""
+      kubectl label node node-role.kubernetes.io/proxy=""
     fi
 
     sleep 15

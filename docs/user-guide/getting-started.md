@@ -89,7 +89,6 @@ spec:
     - IPAutoDetectionMethod=can-reach=8.8.8.8 # calico ip auto-detection method, default is "can-reach=8.8.8.8", see https://projectcalico.docs.tigera.io/archive/v3.8/reference/node/configuration
     - SuspendPeriodHealthCheck=false # suspend period health-check, default is false
     - EnableLocalDNSCache=false # enable local dns cache component, default is false
-    - IPv6DualStack=false # enable IPv6DualStack mode, default is false
     - RemoveMasterTaint=false # remove master taint or not, default is false
   ssh:
     passwd: "password"
@@ -170,7 +169,6 @@ spec:
   env:
     - PodCIDR=5408:4003:10bb:6a01:83b9:6360:c66d:0000/112,101.64.0.0/16
     - SvcCIDR=6408:4003:10bb:6a01:83b9:6360:c66d:0000/112,11.96.0.0/16
-    - IPv6DualStack=true
     - LvsImage=ecp_builder/lvscare:v1.1.3-beta.8
   ssh:
     passwd: "passwd"

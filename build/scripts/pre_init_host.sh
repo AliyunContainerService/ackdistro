@@ -36,16 +36,14 @@ cp -f ${scripts_path}/../bin/* /usr/bin/ || true
 
 sysctl -w net.ipv6.conf.all.forwarding=1
 
-if [ "${IPv6DualStack}" = "true" ];then
-  configure_ipv6="net.ipv6.conf.all.disable_ipv6 = 0"
-  echo $configure_ipv6 > /etc/sysctl.d/ack-d-enable-ipv6.conf
-  if ! grep "${configure_ipv6}" /etc/sysctl.conf;then
-    echo "${configure_ipv6}" >> /etc/sysctl.conf
-  fi
-  if ! sysctl --system;then
-    echo "failed to run sysctl, please check"
-    exit 1
-  fi
+configure_ipv6="net.ipv6.conf.all.disable_ipv6 = 0"
+echo $configure_ipv6 > /etc/sysctl.d/ack-d-enable-ipv6.conf
+if ! grep "${configure_ipv6}" /etc/sysctl.conf;then
+  echo "${configure_ipv6}" >> /etc/sysctl.conf
+fi
+if ! sysctl --system;then
+  echo "failed to run sysctl, please check"
+  exit 1
 fi
 
 KUBELET_EXTRA_ARGS="KUBELET_EXTRA_ARGS=--node-labels=ack-d.alibabacloud.com/managed-node=true"
@@ -54,18 +52,16 @@ if [ "${HostIP}" = "" ];then
   echo "Can't find HostIP in env, skip configure --node-ip"
 else
   KUBELET_EXTRA_ARGS="${KUBELET_EXTRA_ARGS} --node-ip=${HostIP}"
-  if [ "${IPv6DualStack}" = "true" ];then
-    family_of_ip_need_get=6
-    if [ "${HostIPFamily}" = "6" ];then
-      family_of_ip_need_get=4
-    fi
+  family_of_ip_need_get=6
+  if [ "${HostIPFamily}" = "6" ];then
+    family_of_ip_need_get=4
+  fi
 
-    chmod +x ./bin/trident
-    cp -f ./bin/trident /usr/bin/trident
-    anotherIP=`trident get-default-route-ip --ip-family ${family_of_ip_need_get}`
-    if [ $? -eq 0 ] && [ "${anotherIP}" != "" ];then
-      KUBELET_EXTRA_ARGS="${KUBELET_EXTRA_ARGS},${anotherIP}"
-    fi
+  chmod +x ./bin/trident
+  cp -f ./bin/trident /usr/bin/trident
+  anotherIP=`trident get-default-route-ip --ip-family ${family_of_ip_need_get}`
+  if [ $? -eq 0 ] && [ "${anotherIP}" != "" ];then
+    KUBELET_EXTRA_ARGS="${KUBELET_EXTRA_ARGS},${anotherIP}"
   fi
 fi
 

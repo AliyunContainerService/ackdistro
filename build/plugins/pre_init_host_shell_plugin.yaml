@@ -10,7 +10,7 @@ spec:
     set -x
     export HostIPFamily=${HostIPFamily:-4}
     export HostIP=${HostIP}
-    export IPv6DualStack=${IPv6DualStack:-false}
+    export IPv6DualStack=${IPv6DualStack:-true}
 
     bash scripts/pre_init_host.sh
     if [ $? -ne 0 ];then
