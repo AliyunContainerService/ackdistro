@@ -10,7 +10,7 @@ Get sealer：
 
 ```bash
 ARCH=amd64 # or arm64
-wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${ARCH}/sealer-latest-linux-${ARCH}.tar.gz -O sealer-latest-linux-${ARCH}.tar.gz && \
+wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${ARCH}/sealer-latest-linux-${ARCH}.tar.gz -O sealer-latest-linux-${ARCH}.tar.gz && \
       tar -xvf sealer-latest-linux-${ARCH}.tar.gz -C /usr/bin
 ```
 

@@ -20,8 +20,8 @@ spec:
     
     # hack
     if [ "${PlatformType}" != "enterprise" ];then
-      kubectl label node node-role.kubernetes.io/cnstack-infra=""
-      kubectl label node node-role.kubernetes.io/proxy=""
+      kubectl label node node-role.kubernetes.io/cnstack-infra="" --all
+      kubectl label node node-role.kubernetes.io/proxy="" --all
     fi
 
     sleep 15

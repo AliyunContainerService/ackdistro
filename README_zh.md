@@ -51,7 +51,7 @@ ACK Distro作为ACK的下游，会紧跟ACK的发版节奏，具体发版策略�
 
 ```shell
 ARCH=amd64 # or arm64
-wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${ARCH}/sealer-latest-linux-${ARCH}.tar.gz -O sealer-latest-linux-${ARCH}.tar.gz && \
+wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${ARCH}/sealer-latest-linux-${ARCH}.tar.gz -O sealer-latest-linux-${ARCH}.tar.gz && \
       tar -xvf sealer-latest-linux-${ARCH}.tar.gz -C /usr/bin
 
 sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
@@ -82,7 +82,7 @@ kubectl get cs
 
 <!-- markdownlint-disable -->
 <div align="">
-  <img src="https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/tmp/C99AB6D2-826D-4546-BEE1-63435972F2C8.png" width="300" title="dingtalk">
+  <img src="https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/tmp/C99AB6D2-826D-4546-BEE1-63435972F2C8.png" width="300" title="dingtalk">
 </div>
 <!-- markdownlint-restore -->
 

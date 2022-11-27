@@ -23,7 +23,7 @@ jobs:
               branch=`echo "$commentbody"|cut -d" " -f3`
               multi_arch=`echo "$commentbody"|cut -d" " -f4`
 
-              wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/amd64/sealer-latest-linux-amd64.tar.gz -O sealer-latest.tar.gz
+              wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/amd64/sealer-latest-linux-amd64.tar.gz -O sealer-latest.tar.gz
               sudo tar -xvf sealer-latest.tar.gz -C /usr/bin
               sudo sealer login ${{secrets.PRIVATEWAREHOUSE}}
               sudo apt install git
