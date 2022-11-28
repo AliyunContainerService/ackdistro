@@ -75,6 +75,7 @@ metadata:
 spec:
   image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5
   env: # all env are NOT necessary
+    - Addons=paralb,kube-prometheus-crds,ack-node-problem-detector # addons to install, now support paralb, kube-prometheus-crds, ack-node-problem-detector
     - PodCIDR=172.45.0.0/16,5408:4003:10bb:6a01:83b9:6360:c66d:0000/112 # pod subnet, support ipv6 cidr, must be dual stack cidr
     - SvcCIDR=10.96.0.0/16,6408:4003:10bb:6a01:83b9:6360:c66d:0000/112 # service subnet, support ipv6 cidr, must be dual stack cidr
     - Network=hybridnet # support hybridnet/calico, default is hybridnet
@@ -85,11 +86,13 @@ spec:
     - KubeletRunDiskSize=100 # unit is GiB, capacity for /var/lib/kubelet, default is 100
     - DNSDomain=cluster.local # default is cluster.local
     - ServiceNodePortRange=30000-32767 # default is 30000-32767
-    - MTU=1440 # mtu for calico interface, default is 1440
-    - IPAutoDetectionMethod=can-reach=8.8.8.8 # calico ip auto-detection method, default is "can-reach=8.8.8.8", see https://projectcalico.docs.tigera.io/archive/v3.8/reference/node/configuration
     - SuspendPeriodHealthCheck=false # suspend period health-check, default is false
     - EnableLocalDNSCache=false # enable local dns cache component, default is false
     - RemoveMasterTaint=false # remove master taint or not, default is false
+    - DockerLimitNOFILE=infinity # set LimitNOFILE for docker.service, default is 1048576
+    - gatewayInternalIP=1.1.1.1 # the gateway internal vip
+    - ingressInternalIP=1.1.1.1 # the ingress internal vip
+    - CertSANs=1.1.1.1 # extra cert sans, if gatewayInternalIP not empty, must set it in CertSANs too
   ssh:
     passwd: "password"
     #user: root # default is root

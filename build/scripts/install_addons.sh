@@ -29,6 +29,11 @@ if [ "$HostIPFamily" == "6" ];then
 fi
 NumOfMasters=$(kubectl get no -l node-role.kubernetes.io/master="" | grep -v NAME | wc -l)
 
+apiServerVIP=${apiServerInternalIP}
+if [ "${gatewayInternalIP}" != "" ];then
+  apiServerVIP=${gatewayInternalIP}
+fi
+
 # Prepare helm config
 cat >/tmp/ackd-helmconfig.yaml <<EOF
 global:
@@ -51,11 +56,13 @@ init:
   cidr: ${PodCIDR%,*}
   ipVersion: "${HostIPFamily}"
   ingressControllerVIP: "${ingressInternalIP}"
-  apiServerVIP: "${apiServerInternalIP}"
+  apiServerVIP: "${apiServerVIP}"
+  iamGatewayVIP: "${gatewayInternalIP}"
 defaultIPFamily: IPv${HostIPFamily}
 multiCluster: true
 daemon:
   vtepAddressCIDRs: ${VtepAddressCIDRs}
+  hostInterface: "${ParalbHostInterface}"
 manager:
   replicas: ${NumOfMasters}
 webhook:

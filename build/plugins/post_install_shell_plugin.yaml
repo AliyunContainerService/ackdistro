@@ -26,6 +26,7 @@ spec:
     export PlatformType=${PlatformType}
     export ComponentToInstall=${ComponentToInstall}
     export GenerateClusterInfo=${GenerateClusterInfo:-true}
+    export ParalbHostInterface=${ParalbHostInterface}
     export gatewayAddress=${gatewayAddress:-cnstack.local}
     export gatewayInternalIP=${gatewayInternalIP:-${Master0IP}}
     export gatewayExternalIP=${gatewayExternalIP:-${Master0IP}}
