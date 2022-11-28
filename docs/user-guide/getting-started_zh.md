@@ -75,8 +75,8 @@ metadata:
 spec:
   image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5
   env: # all env are NOT necessary
-    - PodCIDR=172.45.0.0/16 # pod subnet, support ipv6 cidr, default is 100.64.0.0/16
-    - SvcCIDR=10.96.0.0/16 # service subnet, support ipv6 cidr default is 10.96.0.0/16
+    - PodCIDR=172.45.0.0/16,5408:4003:10bb:6a01:83b9:6360:c66d:0000/112 # pod subnet, support ipv6 cidr, must be dual stack cidr
+    - SvcCIDR=10.96.0.0/16,6408:4003:10bb:6a01:83b9:6360:c66d:0000/112 # service subnet, support ipv6 cidr, must be dual stack cidr
     - Network=hybridnet # support hybridnet/calico, default is hybridnet
     - EtcdDevice=/dev/vdb # EtcdDevice is device for etcd, default is "", which will use system disk
     - StorageDevice=/dev/vdc # StorageDevice is device for kubelet and container daemon, default is "", which will use system disk
