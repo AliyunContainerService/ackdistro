@@ -5,6 +5,14 @@ source "${scripts_path}"/utils.sh
 
 set -x
 
+helm_install() {
+  for i in `seq 1 3`;do
+    sleep $i
+    helm -n kube-system upgrade -i $1 chart/$1 -f /tmp/ackd-helmconfig.yaml && return 0
+  done
+  return 1
+}
+
 # copy generate adp license script
 cp "${scripts_path}/../etc/generate-adp-license.sh" /usr/bin/ || true
 chmod +x /usr/bin/generate-adp-license.sh || true
@@ -29,11 +37,6 @@ if [ "$HostIPFamily" == "6" ];then
 fi
 NumOfMasters=$(kubectl get no -l node-role.kubernetes.io/master="" | grep -v NAME | wc -l)
 
-apiServerVIP=${apiServerInternalIP}
-if [ "${gatewayInternalIP}" != "" ];then
-  apiServerVIP=${gatewayInternalIP}
-fi
-
 # Prepare helm config
 cat >/tmp/ackd-helmconfig.yaml <<EOF
 global:
@@ -56,7 +59,7 @@ init:
   cidr: ${PodCIDR%,*}
   ipVersion: "${HostIPFamily}"
   ingressControllerVIP: "${ingressInternalIP}"
-  apiServerVIP: "${apiServerVIP}"
+  apiServerVIP: "${apiServerInternalIP}"
   iamGatewayVIP: "${gatewayInternalIP}"
 defaultIPFamily: IPv${HostIPFamily}
 multiCluster: true
@@ -79,7 +82,7 @@ if [ $? -ne 0 ];then
 fi
 
 # install kube core addons
-helm -n kube-system upgrade -i kube-core chart/kube-core -f /tmp/ackd-helmconfig.yaml
+helm_install kube-core || panic "failed to install kube-core"
 kubectl create ns acs-system || true
 kubectl create ns cluster-local || true
 
@@ -98,21 +101,21 @@ done
 
 # install net plugin
 if [ "$Network" == "calico" ];then
-  helm -n kube-system upgrade -i calico chart/calico -f /tmp/ackd-helmconfig.yaml
+  helm_install calico || panic "failed to install calico"
 else
-  helm -n kube-system upgrade -i hybridnet chart/hybridnet -f /tmp/ackd-helmconfig.yaml
+  helm_install hybridnet || panic "failed to install hybridnet"
 fi
 
 # install required addons
-helm -n kube-system upgrade -i l-zero chart/l-zero -f /tmp/ackd-helmconfig.yaml
+helm_install l-zero || panic "failed to install l-zero"
 cp -f chart/open-local/values-acka.yaml chart/open-local/values.yaml
-helm -n kube-system upgrade -i open-local chart/open-local -f /tmp/ackd-helmconfig.yaml
-helm -n kube-system upgrade -i csi-hostpath chart/csi-hostpath -f /tmp/ackd-helmconfig.yaml
-helm -n kube-system upgrade -i etcd-backup chart/etcd-backup -f /tmp/ackd-helmconfig.yaml
+helm_install open-local || panic "failed to install open-local"
+helm_install csi-hostpath || panic "failed to install csi-hostpath"
+helm_install etcd-backup || panic "failed to install etcd-backup"
 
 echo "sleep 15 for l-zero crds ready"
 sleep 15
-helm -n kube-system upgrade -i l-zero-library chart/l-zero-library -f /tmp/ackd-helmconfig.yaml
+helm_install l-zero-library || panic "failed to install l-zero-library"
 
 # install optional addons
 IFS=,
@@ -120,7 +123,7 @@ for addon in ${Addons};do
   if [ "$addon" == "kube-prometheus-stack" ];then
     addon="kube-prometheus-crds"
   fi
-  helm -n kube-system upgrade -i ${addon} chart/${addon} -f /tmp/ackd-helmconfig.yaml
+  helm_install ${addon} || utils_info "failed to install ${addon}"
 done
 IFS="
 "
