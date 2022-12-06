@@ -134,8 +134,6 @@ if [ "$Network" == "calico" ];then
 fi
 
 # sleep for hybridnet webhook ready
-sleep 60
-
 if [ "$IPv6DualStack" == "true" ];then
   secondFamily=6
   if [ "$HostIPFamily" == "6" ];then
@@ -147,6 +145,8 @@ apiVersion: networking.alibaba.com/v1
 kind: Subnet
 metadata:
   name: init-2
+  labels:
+    webhook.hybridnet.io/ignore: "true"
 spec:
   config:
     autoNatOutgoing: true
@@ -155,13 +155,13 @@ spec:
     cidr: ${PodCIDR##*,}
     version: "${secondFamily}"
 EOF
-  for i in `seq 1 6`;do
-    sleep 60
+  for i in `seq 1 16`;do
     kubectl apply -f /tmp/subnet2.yaml && break
+    sleep 30
   done
   if [ $? -ne 0 ];then
     echo "failed to run kubectl apply -f /tmp/subnet2.yaml, ignore this, please apply it by yourself"
   fi
 
-  kubectl  -n kube-system delete pod -lk8s-app=kube-dns
+  kubectl -n kube-system delete pod -lk8s-app=kube-dns
 fi

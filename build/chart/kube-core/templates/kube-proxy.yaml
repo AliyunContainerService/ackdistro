@@ -60,7 +60,7 @@ spec:
         - --feature-gates=IPv6DualStack=true
         - --proxy-mode=ipvs
         - --ipvs-exclude-cidrs={{ .Values.global.IPVSExcludeCIDRs }}
-        image: "{{ .Values.global.RegistryURL }}/ecp_builder/kube-proxy:v1.20.4-aliyun.1"
+        image: "{{ .Values.global.RegistryURL }}/ecp_builder/kube-proxy:v1.20.11-aliyun.1"
         imagePullPolicy: IfNotPresent
         name: kube-proxy-worker
         resources: {}
@@ -175,7 +175,7 @@ spec:
         - --feature-gates=IPv6DualStack=true
         - --proxy-mode=ipvs
         - --ipvs-exclude-cidrs={{ .Values.global.IPVSExcludeCIDRs }}
-        image: "{{ .Values.global.RegistryURL }}/ecp_builder/kube-proxy:v1.20.4-aliyun.1"
+        image: "{{ .Values.global.RegistryURL }}/ecp_builder/kube-proxy:v1.20.11-aliyun.1"
         imagePullPolicy: IfNotPresent
         name: kube-proxy-master
         resources: {}
