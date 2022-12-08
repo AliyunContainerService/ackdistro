@@ -43,3 +43,5 @@ global:
   CoreDnsIP: 10.96.0.10
   IPv6DualStack: true
   IPVSExcludeCIDRs: ""
+metricsServer:
+  replicas: 2

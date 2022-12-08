@@ -49,6 +49,7 @@ metadata:
     k8s-app: metrics-server
     appinstances: monitor
 spec:
+  replicas: {{ .Values.metricsServer.replicas }}
   progressDeadlineSeconds: 20
   strategy:
     rollingUpdate:
@@ -77,7 +78,7 @@ spec:
             - labelSelector:
                 matchLabels:
                   k8s-app: metrics-server
-              topologyKey: failure-domain.beta.kubernetes.io/zone
+              topologyKey: kubernetes.io/hostname
       serviceAccountName: metrics-server
       tolerations:
       - operator: Exists

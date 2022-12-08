@@ -36,6 +36,10 @@ if [ "$HostIPFamily" == "6" ];then
   VtepAddressCIDRs="::/0"
 fi
 NumOfMasters=$(kubectl get no -l node-role.kubernetes.io/master="" | grep -v NAME | wc -l)
+MetricsServerReplicas=2
+if [ $NumOfMasters -eq 1 ];then
+  MetricsServerReplicas=1
+fi
 
 # Prepare helm config
 cat >/tmp/ackd-helmconfig.yaml <<EOF
@@ -70,6 +74,10 @@ manager:
   replicas: ${NumOfMasters}
 webhook:
   replicas: ${NumOfMasters}
+typha:
+  replicas: ${NumOfMasters}
+metricsServer:
+  replicas: ${MetricsServerReplicas}
 EOF
 
 # wait 120s for apiserver ready
