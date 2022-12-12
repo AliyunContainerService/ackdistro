@@ -1,7 +1,7 @@
 # 缺少测试用例：
 # ● inode 压力测试(P1)
 # ● IO 带宽测试
-# ● OOM，这个是要 kernel 的，但是测试用例中
+# ● OOM，这个是要 kernel 的，但是测试用例中 done
 # ● 内核死锁
 # ● 内核 bug
 # ● 内核 panic
@@ -11,16 +11,43 @@
 nodename=$2
 IP=$3
 
-function test_fd_presure() {
-    gcc -o fd_presure fd_presure.c   
+# ● 内核死锁 KernelDeadlock; 包含AUFSUmountHung、DockerHung
+function test_AUFS_unmount_hung() {
+    cmd="echo 'kernel: BUG: task umount:11451 blocked for more than 300 seconds.' >> /dev/kmsg"
+    exec_cmd cmd
 }
 
-function test_pid_presure() {
-    gcc -o pid_presure pid_presure.c
+function test_docker_hung() {
+    cmd="echo 'kernel: INFO: task docker:20744 blocked for more than 120 seconds.' >> /dev/kmsg"
+    exec_cmd cmd
+}
+
+# ● 内核 bug 内核 panic
+function test_kernel_bug() {
+
+}
+
+# ● 节点的 docker/kubelet 测试用例，并测试效果
+function test_kernel_docker() {
+    cmd="systemctl stop docker"
+    exec_cmd cmd
+}
+
+function test_kernel_kubelet() {
+    cmd="systemctl stop kubelet"
+    exec_cmd cmd
+}
+
+function test_fd_pressure() {
+    gcc -o fd_pressure fd_pressure.c
+}
+
+function test_pid_pressure() {
+    gcc -o pid_pressure pid_pressure.c
 }
 
 function test_oom() {
-    cmd="echo 'kernel: BUG: Task in kubepods killed as a result of limit .' >> /dev/kmsg"
+    cmd="echo 'kernel: BUG: Kill process 29957 (java) score 366 or sacrifice child' >> /dev/kmsg"
     exec_cmd cmd
 }
 
