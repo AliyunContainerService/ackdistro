@@ -44,6 +44,8 @@ spec:
         - --config.custom-plugin-monitor=/config/docker-offline-monitor.json
         - --config.custom-plugin-monitor=/config/system-custom-plugin-monitor.json
         - --config.custom-plugin-monitor=/config/kubelet-custom-plugin-monitor.json
+        - --config.custom-plugin-monitor=/config/docker-status-monitor.json
+        - --config.custom-plugin-monitor=/config/kubelet-status-monitor.json
         env:
           - name: NODE_NAME
             valueFrom:

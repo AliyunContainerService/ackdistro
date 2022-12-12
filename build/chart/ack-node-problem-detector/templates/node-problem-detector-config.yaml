@@ -277,6 +277,90 @@ data:
     exit $OK
 
 
+  docker-status-monitor.json: |
+    {
+      "plugin": "custom",
+      "pluginConfig": {
+        "timeout": "30s",
+        "invoke_interval": "120s",
+        "concurrency": 3
+      },
+      "source": "docker-custom-plugin-monitor",
+      "conditions": [
+        {
+          "type": "dockerStatus",
+          "reason": "dockerOpen",
+          "message": "node docker service open"
+        }
+      ],
+      "rules": [
+        {
+          "type": "permanent",
+          "condition": "dockerStatus",
+          "reason": "dockerClose",
+          "message": "node close docker",
+          "path": "/config/plugin/check_docker.sh",
+          "timeout": "30s"
+        }
+      ]
+    }
+  check_docker.sh: |
+    #!/bin/bash
+    OK=0
+    NONOK=1
+    UNKNOWN=2
+    A=$(systemctl status docker |grep "active (running)")
+    if [[ $A != "" ]]; then
+    echo "node open docker service"
+    exit $OK
+    fi
+    echo "node close docker service"
+    systemctl start docker
+    exit $NONOK
+
+
+  kubelet-status-monitor.json: |
+    {
+      "plugin": "custom",
+      "pluginConfig": {
+        "timeout": "30s",
+        "invoke_interval": "120s",
+        "concurrency": 3
+      },
+      "source": "kubelet-custom-plugin-monitor",
+      "conditions": [
+        {
+          "type": "kubeletStatus",
+          "reason": "kubeletOpen",
+          "message": "node kubelet service open"
+        }
+      ],
+      "rules": [
+        {
+          "type": "permanent",
+          "condition": "kubeletStatus",
+          "reason": "kubeletClose",
+          "message": "node close kubelet",
+          "path": "/config/plugin/check_kubelet.sh",
+          "timeout": "30s"
+        }
+      ]
+    }
+  check_kubelet.sh: |
+    #!/bin/bash
+    OK=0
+    NONOK=1
+    UNKNOWN=2
+    A=$(systemctl status kubelet |grep "active (running)")
+    if [[ $A != "" ]]; then
+    echo "node open kubelet service"
+    exit $OK
+    fi
+    echo "node close kubelet service"
+    systemctl start kubelet
+    exit $NONOK
+
+
   irqbalance-monitor.json: |
     {
       "plugin": "custom",
