@@ -41,13 +41,14 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
         mkdir -p ${arch}/bin
         mkdir -p ${arch}/rpm
         mkdir -p ${arch}/tgz
+        mkdir -p ${arch}/cri
 
         bins=(kubectl kubelet kubeadm)
         for bin in ${bins[@]};do
             wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${KUBE_VERSION}/${bin} -O ${arch}/bin/${bin}
         done
 
-        bins=(helm mc etcdctl velero)
+        bins=(helm seautil mc etcdctl nerdctl velero)
         for bin in ${bins[@]};do
             wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${bin} -O ${arch}/bin/${bin}
         done
@@ -81,6 +82,8 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
         for tgz in ${tgzs[@]};do
             wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/${tgz} -O ${arch}/tgz/${tgz}
         done
+
+        wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/containerd/amd64/containerd.tgz -O ${arch}/cri/containerd.tgz
     done
     IFS=" "
 fi

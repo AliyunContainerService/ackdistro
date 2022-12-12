@@ -8,12 +8,16 @@ localAPIEndpoint:
   advertiseAddress: 0.0.0.0
   {{ end }}
 nodeRegistration:
+  {{ if and (.ContainerRuntime) (eq .ContainerRuntime "containerd") }}
+  criSocket: /run/containerd/containerd.sock
+  {{else}}
   criSocket: /var/run/dockershim.sock
+  {{ end }}
 
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
-kubernetesVersion: v1.20.11-aliyun.1
+kubernetesVersion: v1.22.15-aliyun.1
 controlPlaneEndpoint: "apiserver.cluster.local:6443"
 imageRepository: {{or .RegistryURL "sea.hub:5000"}}/ecp_builder
 networking:
@@ -45,7 +49,8 @@ apiServer:
     service-node-port-range: {{or .ServiceNodePortRange "30000-32767"}}
     audit-policy-file: "/etc/kubernetes/audit-policy.yml"
     audit-log-path: "/var/log/kubernetes/audit.log"
-    enable-admission-plugins: PodSecurityPolicy,NodeRestriction
+    api-audiences: https://kubernetes.default.svc
+    enable-admission-plugins: NodeRestriction
     audit-log-format: json
     runtime-config: apps/v1beta1=true,admissionregistration.k8s.io/v1beta1=true
     audit-log-maxbackup: '10'
@@ -71,7 +76,7 @@ apiServer:
 controllerManager:
   extraArgs:
     feature-gates: TTLAfterFinished=true,EphemeralContainers=true,IPv6DualStack=true
-    experimental-cluster-signing-duration: 876000h
+    cluster-signing-duration: 876000h
     allocate-node-cidrs: 'false'
     {{ if and (.HostIPFamily) (eq .HostIPFamily "6") }}
     bind-address: 0000:0000:0000:0000:0000:0000:0000:0000
@@ -80,7 +85,6 @@ controllerManager:
     bind-address: 0.0.0.0
     address: 0.0.0.0
     {{ end }}
-    port: '10252'
     profiling: 'false'
     tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
     node-cidr-mask-size-ipv6: "120"
@@ -101,7 +105,6 @@ scheduler:
     bind-address: 0.0.0.0
     address: 0.0.0.0
     {{ end }}
-    port: '10251'
     profiling: 'false'
     tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
   extraVolumes:
@@ -131,7 +134,11 @@ caCertPath: /etc/kubernetes/pki/ca.crt
 discovery:
   timeout: 5m0s
 nodeRegistration:
+  {{ if and (.ContainerRuntime) (eq .ContainerRuntime "containerd") }}
+  criSocket: /run/containerd/containerd.sock
+  {{else}}
   criSocket: /var/run/dockershim.sock
+  {{ end }}
 controlPlane:
   localAPIEndpoint:
     bindPort: 6443
