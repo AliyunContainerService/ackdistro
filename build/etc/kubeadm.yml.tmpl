@@ -72,6 +72,7 @@ controllerManager:
   extraArgs:
     feature-gates: TTLAfterFinished=true,EphemeralContainers=true,IPv6DualStack=true
     experimental-cluster-signing-duration: 876000h
+    allocate-node-cidrs: 'false'
     {{ if and (.HostIPFamily) (eq .HostIPFamily "6") }}
     bind-address: 0000:0000:0000:0000:0000:0000:0000:0000
     address: 0000:0000:0000:0000:0000:0000:0000:0000
