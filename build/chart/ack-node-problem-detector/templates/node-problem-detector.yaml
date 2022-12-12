@@ -51,10 +51,6 @@ spec:
         - --config.custom-plugin-monitor=/config/system-custom-plugin-monitor.json
         - --config.custom-plugin-monitor=/config/kubelet-custom-plugin-monitor.json
 #        - --config.custom-plugin-monitor=/config/container-custom-plugin-monitor.json
-#        以下为特定环境规则
-#        - --config.custom-plugin-monitor=/config/csi-hang-problem-monitor.json
-#        - --custom-plugin-monitors=/config/instance_expired_checker.json
-#        - --custom-plugin-monitors=/config/ram-role-problem-monitor.json
         env:
           - name: NODE_NAME
             valueFrom:
