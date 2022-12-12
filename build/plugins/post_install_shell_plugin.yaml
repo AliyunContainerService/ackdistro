@@ -1,0 +1,137 @@
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: post_install # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: post-install
+  data: |
+    set -x
+    export DNSDomain=${DNSDomain:-cluster.local}
+    export HostIPFamily=${HostIPFamily:-4}
+    export Master0IP=`trident get-default-route-ip --ip-family ${HostIPFamily}`  
+    export RegistryIP=${RegistryIP:-${Master0IP}}
+    export EnableLocalDNSCache=${EnableLocalDNSCache:-false}
+    export MTU=${MTU:-1440}
+    export IPIP=${IPIP:-Always}
+    export IPv6DualStack=${IPv6DualStack:-true}
+    export IPAutoDetectionMethod=${IPAutoDetectionMethod:-can-reach=8.8.8.8}
+    export DisableFailureDomain=${DisableFailureDomain:-false}
+    export RegistryURL=${RegistryURL:-sea.hub:5000}
+    export SuspendPeriodHealthCheck=${SuspendPeriodHealthCheck:-false}
+    export SuspendPeriodBroadcastHealthCheck=${SuspendPeriodBroadcastHealthCheck:-false}
+    export Addons=${Addons}
+    export Network=${Network}
+    export RemoveMasterTaint=${RemoveMasterTaint}
+    export PlatformType=${PlatformType}
+    export ComponentToInstall=${ComponentToInstall}
+    export GenerateClusterInfo=${GenerateClusterInfo:-true}
+    export ParalbHostInterface=${ParalbHostInterface}
+    export ingressAddress=${ingressAddress:-ingress.cnstack.local}
+    export ingressInternalIP=${ingressInternalIP:-${Master0IP}}
+    export ingressExternalIP=${ingressExternalIP:-${Master0IP}}
+    export ingressHttpPort=${ingressHttpPort:-80}
+    export ingressHttpsPort=${ingressHttpsPort:-443}
+    export scale=${scale:-small}
+    export harborAddress=${harborAddress:-harbor.cnstack.local}
+    export vcnsOssAddress=${vcnsOssAddress:-vcns-oss.cnstack.local}
+    export apiServerInternalIP=${apiServerInternalIP}
+    export apiServerInternalPort=${apiServerInternalPort}
+    if [ "$DisableGateway" != "true" ];then
+      export gatewayAddress=${gatewayAddress:-cnstack.local}
+      export gatewayInternalIP=${gatewayInternalIP:-${Master0IP}}
+      export gatewayExternalIP=${gatewayExternalIP:-${Master0IP}}
+      export gatewayPort=${gatewayPort:-30383}
+      export gatewayAPIServerPort=${gatewayAPIServerPort:-30384}
+    fi
+    export KUBECONFIG=/etc/kubernetes/admin.conf
+
+    if [ "$HostIPFamily" = "6" ];then
+      export SvcCIDR=${SvcCIDR:-4408:4003:10bb:6a01:83b9:6360:c66d:0000/112,10.96.0.0/16}
+      export PodCIDR=${PodCIDR:-3408:4003:10bb:6a01:83b9:6360:c66d:0000/112,100.64.0.0/16}
+    else
+      export SvcCIDR=${SvcCIDR:-10.96.0.0/16,4408:4003:10bb:6a01:83b9:6360:c66d:0000/112}
+      export PodCIDR=${PodCIDR:-100.64.0.0/16,3408:4003:10bb:6a01:83b9:6360:c66d:0000/112}
+    fi
+    
+    # process taints first
+    if [ "${RemoveMasterTaint}" == "true" ];then
+      kubectl taint node node-role.kubernetes.io/master- --all || true
+    fi
+    
+    if [ "${PlatformType}" != "enterprise" ];then
+      kubectl label node node-role.kubernetes.io/cnstack-infra="" --all
+      kubectl label node node-role.kubernetes.io/proxy="" --all
+    fi
+
+    bash scripts/install_addons.sh
+    if [ $? -ne 0 ];then
+      exit 1
+    fi
+        
+    # generate cluster info
+    if [ "$GenerateClusterInfo" == "true" ];then
+      cat >/tmp/clusterinfo-cm.yaml <<EOF
+    ---
+    apiVersion: v1
+    data:
+      gatewayAddress: "${gatewayAddress}"
+      gatewayExternalIP: "${gatewayExternalIP}"
+      gatewayInternalIP: "${gatewayInternalIP}"
+      gatewayPort: "${gatewayPort}"
+      gatewayAPIServerPort: "${gatewayAPIServerPort}"
+      ingressAddress: "${ingressAddress}"
+      ingressExternalIP: "${ingressExternalIP}"
+      ingressInternalIP: "${ingressInternalIP}"
+      ingressHttpPort: "${ingressHttpPort}"
+      ingressHttpsPort: "${ingressHttpsPort}"
+      harborAddress: "${harborAddress}"
+      vcnsOssAddress: "${vcnsOssAddress}"
+      scale: "${scale}"
+      clusterDomain: "${DNSDomain}"
+      registryURL: "${RegistryURL}"
+      RegistryURL: "${RegistryURL}"
+    kind: ConfigMap
+    metadata:
+      name: clusterinfo
+      namespace: kube-public
+    EOF
+    
+      kubectl apply -f /tmp/clusterinfo-cm.yaml
+      GenerateCAFlag="--generate-ca"
+    fi
+    
+    sleep 15
+    if [ "${ComponentToInstall}" != "" ];then
+      ComponentToInstallFlag="--component-to-install ${ComponentToInstall}"
+    fi
+    if [ "${PlatformCAPath}" != "" ];then
+      PlatformCAFlag="--ca-path ${PlatformCAPath} --key-path ${PlatformCAKeyPath}"
+    fi
+    trident on-sealer -f /root/.sealer/Clusterfile --sealer --dump-managed-cluster ${GenerateCAFlag} ${ComponentToInstallFlag} ${PlatformCAFlag}
+    if [ $? -ne 0 ];then
+      exit 1
+    fi
+    
+    # set default storageclass and snapshot
+    kubectl annotate storageclass yoda-lvm-default snapshot.storage.kubernetes.io/is-default-class="true" --overwrite
+    kubectl annotate storageclass yoda-lvm-default storageclass.kubernetes.io/is-default-class="true" --overwrite
+
+    if [ "${SkipHealthCheck}" = "true" ];then
+      exit 0
+    fi
+    sleep 15
+    trident health-check
+    if [ $? -eq 0 ];then
+      exit 0
+    fi
+    echo "First time health check fail, sleep 30 and try again"
+    sleep 30
+    trident health-check --trigger-mode OnlyUnsuccessful
+    if [ $? -eq 0 ];then
+      exit 0
+    fi
+    echo "Second time health check fail, sleep 60 and try again"
+    sleep 60
+    trident health-check --trigger-mode OnlyUnsuccessful
+    exit $?

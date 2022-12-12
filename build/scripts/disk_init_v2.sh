@@ -7,12 +7,18 @@ source "${scripts_path}"/utils.sh
 set -x
 
 # Step 0: get device and parts size
-dev=${StorageDevice}
+storageDev=${StorageDevice}
 etcdDev=${EtcdDevice}
 container_runtime_size=${DockerRunDiskSize}
 kubelet_size=${KubeletRunDiskSize}
 file_system=${DaemonFileSystem}
 container_runtime="docker"
+
+containAnd=$(echo ${storageDev} | grep "&")
+NEW_IFS=","
+if [ "$containAnd" != "" ];then
+   NEW_IFS="&"
+fi
 
 if [ -z "$file_system" ]; then
     file_system="ext4"
@@ -59,7 +65,7 @@ if utils_shouldMkFs $etcdDev;then
 fi
 
 # Step 1: check val
-if ! utils_shouldMkFs $dev; then
+if ! utils_shouldMkFs $storageDev; then
     utils_info "device is empty! exit..."
     exit 0
 fi
@@ -75,12 +81,11 @@ fi
 # Step 2: create vg
 devPrefix="/dev/"
 vgName="ackdistro-pool"
-if [[ $dev =~ $devPrefix ]]
-then
+if [[ $storageDev =~ $devPrefix ]];then
     # check each dev name
     OLD_IFS="$IFS"
-    IFS=","
-    arr=($dev)
+    IFS=${NEW_IFS}
+    arr=($storageDev)
     IFS="$OLD_IFS"
     devForVG=""
     for temp in ${arr[@]};do
@@ -102,9 +107,8 @@ then
     else
         echo "vg "$vgName" exists!"
     fi
-
 else
-    vgName=$dev
+    vgName=$storageDev
 fi
 
 # Step 3: create lv

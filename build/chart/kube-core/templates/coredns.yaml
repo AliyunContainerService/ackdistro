@@ -15,10 +15,8 @@ spec:
     metadata:
       labels:
         k8s-app: kube-dns
-      {{ if .Values.globalconfig.IPv6DualStack }}
       annotations:
         networking.alibaba.com/ip-family: DualStack
-      {{ end }}
     spec:
       priorityClassName: system-cluster-critical
       affinity:
@@ -31,6 +29,8 @@ spec:
       serviceAccountName: coredns
       tolerations:
         - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/cnstack-infra
           effect: NoSchedule
       nodeSelector:
         beta.kubernetes.io/os: linux
@@ -48,6 +48,9 @@ spec:
           volumeMounts:
             - name: config-volume
               mountPath: /etc/coredns
+              readOnly: true
+            - name: config-ackdistro
+              mountPath: /ackdistro
               readOnly: true
           ports:
             - containerPort: 53
@@ -86,6 +89,9 @@ spec:
         - name: config-volume
           configMap:
             name: coredns
+        - name: config-ackdistro
+          configMap:
+            name: coredns-ackdistro
 ---
 apiVersion: v1
 kind: Service

@@ -27,6 +27,8 @@ spec:
       key: alibabacloud.com/system
     - effect: NoSchedule
       key: node-role.kubernetes.io/master
+    - key: node-role.kubernetes.io/cnstack-infra
+      effect: NoSchedule
   privilegeLevel: Cluster
   suspend:  {{ or .Values.global.SuspendPeriodHealthCheck .Values.global.SuspendPeriodBroadcastHealthCheck }}
   timeout: 600

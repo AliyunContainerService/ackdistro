@@ -1,0 +1,34 @@
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: disk-init # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: pre-init-host
+  scope: master
+  data: |
+    set -e; set -x
+    export EtcdDevice="${EtcdDevice}"
+    export StorageDevice="${StorageDevice}"
+    export DockerRunDiskSize="${DockerRunDiskSize}"
+    export KubeletRunDiskSize="${KubeletRunDiskSize}"
+    export DaemonFileSystem="${DaemonFileSystem}"
+    bash scripts/install-lvm.sh || exit 1
+    bash scripts/disk_init_v2.sh
+---
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: node_disk-init # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: pre-init-host
+  scope: node
+  data: |
+    set -e; set -x
+    export StorageDevice="${StorageDevice}"
+    export DockerRunDiskSize="${DockerRunDiskSize}"
+    export KubeletRunDiskSize="${KubeletRunDiskSize}"
+    export DaemonFileSystem="${DaemonFileSystem}"
+    bash scripts/install-lvm.sh || exit 1
+    bash scripts/disk_init_v2.sh

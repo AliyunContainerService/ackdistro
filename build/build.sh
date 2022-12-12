@@ -44,15 +44,17 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
 
         bins=(kubectl kubelet kubeadm)
         for bin in ${bins[@]};do
-            wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${KUBE_VERSION}/${bin} -O ${arch}/bin/${bin}
+            wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${KUBE_VERSION}/${bin} -O ${arch}/bin/${bin}
         done
 
-        bins=(helm seautil mc etcdctl velero)
+        bins=(helm mc etcdctl velero)
         for bin in ${bins[@]};do
-            wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${bin} -O ${arch}/bin/${bin}
+            wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${bin} -O ${arch}/bin/${bin}
         done
 
-        wget "https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/trident/release/trident_license_off-linux-${arch}_${trident_version}.bin" -O ${arch}/bin/trident
+        wget "https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/seautil-new" -O ${arch}/bin/seautil
+
+        wget "https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/trident/release/trident_license_off-linux-${arch}_${trident_version}.bin" -O ${arch}/bin/trident
 
         if [ "$arch" == "amd64" ];then
           rpm_suffix=x86_64
@@ -63,33 +65,41 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
         rpms=(kubernetes-cni)
         for rpm in ${rpms[@]};do
             rpmfile=${rpm}.${rpm_suffix}.rpm
-            wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/rpm/${arch}/${KUBE_VERSION}/${rpmfile} -O ${arch}/rpm/${rpmfile}
+            wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/rpm/${arch}/${KUBE_VERSION}/${rpmfile} -O ${arch}/rpm/${rpmfile}
         done
 
         rpms=(socat-1.7.3.2-2.el7 libseccomp-2.3.1-4.el7)
         for rpm in ${rpms[@]};do
             rpmfile=${rpm}.${rpm_suffix}.rpm
-            wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/rpm/${arch}/${rpmfile} -O ${arch}/rpm/${rpmfile}
+            wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/rpm/${arch}/${rpmfile} -O ${arch}/rpm/${rpmfile}
         done
 
         if [ "$arch" == "amd64" ];then
-            wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/nvidia.tgz -O ${arch}/tgz/nvidia.tgz
+            wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/nvidia.tgz -O ${arch}/tgz/nvidia.tgz
         fi
         tgzs=(lvm-el7.tgz lvm-el8.tgz s3fs-el7.tgz s3fs-el8.tgz)
         for tgz in ${tgzs[@]};do
-            wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/${tgz} -O ${arch}/tgz/${tgz}
+            wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/${tgz} -O ${arch}/tgz/${tgz}
         done
     done
     IFS=" "
 fi
 
-echo -n `git log -1 --pretty=format:%h` > VERSION
+version=`git log -1 --pretty=format:%h` || true
+if [ "$version" != "" ];then
+  echo -n  > VERSION
+fi
 
 #if [ "$(git branch --show-current)" == "main" ]; then
 #  wget https://gosspublic.alicdn.com/ossutil/1.7.8/ossutil64?spm=a2c4g.11186623.0.0.bcbf1770zMJhXK -O ossutil64
 #  chmod +x ossutil64
-#  ./ossutil64 --endpoint http://oss-cn-hangzhou.aliyuncs.com cp -f build/imageList oss://acs-ecp/ack-agility/ack-distro-imagelist-main.info
+#  ./ossutil64 --endpoint http://oss-cn-hangzhou.aliyuncs.com cp -f build/imageList oss://ack-a-aecp/ack-agility/ack-distro-imagelist-main.info
 #fi
 
+#
+# shellcheck disable=SC2016
+#sudo sed -i "s/v1.19.8/$k8s_version/g" rootfs/etc/kubeadm.yml ##change k8s_version
+sed -i "s/${ARCH}/${archs}/g" ./Kubefile
+
 # Build sealer image
-sealer build -f Kubefile -t ack-distro:${TAG} --platform linux/${archs} .
+sealer build -f Kubefile -t ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${TAG} --platform linux/${archs} .

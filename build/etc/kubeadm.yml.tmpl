@@ -13,24 +13,24 @@ nodeRegistration:
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
-kubernetesVersion: v1.20.4-aliyun.1
+kubernetesVersion: v1.20.11-aliyun.1
 controlPlaneEndpoint: "apiserver.cluster.local:6443"
-imageRepository: sea.hub:5000/ecp_builder
+imageRepository: {{or .RegistryURL "sea.hub:5000"}}/ecp_builder
 networking:
   dnsDomain: {{or .DNSDomain "cluster.local"}}
   {{ if .PodCIDR }}
   podSubnet: {{ .PodCIDR }}
   {{else if and (.HostIPFamily) (eq .HostIPFamily "6") }}
-  podSubnet: "3408:4003:10bb:6a01:83b9:6360:c66d:0000/112"
+  podSubnet: "3408:4003:10bb:6a01:83b9:6360:c66d:0000/112,100.64.0.0/16"
   {{else}}
-  podSubnet: "100.64.0.0/16"
+  podSubnet: "100.64.0.0/16,3408:4003:10bb:6a01:83b9:6360:c66d:0000/112"
   {{ end }}
   {{ if .SvcCIDR }}
   serviceSubnet: {{ .SvcCIDR }}
   {{else if and (.HostIPFamily) (eq .HostIPFamily "6") }}
-  serviceSubnet: "4408:4003:10bb:6a01:83b9:6360:c66d:0000/112"
+  serviceSubnet: "4408:4003:10bb:6a01:83b9:6360:c66d:0000/112,10.96.0.0/16"
   {{else}}
-  serviceSubnet: "10.96.0.0/16"
+  serviceSubnet: "10.96.0.0/16,4408:4003:10bb:6a01:83b9:6360:c66d:0000/112"
   {{ end }}
 apiServer:
   certSANs:
@@ -72,26 +72,19 @@ controllerManager:
   extraArgs:
     feature-gates: TTLAfterFinished=true,EphemeralContainers=true,IPv6DualStack=true
     experimental-cluster-signing-duration: 876000h
+    allocate-node-cidrs: 'false'
     {{ if and (.HostIPFamily) (eq .HostIPFamily "6") }}
     bind-address: 0000:0000:0000:0000:0000:0000:0000:0000
     address: 0000:0000:0000:0000:0000:0000:0000:0000
-    {{ if or (not .IPv6DualStack) (ne .IPv6DualStack "true") }}
-    node-cidr-mask-size: "120"
-    {{ end }}
     {{else}}
     bind-address: 0.0.0.0
     address: 0.0.0.0
-    {{ if or (not .IPv6DualStack) (ne .IPv6DualStack "true") }}
-    node-cidr-mask-size: "24"
-    {{ end }}
     {{ end }}
     port: '10252'
     profiling: 'false'
     tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
-    {{ if and (.IPv6DualStack) (eq .IPv6DualStack "true") }}
     node-cidr-mask-size-ipv6: "120"
     node-cidr-mask-size-ipv4: "24"
-    {{ end }}
   extraVolumes:
     - hostPath: /etc/localtime
       mountPath: /etc/localtime
@@ -126,10 +119,10 @@ etcd:
       listen-metrics-urls: http://0.0.0.0:2381
       {{ end }}
       cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
-    imageRepository: sea.hub:5000/ecp_builder
+    imageRepository: {{or .RegistryURL "sea.hub:5000"}}/ecp_builder
     imageTag: 3.5.4
 featureGates:
-  IPv6DualStack: {{or .IPv6DualStack false}}
+  IPv6DualStack: true
 
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
@@ -153,6 +146,7 @@ apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
 readOnlyPort: 10255
 clusterDomain: {{or .DNSDomain "cluster.local"}}
+serializeImagePulls: false
 kubeReserved:
   memory: 400Mi
   pid: "10000"
@@ -181,4 +175,4 @@ tlsCipherSuites:
   - TLS_RSA_WITH_AES_128_GCM_SHA256
 featureGates:
   EphemeralContainers: true
-  IPv6DualStack: {{or .IPv6DualStack false}}
+  IPv6DualStack: true

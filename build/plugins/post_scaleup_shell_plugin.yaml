@@ -1,0 +1,34 @@
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: post_scaleup # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: post-scaleup
+  data: |
+    set -x
+    export RemoveMasterTaint=${RemoveMasterTaint}
+    export PlatformType=${PlatformType}
+    export ComponentToInstall=${ComponentToInstall}
+    
+    export KUBECONFIG=/etc/kubernetes/admin.conf
+
+    # process taints first
+    if [ "${RemoveMasterTaint}" == "true" ];then
+      kubectl taint node node-role.kubernetes.io/master- --all || true
+    fi
+    
+    # hack
+    if [ "${PlatformType}" != "enterprise" ];then
+      kubectl label node node-role.kubernetes.io/cnstack-infra="" --all
+      kubectl label node node-role.kubernetes.io/proxy="" --all
+    fi
+
+    sleep 15
+    if [ "${ComponentToInstall}" != "" ];then
+      ComponentToInstallFlag="--component-to-install ${ComponentToInstall}"
+    fi
+    trident on-sealer -f /root/.sealer/Clusterfile --sealer --dump-managed-cluster ${ComponentToInstallFlag}
+    if [ $? -ne 0 ];then
+      exit 1
+    fi

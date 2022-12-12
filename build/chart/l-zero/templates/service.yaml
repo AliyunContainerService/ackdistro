@@ -6,7 +6,6 @@ metadata:
   labels:
     trident-app: l-zero
 spec:
-  type: NodePort
   ports:
     - port: 16789
       targetPort: 16789

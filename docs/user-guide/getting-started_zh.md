@@ -10,7 +10,7 @@
 
 ```bash
 ARCH=amd64 # or arm64
-wget https://acs-ecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${ARCH}/sealer-latest-linux-${ARCH}.tar.gz -O sealer-latest-linux-${ARCH}.tar.gz && \
+wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${ARCH}/sealer-latest-linux-${ARCH}.tar.gz -O sealer-latest-linux-${ARCH}.tar.gz && \
       tar -xvf sealer-latest-linux-${ARCH}.tar.gz -C /usr/bin
 ```
 
@@ -75,8 +75,9 @@ metadata:
 spec:
   image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5
   env: # all env are NOT necessary
-    - PodCIDR=172.45.0.0/16 # pod subnet, support ipv6 cidr, default is 100.64.0.0/16
-    - SvcCIDR=10.96.0.0/16 # service subnet, support ipv6 cidr default is 10.96.0.0/16
+    - Addons=paralb,kube-prometheus-crds,ack-node-problem-detector # addons to install, now support paralb, kube-prometheus-crds, ack-node-problem-detector
+    - PodCIDR=172.45.0.0/16,5408:4003:10bb:6a01:83b9:6360:c66d:0000/112 # pod subnet, support ipv6 cidr, must be dual stack cidr
+    - SvcCIDR=10.96.0.0/16,6408:4003:10bb:6a01:83b9:6360:c66d:0000/112 # service subnet, support ipv6 cidr, must be dual stack cidr
     - Network=hybridnet # support hybridnet/calico, default is hybridnet
     - EtcdDevice=/dev/vdb # EtcdDevice is device for etcd, default is "", which will use system disk
     - StorageDevice=/dev/vdc # StorageDevice is device for kubelet and container daemon, default is "", which will use system disk
@@ -85,13 +86,13 @@ spec:
     - KubeletRunDiskSize=100 # unit is GiB, capacity for /var/lib/kubelet, default is 100
     - DNSDomain=cluster.local # default is cluster.local
     - ServiceNodePortRange=30000-32767 # default is 30000-32767
-    - MTU=1440 # mtu for calico interface, default is 1440
-    - IPAutoDetectionMethod=can-reach=8.8.8.8 # calico ip auto-detection method, default is "can-reach=8.8.8.8", see https://projectcalico.docs.tigera.io/archive/v3.8/reference/node/configuration
     - SuspendPeriodHealthCheck=false # suspend period health-check, default is false
     - EnableLocalDNSCache=false # enable local dns cache component, default is false
-    - IPv6DualStack=false # enable IPv6DualStack mode, default is false
     - RemoveMasterTaint=false # remove master taint or not, default is false
     - DockerLimitNOFILE=infinity # set LimitNOFILE for docker.service, default is 1048576
+    - gatewayInternalIP=1.1.1.1 # the gateway internal vip
+    - ingressInternalIP=1.1.1.1 # the ingress internal vip
+    - CertSANs=1.1.1.1 # extra cert sans, if gatewayInternalIP not empty, must set it in CertSANs too
   ssh:
     passwd: "password"
     #user: root # default is root
@@ -156,7 +157,7 @@ trident health-check --help
 
 IPv6双栈的配置说明：
 
-1. 节点IP:部署时传入的所有节点地址的地址族需要保持一致，要么都是ipv4，要么都是ipv6，当打开双栈模式时(IPv6DualStack=true)，ACK—Distro 还会额外寻找每个节点上的另一个地址族的默认路由对应的ip，作为Second Host IP
+1. 节点IP:部署时传入的所有节点地址的地址族需要保持一致，要么都是ipv4，要么都是ipv6，ACK-Distro一定会打开双栈模式，因此会尝试额外寻找每个节点上的另一个地址族的默认路由对应的ip，作为Second Host IP
 2. SvcCIDR:部署时必须传入两个svc网段(ipv4段和ipv6段)，用,分隔，第一个svc网段的地址族需要与所有节点的地址族保持一致
 3. PodCIDR:与SvcCIDR一致
 4. 集群组件将使用第一个PodCIDR分配的IP
@@ -171,7 +172,6 @@ spec:
   env:
     - PodCIDR=5408:4003:10bb:6a01:83b9:6360:c66d:0000/112,101.64.0.0/16
     - SvcCIDR=6408:4003:10bb:6a01:83b9:6360:c66d:0000/112,11.96.0.0/16
-    - IPv6DualStack=true
     - LvsImage=ecp_builder/lvscare:v1.1.3-beta.8
   ssh:
     passwd: "passwd"
