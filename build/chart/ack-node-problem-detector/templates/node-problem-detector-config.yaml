@@ -14,6 +14,11 @@ data:
                 "message": "kernel has no deadlock"
             },
             {
+            	"type": "Kernel.KernelBug",
+            	"reason": "KernelHasNoBug",
+            	"message": "kernel has no bug"
+            },
+            {
                 "type": "ReadonlyFilesystem",
                 "reason": "FilesystemIsReadOnly",
                 "message": "Filesystem is read-only"
@@ -47,6 +52,36 @@ data:
         "rules": [
             {
             	"type": "permanent",
+            	"condition": "Kernel.KernelBug",
+            	"reason": "KernelBug",
+            	"pattern": "kernel BUG at.*"
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.KernelBug",
+            	"reason": "KernelBug",
+            	"pattern": "Kernel panic - not syncing.*"
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.KernelBug",
+            	"reason": "KernelBug",
+            	"pattern": "BUG: unable to handle kernel NULL pointer dereference at.*"
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.KernelBug",
+            	"reason": "KernelBug",
+            	"pattern": "general protection fault:.*"
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.KernelBug",
+            	"reason": "KernelBug",
+            	"pattern": "divide error: 0000 \\[#\\d+\\] SMP"
+            },
+            {
+            	"type": "permanent",
             	"reason": "OOMKilling",
             	"pattern": "Kill process \\d+ (.+) score \\d+ or sacrifice child"
             },
@@ -59,16 +94,6 @@ data:
                 "type": "temporary",
                 "reason": "UnregisterNetDevice",
                 "pattern": "unregister_netdevice: waiting for \\w+ to become free. Usage count = \\d+"
-            },
-            {
-                "type": "temporary",
-                "reason": "KernelOops",
-                "pattern": "BUG: unable to handle kernel NULL pointer dereference at .*"
-            },
-            {
-                "type": "temporary",
-                "reason": "KernelOops",
-                "pattern": "divide error: 0000 \\[#\\d+\\] SMP"
             },
             {
                 "type": "permanent",
