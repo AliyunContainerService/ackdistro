@@ -37,13 +37,18 @@ data:
             	"type": "Kernel.CPUHardLockErr",
             	"reason": "CPUHasNotHardLockError",
             	"message": "CPU has not hard lockup"
+            },
+            {
+                "type": "Kernel.OOMKilling",
+                "reason": "NothingOom",
+                "message": "nothing oom"
             }
         ],
         "rules": [
             {
-                "type": "temporary",
-                "reason": "PodOOMKilling",
-                "pattern": "Task in /kubepods.slice/(.+) killed as a result of limit of .*"
+            	"type": "permanent",
+            	"reason": "OOMKilling",
+            	"pattern": "Kill process \\d+ (.+) score \\d+ or sacrifice child"
             },
             {
                 "type": "temporary",
