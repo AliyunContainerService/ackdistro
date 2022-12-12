@@ -109,6 +109,9 @@ spec:
         - name: dockersock
           mountPath: /var/hostrun
           readOnly: true
+      hostIPC: true
+      hostNetwork: true
+      hostPID: true
       volumes:
       - name: log
         # Config `log` to your system log directory
