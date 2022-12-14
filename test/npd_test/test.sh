@@ -1,11 +1,11 @@
 # 缺少测试用例：
-# ● inode 压力测试(P1)
-# ● IO 带宽测试
-# ● OOM，这个是要 kernel 的，但是测试用例中 done
+# ● inode 压力测试(P1) / 可以用fd_pressure.c 测试，原理相同，创建大量文件就会占用inode
+# ● IO 带宽测试 / 无此规则
+# ● OOM，这个是要 kernel 的，但是测试用例中 / 已改为kernel的
 # ● 内核死锁
 # ● 内核 bug
 # ● 内核 panic
-# ● 节点内存条未装配
+# ● 节点内存条未装配 / 无此规则
 # ● 节点的 docker/kubelet 测试用例，并测试效果
 
 nodename=$2
@@ -22,18 +22,25 @@ function test_docker_hung() {
     exec_cmd cmd
 }
 
-# ● 内核 bug 内核 panic
-function test_kernel_bug() {
-
+# ● 内核 bug (内核 panic包含其中)
+function test_kernel_bug_1() {
+    cmd="echo 'kernel: INFO: task docker:20744 blocked for more than 120 seconds.' >> /dev/kmsg"
+    exec_cmd cmd
 }
 
+function test_kernel_bug_2() {
+    cmd="echo 'Kernel panic - not syncing: Attempted to kill init!' >> /dev/kmsg"
+    exec_cmd cmd
+}
+
+
 # ● 节点的 docker/kubelet 测试用例，并测试效果
-function test_kernel_docker() {
+function test_docker_status() {
     cmd="systemctl stop docker"
     exec_cmd cmd
 }
 
-function test_kernel_kubelet() {
+function test_kubelet_status() {
     cmd="systemctl stop kubelet"
     exec_cmd cmd
 }
