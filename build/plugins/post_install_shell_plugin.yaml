@@ -32,7 +32,6 @@ spec:
     export ingressExternalIP=${ingressExternalIP:-${Master0IP}}
     export ingressHttpPort=${ingressHttpPort:-80}
     export ingressHttpsPort=${ingressHttpsPort:-443}
-    export scale=${scale:-small}
     export harborAddress=${harborAddress:-harbor.cnstack.local}
     export vcnsOssAddress=${vcnsOssAddress:-vcns-oss.cnstack.local}
     export apiServerInternalIP=${apiServerInternalIP}
@@ -87,7 +86,6 @@ spec:
       ingressHttpsPort: "${ingressHttpsPort}"
       harborAddress: "${harborAddress}"
       vcnsOssAddress: "${vcnsOssAddress}"
-      scale: "${scale}"
       clusterDomain: "${DNSDomain}"
       registryURL: "${RegistryURL}"
       RegistryURL: "${RegistryURL}"

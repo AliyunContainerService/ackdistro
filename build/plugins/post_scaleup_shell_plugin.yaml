@@ -28,6 +28,10 @@ spec:
     if [ "${ComponentToInstall}" != "" ];then
       ComponentToInstallFlag="--component-to-install ${ComponentToInstall}"
     fi
+    if [ ! -f /root/.sealer/Clusterfile ];then
+      mkdir -p /root/.sealer/
+      kubectl  -n kube-system get cm  sealer-clusterfile -ojsonpath='{.data.Clusterfile}' > /root/.sealer/Clusterfile
+    fi
     trident on-sealer -f /root/.sealer/Clusterfile --sealer --dump-managed-cluster ${ComponentToInstallFlag}
     if [ $? -ne 0 ];then
       exit 1
