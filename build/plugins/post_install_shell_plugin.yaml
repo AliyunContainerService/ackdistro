@@ -37,6 +37,7 @@ spec:
     export apiServerInternalIP=${apiServerInternalIP}
     export apiServerInternalPort=${apiServerInternalPort}
     if [ "$DisableGateway" != "true" ];then
+      export gatewayExposeMode=${gatewayExposeMode:-ip_domain}
       export gatewayAddress=${gatewayAddress:-cnstack.local}
       export gatewayInternalIP=${gatewayInternalIP:-${Master0IP}}
       export gatewayExternalIP=${gatewayExternalIP:-${Master0IP}}
@@ -61,6 +62,7 @@ spec:
     if [ "${PlatformType}" != "enterprise" ];then
       kubectl label node node-role.kubernetes.io/cnstack-infra="" --all
       kubectl label node node-role.kubernetes.io/proxy="" --all
+      gatewayExposeMode=ip
     fi
 
     bash scripts/install_addons.sh
@@ -88,6 +90,7 @@ spec:
       vcnsOssAddress: "${vcnsOssAddress}"
       clusterDomain: "${DNSDomain}"
       registryURL: "${RegistryURL}"
+      gatewayExposeMode: "${gatewayExposeMode}"
       RegistryURL: "${RegistryURL}"
     kind: ConfigMap
     metadata:
