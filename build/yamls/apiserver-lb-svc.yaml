@@ -13,5 +13,6 @@ spec:
     - name: https
       port: 6443
       targetPort: 6443
+      nodePort: 30057
   selector:
     component: kube-apiserver
