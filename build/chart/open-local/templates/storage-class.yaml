@@ -3,7 +3,7 @@ kind: StorageClass
 metadata:
   name: {{ .Values.storageclass.lvm.name }}
   annotations:
-    cnstack.alibabacloud.com/description: "用于创建lvm类型本地存储卷(ext4文件系统)"
+    paas.cnstack.alibabacloud.com/description: "用于创建lvm类型本地存储卷(ext4文件系统)"
 {{ include "local.labels" . | indent 2 }}
 provisioner: {{ .Values.driver }}
 parameters:
@@ -18,7 +18,7 @@ kind: StorageClass
 metadata:
   name: {{ .Values.storageclass.lvm_xfs.name }}
   annotations:
-    cnstack.alibabacloud.com/description: "用于创建lvm类型本地存储卷(xfs文件系统)"
+    paas.cnstack.alibabacloud.com/description: "用于创建lvm类型本地存储卷(xfs文件系统)"
 {{ include "local.labels" . | indent 2 }}
 provisioner: {{ .Values.driver }}
 parameters:
