@@ -5,7 +5,7 @@ metadata:
 spec:
   type: SHELL
   action: pre-init-host
-  scope: master | node
+  scope: node
   data: |
     set -x
     export HostIPFamily=${HostIPFamily:-4}
@@ -16,3 +16,27 @@ spec:
     if [ $? -ne 0 ];then
       exit 1
     fi
+---
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: pre_init_host_master # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: pre-init-host
+  scope: master
+  data: |
+    set -x
+    export HostIPFamily=${HostIPFamily:-4}
+    export HostIP=${HostIP}
+    export IPv6DualStack=${IPv6DualStack:-true}
+
+    bash scripts/pre_init_host.sh
+    if [ $? -ne 0 ];then
+      exit 1
+    fi
+    
+    cp -f scripts/push-to-registry.sh /usr/local/bin/push-to-registry.sh
+    chmod +x /usr/local/bin/push-to-registry.sh
+    cp -f scripts/etcdctl_v3.sh /usr/local/bin/etcdctl_v3
+    chmod +x /usr/local/bin/etcdctl_v3
