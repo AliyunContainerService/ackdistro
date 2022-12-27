@@ -16,6 +16,9 @@ kind: ClusterConfiguration
 kubernetesVersion: v1.20.11-aliyun.1
 controlPlaneEndpoint: "apiserver.cluster.local:6443"
 imageRepository: {{or .RegistryURL "sea.hub:5000"}}/ecp_builder
+dns:
+  imageRepository: {{or .RegistryURL "sea.hub:5000"}}/acs
+  imageTag: v1.8.4.5-2ce07fd2-aliyun
 networking:
   dnsDomain: {{or .DNSDomain "cluster.local"}}
   {{ if .PodCIDR }}
@@ -40,6 +43,7 @@ apiServer:
   - 10.96.0.1
   - 10.103.97.2
   - 1248:4003:10bb:6a01:83b9:6360:c66d:0002
+  - cnstack.local
   extraArgs:
     feature-gates: TTLAfterFinished=true,EphemeralContainers=true,IPv6DualStack=true
     service-node-port-range: {{or .ServiceNodePortRange "30000-32767"}}

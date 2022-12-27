@@ -52,8 +52,6 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
             wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${bin} -O ${arch}/bin/${bin}
         done
 
-        wget "https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/seautil-new" -O ${arch}/bin/seautil
-
         wget "https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/trident/release/trident_license_off-linux-${arch}_${trident_version}.bin" -O ${arch}/bin/trident
 
         if [ "$arch" == "amd64" ];then

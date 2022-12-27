@@ -26,28 +26,29 @@ if [ -z "$file_system" ]; then
 fi
 
 mkfsForce() {
-  if [ "$file_system" = "ext4" ];then
-    mkfs.ext4 -F "$1"
-  elif [ "$file_system" = "xfs" ];then
-    mkfs.xfs -f "$1"
-  else
-    panic "file system $file_system is not supported now"
-  fi
+    if [ "$file_system" = "ext4" ];then
+        mkfs.ext4 -F "$1"
+    elif [ "$file_system" = "xfs" ];then
+        mkfs.xfs -f "$1"
+    else
+        panic "file system $file_system is not supported now"
+    fi
+}
+
+checkMountOK() {
+    mountPoint=${1}
+    nowDev=`mount | awk -v mp="$mountPoint" '{if($3 == mp)print $1}'`
+    if [ "${nowDev}" != "" ];then
+        utils_info "${mountPoint} has already been mounted by ${nowDev}"
+        return 0
+    fi
+
+    return 1
 }
 
 mountEtcd() {
-    if [[ $etcdDev == *"nvme"* ]]; then
-        mount |grep ^$etcdDev[p0-9]*|grep /var/lib/etcd
-        if [ "$?" == "0" ]; then
-            utils_info "$etcdDev has been mounted already, and in correct way~"
-            return
-        fi
-    else
-        mount |grep ^$etcdDev[0-9]*|grep /var/lib/etcd
-        if [ "$?" == "0" ]; then
-            utils_info "$etcdDev has been mounted already, and in correct way~"
-            return
-        fi
+    if checkMountOK /var/lib/etcd;then
+        return 0
     fi
 
     mkfsForce $etcdDev
@@ -76,6 +77,20 @@ fi
 if [ -z "$kubelet_size" ]; then
     kubelet_size="100"
     utils_info "set partition /var/lib/kubelet size to default size - 100G"
+fi
+
+checkMountOK /var/lib/kubelet
+check1=$?
+checkMountOK /var/lib/${container_runtime}
+check2=$?
+if [ "${check1}" == "0" ] && [ "${check2}" == "0" ];then
+    exit 0
+fi
+if [ "${check1}" == "0" ] && [ "${check2}" != "0" ];then
+    panic "mount for /var/lib/kubelet found, but not /var/lib/${container_runtime}, if you are scaling this node and some error occurs before, you can try delete it and try again"
+fi
+if [ "${check1}" != "0" ] && [ "${check2}" == "0" ];then
+    panic "mount for /var/lib/${container_runtime} found, but not /var/lib/kubelet, if you are scaling this node and some error occurs before, you can try delete it and try again"
 fi
 
 # Step 2: create vg
@@ -114,7 +129,6 @@ fi
 # Step 3: create lv
 sed -i "/\\/var\\/lib\\/kubelet/d"  /etc/fstab
 sed -i "/\\/var\\/lib\\/${container_runtime}/d"  /etc/fstab
-sed -i "/\\/var\\/lib\\/${container_runtime}\\/logs/d"  /etc/fstab
 
 lv_container_name="container"
 lv_kubelet_name="kubelet"
