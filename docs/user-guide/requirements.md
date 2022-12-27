@@ -24,7 +24,6 @@ To successfully install ACK Distro, you need to ensure that the following requir
 
 ### Kernel：
 
-- 4.18.*
 - 4.19.*
 - 3.10.* (must >=3.10.0-1160)
 
