@@ -24,7 +24,8 @@ spec:
     export Network=${Network}
     export RemoveMasterTaint=${RemoveMasterTaint}
     export PlatformType=${PlatformType}
-    export ComponentToInstall=${ComponentToInstall}
+    export DefaultStorageClass=${DefaultStorageClass:-yoda-lvm-default}
+    export ComponentToInstall=${ComponentToInstall:-disaster-recovery,harbor,logging,monitor}
     export GenerateClusterInfo=${GenerateClusterInfo:-true}
     export ParalbHostInterface=${ParalbHostInterface}
     export deployMode=${deployMode:-offline}
@@ -130,8 +131,8 @@ spec:
     fi
     
     # set default storageclass and snapshot
-    kubectl annotate storageclass yoda-lvm-default snapshot.storage.kubernetes.io/is-default-class="true" --overwrite
-    kubectl annotate storageclass yoda-lvm-default storageclass.kubernetes.io/is-default-class="true" --overwrite
+    kubectl annotate storageclass ${DefaultStorageClass} snapshot.storage.kubernetes.io/is-default-class="true" --overwrite
+    kubectl annotate storageclass ${DefaultStorageClass} storageclass.kubernetes.io/is-default-class="true" --overwrite
 
     if [ "${SkipHealthCheck}" = "true" ];then
       exit 0
