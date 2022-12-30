@@ -117,7 +117,9 @@ fi
 # install required addons
 helm_install l-zero || panic "failed to install l-zero"
 cp -f chart/open-local/values-acka.yaml chart/open-local/values.yaml
-helm_install open-local || panic "failed to install open-local"
+if [ "${DefaultStorageClass}" == "yoda-lvm-default" ];then
+  helm_install open-local || panic "failed to install open-local"
+fi
 helm_install csi-hostpath || panic "failed to install csi-hostpath"
 helm_install etcd-backup || panic "failed to install etcd-backup"
 

@@ -50,7 +50,7 @@ spec:
             - --registry-url={{ .Values.global.RegistryURL }}
           resources:
             requests:
-              cpu: 200m
+              cpu: 20m
               memory: 200Mi
             limits:
               cpu: "1"
