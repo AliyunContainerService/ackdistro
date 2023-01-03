@@ -18,10 +18,12 @@ spec:
       kubectl taint node node-role.kubernetes.io/master- --all || true
     fi
     
-    # hack
     if [ "${PlatformType}" != "enterprise" ];then
       kubectl label node node-role.kubernetes.io/cnstack-infra="" --all
       kubectl label node node-role.kubernetes.io/proxy="" --all
+    else
+      kubectl taint node node-role.kubernetes.io/cnstack-infra=:NoSchedule -l node-role.kubernetes.io/cnstack-infra="" --overwrite
+      kubectl taint node node-role.kubernetes.io/cnstack-infra=:NoSchedule -l node-role.kubernetes.io/proxy="" --overwrite
     fi
 
     sleep 15
@@ -30,7 +32,7 @@ spec:
     fi
     if [ ! -f /root/.sealer/Clusterfile ];then
       mkdir -p /root/.sealer/
-      kubectl  -n kube-system get cm  sealer-clusterfile -ojsonpath='{.data.Clusterfile}' > /root/.sealer/Clusterfile
+      kubectl -n kube-system get cm sealer-clusterfile -ojsonpath='{.data.Clusterfile}' > /root/.sealer/Clusterfile
     fi
     trident on-sealer -f /root/.sealer/Clusterfile --sealer --dump-managed-cluster ${ComponentToInstallFlag}
     if [ $? -ne 0 ];then

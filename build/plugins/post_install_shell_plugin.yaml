@@ -64,6 +64,9 @@ spec:
     if [ "${PlatformType}" != "enterprise" ];then
       kubectl label node node-role.kubernetes.io/cnstack-infra="" --all
       kubectl label node node-role.kubernetes.io/proxy="" --all
+    else
+      kubectl taint node node-role.kubernetes.io/cnstack-infra=:NoSchedule -l node-role.kubernetes.io/cnstack-infra="" --overwrite
+      kubectl taint node node-role.kubernetes.io/cnstack-infra=:NoSchedule -l node-role.kubernetes.io/proxy="" --overwrite
     fi
     if [ "${deployMode}" == "online" ];then
       gatewayExposeMode=ip
