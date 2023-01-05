@@ -111,6 +111,7 @@ spec:
       registryURL: "${RegistryURL}"
       registryExternalURL: "${RegistryDomain}:5001"
       RegistryURL: "${RegistryURL}"
+      platformType: "${PlatformType}"
     kind: ConfigMap
     metadata:
       name: clusterinfo
