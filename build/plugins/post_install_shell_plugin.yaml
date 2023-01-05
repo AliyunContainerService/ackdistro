@@ -25,7 +25,7 @@ spec:
     export RemoveMasterTaint=${RemoveMasterTaint}
     export PlatformType=${PlatformType}
     export DefaultStorageClass=${DefaultStorageClass:-yoda-lvm-default}
-    export ComponentToInstall=${ComponentToInstall:-disaster-recovery,harbor,logging,monitor}
+    export ComponentToInstall=${ComponentToInstall}
     export GenerateClusterInfo=${GenerateClusterInfo:-true}
     export ParalbHostInterface=${ParalbHostInterface}
     export deployMode=${deployMode:-offline}
