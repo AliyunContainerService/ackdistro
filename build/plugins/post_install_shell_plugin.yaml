@@ -9,7 +9,7 @@ spec:
     set -x
     export DNSDomain=${DNSDomain:-cluster.local}
     export HostIPFamily=${HostIPFamily:-4}
-    export Master0IP=`trident get-default-route-ip --ip-family ${HostIPFamily}`  
+    export Master0IP=${HostIP}
     export RegistryIP=${RegistryIP:-${Master0IP}}
     export EnableLocalDNSCache=${EnableLocalDNSCache:-false}
     export MTU=${MTU:-1440}
@@ -48,7 +48,11 @@ spec:
     export apiServerInternalPort=${apiServerInternalPort}
     export KUBECONFIG=/etc/kubernetes/admin.conf
 
-    if [ "$HostIPFamily" = "6" ];then
+    if [ "$Master0IP" == "" ];then
+      echo "Master0IP is required"
+      exit 1
+    fi
+    if [ "$HostIPFamily" == "6" ];then
       export SvcCIDR=${SvcCIDR:-4408:4003:10bb:6a01:83b9:6360:c66d:0000/112,10.96.0.0/16}
       export PodCIDR=${PodCIDR:-3408:4003:10bb:6a01:83b9:6360:c66d:0000/112,100.64.0.0/16}
     else
