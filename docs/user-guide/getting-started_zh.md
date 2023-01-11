@@ -17,7 +17,7 @@ wget https://github.com/sealerio/sealer/releases/download/v0.9.0/sealer-v0.9.0-l
 使用sealer获取ACK Distro制品，并创建集群：
 
 ```bash
-sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-11-ack-16 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
 ```
 
 如果您想在离网环境安装，请按如下操作：
@@ -27,10 +27,10 @@ sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistr
 # 以下操作在联网环境执行
 # 使用sealer pull拉取ACK-D集群镜像；
 # 可以通过--platform拉取指定架构的集群镜像，多种架构以,隔开，例如--platform amd64,arm64
-sealer --platform amd64 pull ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5
+sealer --platform amd64 pull ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-11-ack-16
 
 # 保存集群镜像为tar文件
-sealer save ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5 -o ackdistro.tar
+sealer save ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-11-ack-16 -o ackdistro.tar
 
 ##########################################################
 # 以下操作在离网环境执行
@@ -73,7 +73,7 @@ kind: Cluster
 metadata:
   name: my-cluster
 spec:
-  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5
+  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-11-ack-16
   env: # all env are NOT necessary
     - Addons=paralb,kube-prometheus-crds,ack-node-problem-detector # addons to install, now support paralb, kube-prometheus-crds, ack-node-problem-detector
     - PodCIDR=172.45.0.0/16,5408:4003:10bb:6a01:83b9:6360:c66d:0000/112 # pod subnet, support ipv6 cidr, must be dual stack cidr
@@ -168,7 +168,7 @@ kind: Cluster
 metadata:
   name: my-cluster
 spec:
-  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5
+  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-11-ack-16
   env:
     - PodCIDR=5408:4003:10bb:6a01:83b9:6360:c66d:0000/112,101.64.0.0/16
     - SvcCIDR=6408:4003:10bb:6a01:83b9:6360:c66d:0000/112,11.96.0.0/16

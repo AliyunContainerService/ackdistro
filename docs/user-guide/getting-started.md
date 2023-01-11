@@ -17,7 +17,7 @@ wget https://github.com/sealerio/sealer/releases/download/v0.9.0/sealer-v0.9.0-l
 Use sealer to get ACK Distro artifacts and create clusters:
 
 ```bash
-sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-11-ack-16 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
 ```
 
 If you want install ACK-D on an air-gap cluster, you can:
@@ -27,10 +27,10 @@ If you want install ACK-D on an air-gap cluster, you can:
 # The following command should be run on machine with internet access
 # Use sealer to pull ACK-D cluster image,
 # Also you can use --platform to specify the arch of cluster image you want to pull, if you want pull multi archs, please use ',' to join them, for example: --platform amd64,arm64
-sealer --platform amd64 pull ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5
+sealer --platform amd64 pull ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-11-ack-16
 
 # Save cluster image as a tar
-sealer save ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5 -o ackdistro.tar
+sealer save ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-11-ack-16 -o ackdistro.tar
 
 ##########################################################
 # The following command should be run on the target air gap cluster
@@ -73,7 +73,7 @@ kind: Cluster
 metadata:
   name: my-cluster
 spec:
-  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5
+  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-11-ack-16
   env: # all env are NOT necessary
     - Addons=paralb,kube-prometheus-crds,ack-node-problem-detector # addons to install, now support paralb, kube-prometheus-crds, ack-node-problem-detector
     - PodCIDR=172.45.0.0/16,5408:4003:10bb:6a01:83b9:6360:c66d:0000/112 # pod subnet, support ipv6 cidr, must be dual stack cidr
@@ -168,7 +168,7 @@ kind: Cluster
 metadata:
   name: my-cluster
 spec:
-  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-4-ack-5
+  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-11-ack-16
   env:
     - PodCIDR=5408:4003:10bb:6a01:83b9:6360:c66d:0000/112,101.64.0.0/16
     - SvcCIDR=6408:4003:10bb:6a01:83b9:6360:c66d:0000/112,11.96.0.0/16
