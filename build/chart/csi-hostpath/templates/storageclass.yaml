@@ -9,3 +9,4 @@ metadata:
 provisioner: {{ .Values.driver_name }}
 volumeBindingMode: WaitForFirstConsumer
 parameters:
+  csi.storage.k8s.io/fstype: ext4

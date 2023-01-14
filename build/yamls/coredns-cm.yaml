@@ -37,5 +37,4 @@ metadata:
   name: coredns-ackdistro
   namespace: kube-system
 data:
-  hosts: |
-    ##REGISTRY_IP## ##REGISTRY_DOMAIN##
+  hosts: ""
