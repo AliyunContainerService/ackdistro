@@ -84,18 +84,6 @@ spec:
         gatewayAddress=${gatewayExternalIP}  
       fi
     fi
-    if [ "${deployMode}" == "online" ];then
-      gatewayExposeMode=ip
-    fi
-    
-    gatewayAddress=${gatewayDomain}
-    if [ "$gatewayExposeMode" == "ip" ];then
-      if [[ ${gatewayExternalIP} =~ ":" ]];then
-        gatewayAddress=[${gatewayExternalIP}]
-      else
-        gatewayAddress=${gatewayExternalIP}  
-      fi
-    fi
 
     bash scripts/install_addons.sh
     if [ $? -ne 0 ];then
