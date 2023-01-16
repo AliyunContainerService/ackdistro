@@ -31,7 +31,7 @@ check_docker_valid() {
   fi
 }
 
-storage=${1:-/var/lib/docker}
+storage=${ContainerDataRoot:-/var/lib/docker}
 mkdir -p $storage
 if ! utils_command_exists docker; then
   lsb_dist=$(utils_get_distribution)

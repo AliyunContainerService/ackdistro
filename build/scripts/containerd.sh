@@ -18,7 +18,7 @@ source "${scripts_path}"/utils.sh
 set -e;set -x
 
 # get params
-storage=${1:-/var/lib/containerd} # containerd default uses /var/lib/containerd
+storage=${ContainerDataRoot:-/var/lib/containerd} # containerd default uses /var/lib/containerd
 mkdir -p $storage
 
 # Begin install containerd
@@ -26,6 +26,12 @@ if ! containerd --version; then
   lsb_dist=$(utils_get_distribution)
   lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
   echo "current system is ${lsb_dist}"
+
+  # containerd bin、crictl bin、ctr bin、nerdctr bin、cni plugin etc
+  tar -zxvf "${scripts_path}"/../tgz/containerd.tgz -C /
+  chmod a+x /usr/local/bin
+  chmod a+x /usr/local/sbin
+
   case "${lsb_dist}" in
   ubuntu | deepin | debian | raspbian)
     cp -f "${scripts_path}"/../etc/containerd.service /etc/systemd/system/containerd.service
@@ -64,10 +70,6 @@ if ! containerd --version; then
     cp -f "${scripts_path}"/../etc/containerd.service /etc/systemd/system/containerd.service
     ;;
   esac
-
-  # containerd bin、crictl bin、ctr bin、nerdctr bin、cni plugin etc
-  tar -zxvf "${scripts_path}"/../cri/containerd.tgz -C /
-  chmod a+x /usr/bin
 
   # install /etc/containerd/config.toml
   mkdir -p /etc/containerd
