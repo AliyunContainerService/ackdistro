@@ -45,7 +45,7 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
 
         bins=(kubectl kubelet kubeadm)
         for bin in ${bins[@]};do
-            wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${KUBE_VERSION}/${bin} -O ${arch}/bin/${bin}
+            curl -L "https://dl.k8s.io/release/${KUBE_VERSION}/bin/linux/amd64/${bin}" -o "amd64/bin/${bin}";
         done
 
         bins=(helm seautil mc etcdctl nerdctl velero)

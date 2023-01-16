@@ -6,13 +6,13 @@ images:
     tag: 3.5
   apiserver:
     image: ecp_builder/kube-apiserver
-    tag: v1.22.15-aliyun.1
+    tag: v1.22.15
   controllermanager:
     image: ecp_builder/kube-controller-manager
-    tag: v1.22.15-aliyun.1
+    tag: v1.22.15
   scheduler:
     image: ecp_builder/kube-scheduler
-    tag: v1.22.15-aliyun.1
+    tag: v1.22.15
   etcd:
     image: ecp_builder/etcd
     tag: 3.5.4
@@ -27,7 +27,7 @@ images:
     tag: v0.3.8.5-307cf45-aliyun
   kubeproxy:
     image: ecp_builder/kube-proxy
-    tag: v1.22.15-aliyun.1
+    tag: v1.22.15
   coredns:
     image: acs/coredns
     tag: v1.8.4.5-2ce07fd2-aliyun
