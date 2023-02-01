@@ -28,23 +28,24 @@ spec:
     export ComponentToInstall=${ComponentToInstall}
     export GenerateClusterInfo=${GenerateClusterInfo:-true}
     export ParalbHostInterface=${ParalbHostInterface}
-    export ingressAddress=${ingressAddress:-ingress.cnstack.local}
-    export ingressInternalIP=${ingressInternalIP:-${Master0IP}}
-    export ingressExternalIP=${ingressExternalIP:-${Master0IP}}
-    export ingressHttpPort=${ingressHttpPort:-80}
-    export ingressHttpsPort=${ingressHttpsPort:-443}
-    export harborAddress=${harborAddress:-harbor.cnstack.local}
-    export vcnsOssAddress=${vcnsOssAddress:-vcns-oss.cnstack.local}
-    export apiServerInternalIP=${apiServerInternalIP}
-    export apiServerInternalPort=${apiServerInternalPort}
+    export deployMode=${deployMode:-offline}
+    export gatewayDomain=${gatewayDomain:-cnstack.local}
     if [ "$DisableGateway" != "true" ];then
       export gatewayExposeMode=${gatewayExposeMode:-ip_domain}
-      export gatewayAddress=${gatewayAddress:-cnstack.local}
       export gatewayInternalIP=${gatewayInternalIP:-${Master0IP}}
       export gatewayExternalIP=${gatewayExternalIP:-${Master0IP}}
       export gatewayPort=${gatewayPort:-30383}
       export gatewayAPIServerPort=${gatewayAPIServerPort:-30384}
     fi
+    export ingressAddress=${ingressAddress:-ingress.${gatewayDomain}}
+    export ingressInternalIP=${ingressInternalIP:-${Master0IP}}
+    export ingressExternalIP=${ingressExternalIP:-${Master0IP}}
+    export ingressHttpPort=${ingressHttpPort:-80}
+    export ingressHttpsPort=${ingressHttpsPort:-443}
+    export harborAddress=${harborAddress:-harbor.${gatewayDomain}}
+    export vcnsOssAddress=${vcnsOssAddress:-vcns-oss.${gatewayDomain}}
+    export apiServerInternalIP=${apiServerInternalIP}
+    export apiServerInternalPort=${apiServerInternalPort}
     export KUBECONFIG=/etc/kubernetes/admin.conf
 
     if [ "$Master0IP" == "" ];then
@@ -74,19 +75,31 @@ spec:
     if [ "${deployMode}" == "online" ];then
       gatewayExposeMode=ip
     fi
+    
+    gatewayAddress=${gatewayDomain}
+    if [ "$gatewayExposeMode" == "ip" ];then
+      if [[ ${gatewayExternalIP} =~ ":" ]];then
+        gatewayAddress=[${gatewayExternalIP}]
+      else
+        gatewayAddress=${gatewayExternalIP}  
+      fi
+    fi
 
     bash scripts/install_addons.sh
     if [ $? -ne 0 ];then
       exit 1
     fi
-        
+
     # generate cluster info
     if [ "$GenerateClusterInfo" == "true" ];then
       cat >/tmp/clusterinfo-cm.yaml <<EOF
     ---
     apiVersion: v1
     data:
+      deployMode: "${deployMode}"
+      gatewayExposeMode: "${gatewayExposeMode}"
       gatewayAddress: "${gatewayAddress}"
+      gatewayDomain: "${gatewayDomain}"
       gatewayExternalIP: "${gatewayExternalIP}"
       gatewayInternalIP: "${gatewayInternalIP}"
       gatewayPort: "${gatewayPort}"
@@ -100,7 +113,7 @@ spec:
       vcnsOssAddress: "${vcnsOssAddress}"
       clusterDomain: "${DNSDomain}"
       registryURL: "${RegistryURL}"
-      gatewayExposeMode: "${gatewayExposeMode}"
+      registryExternalURL: "${RegistryDomain}:5001"
       RegistryURL: "${RegistryURL}"
       platformType: "${PlatformType}"
     kind: ConfigMap
