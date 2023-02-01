@@ -101,6 +101,11 @@ fi
 # shellcheck disable=SC2016
 #sudo sed -i "s/v1.19.8/$k8s_version/g" rootfs/etc/kubeadm.yml ##change k8s_version
 sed -i "s/${ARCH}/${archs}/g" ./Kubefile
+if [ "$NO_IMAGES" == "true" ];then
+  sed -i "s/COPY imageList manifests/#COPY imageList manifests/g" ./Kubefile
+else
+  sed -i "s/#COPY imageList manifests/COPY imageList manifests/g" ./Kubefile
+fi
 
 # Build sealer image
 sealer build -f Kubefile -t ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${TAG} --platform linux/${archs} .
