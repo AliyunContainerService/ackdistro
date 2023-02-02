@@ -81,7 +81,7 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
             wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/${tgz} -O ${arch}/tgz/${tgz}
         done
 
-        wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/amd64/cri-containerd-cni-1.5.13-linux-amd64.tar.gz -O ${arch}/tgz/containerd.tgz
+        wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/cri-containerd-cni-1.5.13-linux-${arch}.tar.gz -O ${arch}/tgz/containerd.tgz
     done
     IFS=" "
 fi
@@ -101,10 +101,10 @@ fi
 # shellcheck disable=SC2016
 #sudo sed -i "s/v1.19.8/$k8s_version/g" rootfs/etc/kubeadm.yml ##change k8s_version
 sed -i "s/${ARCH}/${archs}/g" ./Kubefile
-if [ "$NO_IMAGES" == "true" ];then
-  sed -i "s/COPY imageList manifests/#COPY imageList manifests/g" ./Kubefile
+if [ "$BUILD_MODE" == "lite" ];then
+  cp -f imageList-lite imageList
 else
-  sed -i "s/#COPY imageList manifests/COPY imageList manifests/g" ./Kubefile
+  cp -f imageList-standard imageList
 fi
 
 # Build sealer image
