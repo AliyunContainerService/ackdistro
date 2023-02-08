@@ -30,12 +30,17 @@ KUBE_VERSION=`cat Metadata |grep version |awk '{print $2}' |tr -d '"|,'`
 
 archs=$ARCH
 if [[ "$MULTI_ARCH" == "true" ]];then
-    archs="amd64,arm64"
+    archs="amd64 arm64"
 fi
 
-trident_version=1.14.0
+platform=""
+for arch in $archs;do
+  platform="${platform},linux/${arch}"
+done
+platform=${platform:1}
+
+trident_version=1.14.1
 if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
-    IFS=","
     for arch in $archs;do
         rm -rf ${arch}
         mkdir -p ${arch}/bin
@@ -47,7 +52,7 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
             wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${KUBE_VERSION}/${bin} -O ${arch}/bin/${bin}
         done
 
-        bins=(helm mc etcdctl velero)
+        bins=(helm seautil mc etcdctl nerdctl velero)
         for bin in ${bins[@]};do
             wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${bin} -O ${arch}/bin/${bin}
         done
@@ -79,8 +84,9 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
         for tgz in ${tgzs[@]};do
             wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/${tgz} -O ${arch}/tgz/${tgz}
         done
+
+        wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/cri-containerd-cni-1.5.13-linux-${arch}.tar.gz -O ${arch}/tgz/containerd.tgz
     done
-    IFS=" "
 fi
 
 version=`git log -1 --pretty=format:%h` || true
@@ -97,7 +103,12 @@ fi
 #
 # shellcheck disable=SC2016
 #sudo sed -i "s/v1.19.8/$k8s_version/g" rootfs/etc/kubeadm.yml ##change k8s_version
-sed -i "s/${ARCH}/${archs}/g" ./Kubefile
+
+if [ "$BUILD_MODE" == "lite" ];then
+  cp -f imageList-lite imageList
+else
+  cp -f imageList-standard imageList
+fi
 
 # Build sealer image
-sealer build -f Kubefile -t ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${TAG} --platform linux/${archs} .
+sealer build -f Kubefile -t ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${TAG} --platform ${platform} .

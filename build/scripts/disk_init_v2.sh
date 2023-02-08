@@ -12,7 +12,11 @@ etcdDev=${EtcdDevice}
 container_runtime_size=${DockerRunDiskSize}
 kubelet_size=${KubeletRunDiskSize}
 file_system=${DaemonFileSystem}
-container_runtime="docker"
+container_runtime=${ContainerRuntime}
+
+if [ "$container_runtime" == "" ];then
+  container_runtime=docker
+fi
 
 containAnd=$(echo ${storageDev} | grep "&")
 NEW_IFS=","

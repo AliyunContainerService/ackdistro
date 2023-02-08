@@ -3,19 +3,16 @@
 images:
   calicocni:
     image: ecp_builder/calico-cni
-    tag: v3.8.2
-  calicoflexvol:
-    image: ecp_builder/calico-pod2daemon-flexvol
-    tag: v3.9.1
+    tag: v3.23.0
   caliconode:
     image: ecp_builder/calico-node
-    tag: v3.8.2
+    tag: v3.23.0
   calicocontrollers:
     image: ecp_builder/calico-kube-controllers
-    tag: v3.8.2
+    tag: v3.23.0
 global:
   RegistryURL: sea.hub:5000
-  MTU: "1440"
-  PodCIDR: 100.64.0.0/16
+  MTU: "1430"
+  PodCIDR: 100.65.0.0/16
   IPIP: Always
   IPAutoDetectionMethod: can-reach=8.8.8.8

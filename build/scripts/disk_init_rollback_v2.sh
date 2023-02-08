@@ -58,7 +58,10 @@ lsblk
 # Step 1: get device
 etcdDev=${EtcdDevice}
 storageDev=${StorageDevice}
-container_runtime="docker"
+container_runtime=${ContainerRuntime}
+if [ "$container_runtime" == "" ];then
+  container_runtime=docker
+fi
 
 containAnd=$(echo ${storageDev} | grep "&")
 NEW_IFS=","
