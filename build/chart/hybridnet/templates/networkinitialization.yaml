@@ -3,6 +3,8 @@ apiVersion: networking.alibaba.com/v1
 kind: Network
 metadata:
   name: init
+  labels:
+    webhook.hybridnet.io/ignore: "true"
 spec:
   netID: {{ .Values.init.vxlanID }}
   type: Overlay
