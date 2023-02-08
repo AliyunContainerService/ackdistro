@@ -52,21 +52,21 @@ max_conf_num = 1
 [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
 [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
   endpoint = ["https://registry-1.docker.io"]
-[plugins."io.containerd.grpc.v1.cri".registry.mirrors."127.0.0.1:5000"]
-  endpoint = ["https://127.0.0.1:5000"]
-[plugins."io.containerd.grpc.v1.cri".registry.configs."127.0.0.1:5000".tls]
+[plugins."io.containerd.grpc.v1.cri".registry.mirrors."127.0.0.1:{{or .LocalRegistryPort 5000}}"]
+  endpoint = ["https://127.0.0.1:{{or .LocalRegistryPort 5000}}"]
+[plugins."io.containerd.grpc.v1.cri".registry.configs."127.0.0.1:{{or .LocalRegistryPort 5000}}".tls]
   insecure_skip_verify = true
-[plugins."io.containerd.grpc.v1.cri".registry.mirrors."sea.hub:5000"]
-  endpoint = ["https://sea.hub:5000"]
-[plugins."io.containerd.grpc.v1.cri".registry.configs."sea.hub:5000".tls]
+[plugins."io.containerd.grpc.v1.cri".registry.mirrors."sea.hub:{{or .LocalRegistryPort 5000}}"]
+  endpoint = ["https://sea.hub:{{or .LocalRegistryPort 5000}}"]
+[plugins."io.containerd.grpc.v1.cri".registry.configs."sea.hub:{{or .LocalRegistryPort 5000}}".tls]
+  insecure_skip_verify = true
+[plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry-internal.adp.aliyuncs.com:{{or .LocalRegistryPort 5000}}"]
+  endpoint = ["https://registry-internal.adp.aliyuncs.com:{{or .LocalRegistryPort 5000}}"]
+[plugins."io.containerd.grpc.v1.cri".registry.configs."registry-internal.adp.aliyuncs.com:{{or .LocalRegistryPort 5000}}".tls]
   insecure_skip_verify = true
 [plugins."io.containerd.grpc.v1.cri".registry.mirrors."ack-agility-registry.cn-shanghai.cr.aliyuncs.com"]
   endpoint = ["https://ack-agility-registry.cn-shanghai.cr.aliyuncs.com"]
 [plugins."io.containerd.grpc.v1.cri".registry.configs."ack-agility-registry.cn-shanghai.cr.aliyuncs.com".tls]
-  insecure_skip_verify = true
-[plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry-internal.adp.aliyuncs.com:5000"]
-  endpoint = ["https://registry-internal.adp.aliyuncs.com:5000"]
-[plugins."io.containerd.grpc.v1.cri".registry.configs."registry-internal.adp.aliyuncs.com:5000".tls]
   insecure_skip_verify = true
 
 [plugins."io.containerd.internal.v1.opt"]

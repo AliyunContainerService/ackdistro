@@ -57,7 +57,11 @@ spec:
       export PodCIDR=${PodCIDR:-3408:4003:10bb:6a01:83b9:6360:c66d:0000/112,100.64.0.0/16}
     else
       export SvcCIDR=${SvcCIDR:-10.96.0.0/16,4408:4003:10bb:6a01:83b9:6360:c66d:0000/112}
-      export PodCIDR=${PodCIDR:-100.64.0.0/16,3408:4003:10bb:6a01:83b9:6360:c66d:0000/112}
+      if [ "$Network" == "calico" ];then
+        export PodCIDR=${PodCIDR:-100.64.0.0/16}
+      else
+        export PodCIDR=${PodCIDR:-100.64.0.0/16,3408:4003:10bb:6a01:83b9:6360:c66d:0000/112}
+      fi
     fi
     
     # process taints first
@@ -112,9 +116,9 @@ spec:
       harborAddress: "${harborAddress}"
       vcnsOssAddress: "${vcnsOssAddress}"
       clusterDomain: "${DNSDomain}"
-      registryURL: "${RegistryURL}"
-      registryExternalURL: "${RegistryDomain}:5001"
-      RegistryURL: "${RegistryURL}"
+      registryURL: "${LocalRegistryURL}"
+      registryExternalURL: "${LocalRegistryDomain}:5001"
+      RegistryURL: "${LocalRegistryURL}"
       platformType: "${PlatformType}"
     kind: ConfigMap
     metadata:
