@@ -21,6 +21,7 @@ kubernetesVersion: v1.20.11-aliyun.1
 controlPlaneEndpoint: "apiserver.cluster.local:6443"
 imageRepository: {{or .RegistryURL "sea.hub:5000"}}/ecp_builder
 dns:
+  imageRepository: {{or .RegistryURL "sea.hub:5000"}}/ecp_builder
   imageTag: v1.8.4.5-2ce07fd2-aliyun
 networking:
   dnsDomain: {{or .DNSDomain "cluster.local"}}

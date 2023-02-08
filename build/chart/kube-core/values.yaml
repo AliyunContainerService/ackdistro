@@ -29,7 +29,7 @@ images:
     image: ecp_builder/kube-proxy
     tag: v1.20.11-aliyun.1
   coredns:
-    image: acs/coredns
+    image: ecp_builder/coredns
     tag: v1.8.4.5-2ce07fd2-aliyun
   localdnscache:
     image: ecp_builder/k8s-dns-node-cache

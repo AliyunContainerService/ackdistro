@@ -111,4 +111,5 @@ else
 fi
 
 # Build sealer image
+sealer rmi ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${TAG}
 sealer build -f Kubefile -t ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${TAG} --platform ${platform} .
