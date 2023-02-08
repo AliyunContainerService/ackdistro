@@ -1,0 +1,4 @@
+FROM scratch
+COPY rootfs .
+COPY amd64 .
+COPY manifests manifests

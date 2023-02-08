@@ -12,7 +12,7 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-cni:v3.8.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-pod2daemon-flexvol:v3.9.1
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-node:v3.8.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-kube-controllers:v3.8.2
-ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/hybridnet:v0.7.6
+ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/hybridnet:v0.7.7
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/paralb:v0.1.1
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/open-local:v0.6.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-node-driver-registrar:v2.3.0
