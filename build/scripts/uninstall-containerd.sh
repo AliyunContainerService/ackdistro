@@ -1,11 +1,9 @@
 #!/bin/bash
 
 # remove containers and images
-ctr task ls | grep -v 'TASK' | cut -d' ' -f 1 | xargs ctr task kill
-ctr task ls | grep -v 'TASK' | cut -d' ' -f 1 | xargs ctr task kill
-ctr container ls | grep -v 'CONTAINER' | cut -d' ' -f 1 | xargs ctr container delete
-ctr container ls | grep -v 'CONTAINER' | cut -d' ' -f 1 | xargs ctr container delete
-ctr image ls | grep -v 'REF' | cut -d' ' -f 1 | xargs ctr image rm
+crictl ps -aq | xargs crictl stop
+crictl ps -aq | xargs crictl rm
+crictl images -q | xargs crictl rmi
 
 # stop containerd and remove the containerd configure files
 systemctl stop containerd.service && systemctl disable containerd.service
@@ -13,6 +11,7 @@ rm -f /lib/systemd/system/containerd.service
 rm -f /etc/systemd/system/containerd.service
 rm -f /usr/lib/systemd/system/containerd.service
 rm -f /etc/containerd/config.toml
+rm -f /etc/cni/net.d
 
 # kill containerd process and related processes
 for pid in $(ps aux | awk '{ if ($11 == "containerd" || $11 == "containerd-shim" || $11 == "containerd-shim-runc-v1" || $11 == "containerd-shim-runc-v2") print $2 }')
