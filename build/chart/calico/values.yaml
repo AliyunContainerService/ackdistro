@@ -3,13 +3,13 @@
 images:
   calicocni:
     image: ecp_builder/calico-cni
-    tag: v3.23.0
+    tag: v3.23.1
   caliconode:
     image: ecp_builder/calico-node
-    tag: v3.23.0
+    tag: v3.23.1
   calicocontrollers:
     image: ecp_builder/calico-kube-controllers
-    tag: v3.23.0
+    tag: v3.23.1
 global:
   RegistryURL: sea.hub:5000
   MTU: "1430"

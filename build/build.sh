@@ -7,26 +7,40 @@ if ! which sealer;then
     exit 1
 fi
 
-TAG=$1
-MULTI_ARCH=$2
-ARCH=$3
+KUBE_VERSION=$1
+TAG=$2
+MULTI_ARCH=$3
+ARCH=$4
+
+if [[ "$KUBE_VERSION" == "" ]];then
+    echo "Usage: bash build.sh VERSION"
+    exit 1
+fi
+
+if [ ! -d $KUBE_VERSION ];then
+    echo "Directory $KUBE_VERSION not found"
+    exit 1
+fi
+
+mkdir -p _build/${KUBE_VERSION}
+cp -r ./* _build/${KUBE_VERSION}/ || true
+cp -r ./${KUBE_VERSION}/* _build/${KUBE_VERSION}/
+cd _build/${KUBE_VERSION}
 
 if [[ "$TAG" == "" ]];then
-    echo "Usage: bash build.sh TAG"
+    echo "Usage: bash build.sh VERSION TAG"
     exit 1
 fi
 
 if [[ "$MULTI_ARCH" == "" ]];then
-    echo "MULTI_ARCH is not set, default is false, if you want build multi arch, please run 'bash build.sh TAG true'"
+    echo "MULTI_ARCH is not set, default is false, if you want build multi arch, please run 'bash build.sh VERSION TAG true'"
     MULTI_ARCH=false
 fi
 
 if [[ "$ARCH" == "" ]];then
-    echo "ARCH is not set, default is amd64, if you want build other arch, please run 'bash build.sh TAG false ARCH'"
+    echo "ARCH is not set, default is amd64, if you want build other arch, please run 'bash build.sh VERSION TAG false ARCH'"
     ARCH=amd64
 fi
-
-KUBE_VERSION=`cat Metadata |grep version |awk '{print $2}' |tr -d '"|,'`
 
 archs=$ARCH
 if [[ "$MULTI_ARCH" == "true" ]];then
@@ -111,5 +125,5 @@ else
 fi
 
 # Build sealer image
-sealer rmi ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${TAG}
+sealer rmi ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${TAG} || true
 sealer build -f Kubefile -t ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${TAG} --platform ${platform} .
