@@ -100,7 +100,7 @@ controllerManager:
       pathType: File
 scheduler:
   extraArgs:
-    feature-gates: TTLAfterFinished=true,EphemeralContainers=true,IPv6DualStack=true
+    feature-gates: CSIStorageCapacity=false,EphemeralContainers=true,IPv6DualStack=true,TTLAfterFinished=true
     {{- if and (.HostIPFamily) (eq .HostIPFamily "6") }}
     bind-address: 0000:0000:0000:0000:0000:0000:0000:0000
     address: 0000:0000:0000:0000:0000:0000:0000:0000
@@ -114,6 +114,16 @@ scheduler:
     - hostPath: /etc/localtime
       mountPath: /etc/localtime
       name: localtime
+      readOnly: true
+      pathType: File
+    - hostPath: /etc/kubernetes/kube-scheduler-config.yaml
+      mountPath: /etc/kubernetes/kube-scheduler-config.yaml
+      name: scheduler-config
+      readOnly: true
+      pathType: File
+    - hostPath: /etc/kubernetes/admin.conf
+      mountPath: /root/.kube/config
+      name: admin-config
       readOnly: true
       pathType: File
 etcd:

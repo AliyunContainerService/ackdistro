@@ -2,6 +2,8 @@ FROM registry.cn-qingdao.aliyuncs.com/sealer-io/ackdistro-multi:v0.4.0
 
 COPY Metadata .
 COPY VERSION VERSION
+COPY KUBE_VERSION KUBE_VERSION
+COPY KOORD_SCHE_VERSION KOORD_SCHE_VERSION
 COPY imageList manifests/
 
 COPY ${ARCH}/bin ./bin

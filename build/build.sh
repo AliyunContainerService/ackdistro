@@ -27,6 +27,8 @@ cp -r ./* _build/${KUBE_VERSION}/ || true
 cp -r ./${KUBE_VERSION}/* _build/${KUBE_VERSION}/
 cd _build/${KUBE_VERSION}
 
+echo -n "${KUBE_VERSION}" > KUBE_VERSION
+
 if [[ "$TAG" == "" ]];then
     echo "Usage: bash build.sh VERSION TAG"
     exit 1
