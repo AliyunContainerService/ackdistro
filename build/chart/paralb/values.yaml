@@ -21,9 +21,9 @@ webhook:
 init:
   # labels
   networkNodeSelector: {}
-
+  # ipv4,ipv6
   ingressControllerVIP: ""
-
+  # ipv4,ipv6
   iamGatewayVIP: ""
-
+  # ipv4,ipv6
   apiServerVIP: ""
