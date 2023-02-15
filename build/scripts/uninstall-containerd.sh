@@ -1,5 +1,12 @@
 #!/bin/bash
 
+scripts_path=$(cd `dirname $0`; pwd)
+
+if which nvidia-docker;then
+  bash "${scripts_path}"/uninstall-docker.sh
+  exit $?
+fi
+
 # remove containers and images
 crictl ps -aq | xargs crictl stop
 crictl ps -aq | xargs crictl rm

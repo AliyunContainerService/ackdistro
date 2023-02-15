@@ -16,6 +16,10 @@ scripts_path=$(cd `dirname $0`; pwd)
 source "${scripts_path}"/utils.sh
 
 set -e;set -x
+if public::nvidia::check_has_gpu ${scripts_path};then
+  bash "${scripts_path}"/docker.sh
+  exit 0
+fi
 
 # get params
 storage=${ContainerDataRoot:-/var/lib/containerd} # containerd default uses /var/lib/containerd
