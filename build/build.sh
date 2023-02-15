@@ -23,11 +23,14 @@ if [ ! -d $KUBE_VERSION ];then
 fi
 
 mkdir -p _build/${KUBE_VERSION}
-cp -r ./* _build/${KUBE_VERSION}/ || true
+for f in chart etc plugins scripts statics yamls Kubefile VERSION;do
+  cp -r $f _build/${KUBE_VERSION}/ || true
+done
 cp -r ./${KUBE_VERSION}/* _build/${KUBE_VERSION}/
 cd _build/${KUBE_VERSION}
 
 echo -n "${KUBE_VERSION}" > KUBE_VERSION
+cat imageList-standard | grep koord-scheduler | cut -d "/" -f 3 > KOORD_SCHE_VERSION
 
 if [[ "$TAG" == "" ]];then
     echo "Usage: bash build.sh VERSION TAG"
