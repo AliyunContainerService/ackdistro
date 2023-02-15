@@ -14,23 +14,20 @@
 # limitations under the License.
 
 
-
 STORAGE=${1:-/var/lib/docker}
 REGISTRY_DOMAIN=${2-sea.hub}
 REGISTRY_PORT=${3-5000}
+CONTAINER_RUNTIME=${4-docker}
 
-
-# Install docker
-chmod a+x docker.sh
-#./docker.sh  /var/docker/lib  sealer.hub 5001
-bash docker.sh ${STORAGE} ${REGISTRY_DOMAIN} $REGISTRY_PORT
-if [  $? -ne 0 ]; then
-  exit 1
+# Install container runtime
+if [ "$CONTAINER_RUNTIME" == "containerd" ];then
+  chmod a+x containerd.sh
+  bash containerd.sh || exit 1
+else
+  chmod a+x docker.sh
+  bash docker.sh || exit 1
 fi
 
 chmod a+x init-kube.sh
-bash init-kube.sh
-if [  $? -ne 0 ]; then
-  exit 1
-fi
 
+bash init-kube.sh || exit 1

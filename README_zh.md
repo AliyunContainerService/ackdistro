@@ -54,7 +54,7 @@ ARCH=amd64 # or arm64
 wget https://github.com/sealerio/sealer/releases/download/v0.9.0/sealer-v0.9.0-linux-amd64.tar.gz -O sealer-latest-linux-${ARCH}.tar.gz && \
       tar -xvf sealer-latest-linux-${ARCH}.tar.gz -C /usr/bin
 
-sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-11-ack-16 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-3-ack-3 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
 
 kubectl get cs
 ```

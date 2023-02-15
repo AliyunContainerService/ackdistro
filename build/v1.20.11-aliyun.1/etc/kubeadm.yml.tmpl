@@ -2,13 +2,17 @@ apiVersion: kubeadm.k8s.io/v1beta2
 kind: InitConfiguration
 localAPIEndpoint:
   bindPort: 6443
-  {{ if and (.HostIPFamily) (eq .HostIPFamily "6") }}
+  {{- if and (.HostIPFamily) (eq .HostIPFamily "6") }}
   advertiseAddress: 0000:0000:0000:0000:0000:0000:0000:0000
   {{else}}
   advertiseAddress: 0.0.0.0
-  {{ end }}
+  {{- end }}
 nodeRegistration:
+  {{- if and (.ContainerRuntime) (eq .ContainerRuntime "containerd") }}
+  criSocket: /run/containerd/containerd.sock
+  {{else}}
   criSocket: /var/run/dockershim.sock
+  {{- end }}
 
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
@@ -17,24 +21,24 @@ kubernetesVersion: v1.20.11-aliyun.1
 controlPlaneEndpoint: "apiserver.cluster.local:6443"
 imageRepository: {{or .RegistryURL "sea.hub:5000"}}/ecp_builder
 dns:
-  imageRepository: {{or .RegistryURL "sea.hub:5000"}}/acs
+  imageRepository: {{or .RegistryURL "sea.hub:5000"}}/ecp_builder
   imageTag: v1.8.4.5-2ce07fd2-aliyun
 networking:
   dnsDomain: {{or .DNSDomain "cluster.local"}}
-  {{ if .PodCIDR }}
+  {{- if .PodCIDR }}
   podSubnet: {{ .PodCIDR }}
   {{else if and (.HostIPFamily) (eq .HostIPFamily "6") }}
   podSubnet: "3408:4003:10bb:6a01:83b9:6360:c66d:0000/112,100.64.0.0/16"
   {{else}}
   podSubnet: "100.64.0.0/16,3408:4003:10bb:6a01:83b9:6360:c66d:0000/112"
-  {{ end }}
-  {{ if .SvcCIDR }}
+  {{- end }}
+  {{- if .SvcCIDR }}
   serviceSubnet: {{ .SvcCIDR }}
   {{else if and (.HostIPFamily) (eq .HostIPFamily "6") }}
   serviceSubnet: "4408:4003:10bb:6a01:83b9:6360:c66d:0000/112,10.96.0.0/16"
   {{else}}
   serviceSubnet: "10.96.0.0/16,4408:4003:10bb:6a01:83b9:6360:c66d:0000/112"
-  {{ end }}
+  {{- end }}
 apiServer:
   certSANs:
   - 127.0.0.1
@@ -77,14 +81,13 @@ controllerManager:
     feature-gates: TTLAfterFinished=true,EphemeralContainers=true,IPv6DualStack=true
     experimental-cluster-signing-duration: 876000h
     allocate-node-cidrs: 'false'
-    {{ if and (.HostIPFamily) (eq .HostIPFamily "6") }}
+    {{- if and (.HostIPFamily) (eq .HostIPFamily "6") }}
     bind-address: 0000:0000:0000:0000:0000:0000:0000:0000
     address: 0000:0000:0000:0000:0000:0000:0000:0000
     {{else}}
     bind-address: 0.0.0.0
     address: 0.0.0.0
-    {{ end }}
-    port: '10252'
+    {{- end }}
     profiling: 'false'
     tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
     node-cidr-mask-size-ipv6: "120"
@@ -97,15 +100,14 @@ controllerManager:
       pathType: File
 scheduler:
   extraArgs:
-    feature-gates: TTLAfterFinished=true,EphemeralContainers=true,IPv6DualStack=true
-    {{ if and (.HostIPFamily) (eq .HostIPFamily "6") }}
+    feature-gates: CSIStorageCapacity=false,EphemeralContainers=true,IPv6DualStack=true,TTLAfterFinished=true
+    {{- if and (.HostIPFamily) (eq .HostIPFamily "6") }}
     bind-address: 0000:0000:0000:0000:0000:0000:0000:0000
     address: 0000:0000:0000:0000:0000:0000:0000:0000
     {{else}}
     bind-address: 0.0.0.0
     address: 0.0.0.0
-    {{ end }}
-    port: '10251'
+    {{- end }}
     profiling: 'false'
     tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
   extraVolumes:
@@ -114,14 +116,24 @@ scheduler:
       name: localtime
       readOnly: true
       pathType: File
+    - hostPath: /etc/kubernetes/kube-scheduler-config.yaml
+      mountPath: /etc/kubernetes/kube-scheduler-config.yaml
+      name: scheduler-config
+      readOnly: true
+      pathType: File
+    - hostPath: /etc/kubernetes/admin.conf
+      mountPath: /root/.kube/config
+      name: admin-config
+      readOnly: true
+      pathType: File
 etcd:
   local:
     extraArgs:
-      {{ if and (.HostIPFamily) (eq .HostIPFamily "6") }}
+      {{- if and (.HostIPFamily) (eq .HostIPFamily "6") }}
       listen-metrics-urls: http://[::]:2381
       {{else}}
       listen-metrics-urls: http://0.0.0.0:2381
-      {{ end }}
+      {{- end }}
       cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
     imageRepository: {{or .RegistryURL "sea.hub:5000"}}/ecp_builder
     imageTag: 3.5.4
@@ -135,15 +147,19 @@ caCertPath: /etc/kubernetes/pki/ca.crt
 discovery:
   timeout: 5m0s
 nodeRegistration:
+  {{- if and (.ContainerRuntime) (eq .ContainerRuntime "containerd") }}
+  criSocket: /run/containerd/containerd.sock
+  {{else}}
   criSocket: /var/run/dockershim.sock
+  {{- end }}
 controlPlane:
   localAPIEndpoint:
     bindPort: 6443
-    {{ if and (.HostIPFamily) (eq .HostIPFamily "6") }}
+    {{- if and (.HostIPFamily) (eq .HostIPFamily "6") }}
     advertiseAddress: 0000:0000:0000:0000:0000:0000:0000:0000
     {{else}}
     advertiseAddress: 0.0.0.0
-    {{ end }}
+    {{- end }}
 
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
@@ -154,20 +170,20 @@ serializeImagePulls: false
 kubeReserved:
   memory: 400Mi
   pid: "10000"
-{{ if and (.HostIPFamily) (eq .HostIPFamily "6") }}
+{{- if and (.HostIPFamily) (eq .HostIPFamily "6") }}
 healthzBindAddress: "::1"
-{{ end }}
+{{- end }}
 systemReserved:
   memory: 300Mi
   pid: "10000"
-{{ if and (.EnableLocalDNSCache) (eq .EnableLocalDNSCache "true") }}
+{{- if and (.EnableLocalDNSCache) (eq .EnableLocalDNSCache "true") }}
 clusterDNS:
-  {{ if and (.HostIPFamily) (eq .HostIPFamily "6") }}
+  {{- if and (.HostIPFamily) (eq .HostIPFamily "6") }}
   - fd00::aaaa::ffff:a
   {{else}}
   - 169.254.20.10
-  {{ end }}
-{{ end }}
+  {{- end }}
+{{- end }}
 tlsCipherSuites:
   - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
   - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256

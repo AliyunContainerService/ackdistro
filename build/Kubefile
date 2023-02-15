@@ -1,17 +1,18 @@
-FROM registry.cn-qingdao.aliyuncs.com/sealer-io/ackdistro-multi:v0.3.0
+FROM registry.cn-qingdao.aliyuncs.com/sealer-io/ackdistro-multi:v0.4.0
 
 COPY Metadata .
 COPY VERSION VERSION
-COPY imageList manifests
+COPY KUBE_VERSION KUBE_VERSION
+COPY KOORD_SCHE_VERSION KOORD_SCHE_VERSION
+COPY imageList manifests/
 
-COPY amd64/bin ./bin
-COPY amd64/rpm ./rpm
-COPY amd64/tgz ./tgz
+COPY ${ARCH}/bin ./bin
+COPY ${ARCH}/rpm ./rpm
+COPY ${ARCH}/tgz ./tgz
 
 COPY scripts scripts
 COPY plugins plugins
 COPY etc etc
-COPY kubeadm-patchs kubeadm-patchs
 COPY chart chart
 COPY statics statics
 COPY yamls ack-distro-yamls

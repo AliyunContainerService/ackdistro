@@ -1,0 +1,25 @@
+---
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: post_init_host_master # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: post-init-host
+  scope: master
+  data: |
+    set -x
+    KUBE_VERSION=`cat KUBE_VERSION`
+    KOORD_SCHE_VERSION=`cat KOORD_SCHE_VERSION`
+
+    if ! grep "${KOORD_SCHE_VERSION}" /etc/kubernetes/manifests/kube-scheduler.yaml; then
+        sed -i "s#kube-scheduler:${KUBE_VERSION}#${KOORD_SCHE_VERSION}#g" /etc/kubernetes/manifests/kube-scheduler.yaml
+    fi
+
+    if ! grep "config=/etc/kubernetes/kube-scheduler-config.yaml" /etc/kubernetes/manifests/kube-scheduler.yaml; then
+        sed -i "/    - kube-scheduler/a \    - --config=/etc/kubernetes/kube-scheduler-config.yaml" /etc/kubernetes/manifests/kube-scheduler.yaml
+    fi
+    
+    if ! grep "start-cnstack-koord-scheduler.sh" /etc/kubernetes/manifests/kube-scheduler.yaml; then
+        sed -i "s#- kube-scheduler#- /start-cnstack-koord-scheduler.sh#g" /etc/kubernetes/manifests/kube-scheduler.yaml
+    fi

@@ -27,11 +27,19 @@ split_image_name() {
   fi
 }
 
+import_image() {
+  if which docker;then
+    docker load -i ${1} | cut -d' ' -f 3
+  else
+    ctr -n k8s.io image import ${1} | cut -d' ' -f 2
+  fi
+}
+
 if echo "$1" | grep -q -E '\.tar$';then
-  FullName=`docker load -i ${1} | cut -d' ' -f 3`
+  FullName=`import_image ${1}`
 elif echo "$1" | grep -q -E '\.tgz$';then
   image=`tar -xvf $1`
-  FullName=`docker load -i ${image} | cut -d' ' -f 3`
+  FullName=`import_image ${image}`
 else
   FullName="$1"
 fi
@@ -39,8 +47,13 @@ fi
 split_image_name $FullName
 
 for m in `kubectl get no -owide  |grep master|awk '{print $6}'`;do
-  docker tag $ImageUrl ${m}:5000/$Domain/$Image
-  docker push ${m}:5000/$Domain/$Image
+  if which docker;then
+    docker tag $ImageUrl ${m}:5000/$Domain/$Image
+    docker push ${m}:5000/$Domain/$Image
+  else
+    nerdctl -n k8s.io tag $ImageUrl ${m}:5000/$Domain/$Image
+    ctr -n k8s.io i push ${m}:5000/$Domain/$Image -k
+  fi
 done
 
 echo "已成功转存到 registry-internal.adp.aliyuncs.com:5000/$Domain/$Image"

@@ -1,0 +1,248 @@
+## Avoid SLB loopback. make this change .
+## deploy kube-proxy on worker with apiserver point to apiserver_lb.
+---
+apiVersion: v1
+data:
+  kubeconfig.conf: |
+    apiVersion: v1
+    kind: Config
+    clusters:
+    - cluster:
+        certificate-authority: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        server: https://apiserver.cluster.local:6443
+      name: default
+    contexts:
+    - context:
+        cluster: default
+        namespace: default
+        user: default
+      name: default
+    current-context: default
+    users:
+    - name: default
+      user:
+        tokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+kind: ConfigMap
+metadata:
+  labels:
+    app: kube-proxy
+    k8s-app: kube-proxy-worker
+  name: kube-proxy-worker
+  namespace: kube-system
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: kube-proxy
+    k8s-app: kube-proxy-worker
+  name: kube-proxy-worker
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      k8s-app: kube-proxy-worker
+  template:
+    metadata:
+      labels:
+        k8s-app: kube-proxy-worker
+        app: kube-proxy
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ""
+    spec:
+      priorityClassName: system-node-critical
+      containers:
+      - command:
+        - /usr/local/bin/kube-proxy
+        - --kubeconfig=/var/lib/kube-proxy/kubeconfig.conf
+        - --hostname-override=$(NODE_NAME)
+        - --metrics-bind-address=0.0.0.0
+        - --feature-gates=IPv6DualStack=true
+        - --proxy-mode=ipvs
+        - --ipvs-exclude-cidrs={{ .Values.global.IPVSExcludeCIDRs }}
+        image: "{{ .Values.global.RegistryURL }}/ecp_builder/kube-proxy:v1.22.15-aliyun.1"
+        imagePullPolicy: IfNotPresent
+        name: kube-proxy-worker
+        resources: {}
+        securityContext:
+          privileged: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        volumeMounts:
+        - mountPath: /var/lib/kube-proxy
+          name: kube-proxy-worker
+        - mountPath: /run/xtables.lock
+          name: xtables-lock
+        - mountPath: /lib/modules
+          name: lib-modules
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: kube-proxy
+      serviceAccountName: kube-proxy
+      terminationGracePeriodSeconds: 30
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/master
+                operator: DoesNotExist
+      tolerations:
+      - operator: Exists
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: kube-proxy-worker
+        name: kube-proxy-worker
+      - hostPath:
+          path: /run/xtables.lock
+          type: FileOrCreate
+        name: xtables-lock
+      - hostPath:
+          path: /lib/modules
+          type: ""
+        name: lib-modules
+  updateStrategy:
+    type: RollingUpdate
+
+## deploy kube-proxy on master with apiserver connect to 127.0.0.1:6443
+---
+apiVersion: v1
+data:
+  kubeconfig.conf: |
+    apiVersion: v1
+    kind: Config
+    clusters:
+    - cluster:
+        server: https://127.0.0.1:6443
+        insecure-skip-tls-verify: true
+      name: default
+    contexts:
+    - context:
+        cluster: default
+        namespace: default
+        user: default
+      name: default
+    current-context: default
+    users:
+    - name: default
+      user:
+        tokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+kind: ConfigMap
+metadata:
+  labels:
+    app: kube-proxy
+    k8s-app: kube-proxy-master
+  name: kube-proxy-master
+  namespace: kube-system
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: kube-proxy
+    k8s-app: kube-proxy-master
+  name: kube-proxy-master
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      k8s-app: kube-proxy-master
+  template:
+    metadata:
+      labels:
+        k8s-app: kube-proxy-master
+        app: kube-proxy
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
+    spec:
+      priorityClassName: system-node-critical
+      containers:
+      - command:
+        - /usr/local/bin/kube-proxy
+        - --kubeconfig=/var/lib/kube-proxy/kubeconfig.conf
+        - --hostname-override=$(NODE_NAME)
+        - --metrics-bind-address=0.0.0.0
+        - --feature-gates=IPv6DualStack=true
+        - --proxy-mode=ipvs
+        - --ipvs-exclude-cidrs={{ .Values.global.IPVSExcludeCIDRs }}
+        image: "{{ .Values.global.RegistryURL }}/ecp_builder/kube-proxy:v1.22.15-aliyun.1"
+        imagePullPolicy: IfNotPresent
+        name: kube-proxy-master
+        resources: {}
+        securityContext:
+          privileged: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        volumeMounts:
+        - mountPath: /var/lib/kube-proxy
+          name: kube-proxy-master
+        - mountPath: /run/xtables.lock
+          name: xtables-lock
+        - mountPath: /lib/modules
+          name: lib-modules
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: kube-proxy
+      serviceAccountName: kube-proxy
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - operator: Exists
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: kube-proxy-master
+        name: kube-proxy-master
+      - hostPath:
+          path: /run/xtables.lock
+          type: FileOrCreate
+        name: xtables-lock
+      - hostPath:
+          path: /lib/modules
+          type: ""
+        name: lib-modules
+  updateStrategy:
+    type: RollingUpdate
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-proxy
+  namespace: kube-system
+  labels:
+    app: kube-proxy
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubeadm:node-proxier
+  labels:
+    app: kube-proxy
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:node-proxier
+subjects:
+- kind: ServiceAccount
+  name: kube-proxy
+  namespace: kube-system

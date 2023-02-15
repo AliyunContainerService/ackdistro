@@ -1,6 +1,4 @@
----
 # Source: calico/templates/calico-kube-controllers.yaml
-
 # See https://github.com/projectcalico/kube-controllers
 apiVersion: apps/v1
 kind: Deployment
@@ -27,7 +25,7 @@ spec:
         trident-app: calico
     spec:
       nodeSelector:
-        beta.kubernetes.io/os: linux
+        kubernetes.io/os: linux
       tolerations:
         # Mark the pod as a critical add-on for rescheduling.
         - key: CriticalAddonsOnly
@@ -47,8 +45,18 @@ spec:
               value: node
             - name: DATASTORE_TYPE
               value: kubernetes
+          livenessProbe:
+            exec:
+              command:
+                - /usr/bin/check-status
+                - -l
+            periodSeconds: 10
+            initialDelaySeconds: 10
+            failureThreshold: 6
+            timeoutSeconds: 10
           readinessProbe:
             exec:
               command:
                 - /usr/bin/check-status
                 - -r
+            periodSeconds: 10

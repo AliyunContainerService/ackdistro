@@ -34,7 +34,7 @@ clean_vg_pool()
             suc=true
             break
           fi
-          sleep 10
+          sleep 5
         done
         if [ "$suc" != "true" ];then
           panic "failed to do vgremove, please run (vgremove -f $value) by yourself"
@@ -58,7 +58,10 @@ lsblk
 # Step 1: get device
 etcdDev=${EtcdDevice}
 storageDev=${StorageDevice}
-container_runtime="docker"
+container_runtime=${ContainerRuntime}
+if [ "$container_runtime" == "" ];then
+  container_runtime=docker
+fi
 
 containAnd=$(echo ${storageDev} | grep "&")
 NEW_IFS=","
@@ -138,7 +141,7 @@ if [ "$vgName" = "ackdistro-pool" ];then
             utils_info "wipefs $temp"
             output=$(wipefs -a $temp)
             if [ "$?" != "0" ]; then
-                panic "failed to exec [wipefs -a $temp]: $output"
+                echo -e "\033[1;31mPanic error: failed to exec [wipefs -a $temp]: $output, please check this panic\033[0m"
             fi
             utils_info "wipefs $temp done!"
         done
