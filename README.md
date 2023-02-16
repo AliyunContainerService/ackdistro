@@ -76,13 +76,9 @@ Please refer to: [community](docs/community.md)
 
 ## Communication Channels
 
-- [DingTalk:](https://h5.dingtalk.com/circle/healthCheckin.html?dtaction=os&corpId=dingc6fc0a2fc2f6079fcc358aa147c3dfd3&eaa3ff=6eb60f&cbdbhh=qwertyuiop)
+dingtalk support group
 
-<!-- markdownlint-disable -->
-<div align="">
-  <img src="https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/6e13f507-51d0-48be-80e4-1929331f88ac.jpg" width="300" title="dingtalk">
-</div>
-<!-- markdownlint-restore -->
+![image](https://user-images.githubusercontent.com/8002217/219262137-9c809d26-fc37-4bef-b0ba-4c7fbe4bbdeb.png)
 
 ## License
 ACK Distro is licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the full license text.
