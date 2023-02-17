@@ -3,7 +3,7 @@
 images:
   paralb:
     image: ecp_builder/paralb
-    tag: v0.1.1
+    tag: v0.2.0
 global:
   RegistryURL: sea.hub:5000
 
