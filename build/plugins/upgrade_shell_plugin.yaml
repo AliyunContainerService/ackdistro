@@ -1,0 +1,15 @@
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: upgrade # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: upgrade
+  data: |
+    set -x
+    chmod +x ./bin/trident
+    cp -f ./bin/trident /usr/bin/trident
+    export ActualVersion=v1.20.11-aliyun.1
+    export DesiredVersion=v1.22.15-aliyun.1
+    export ForceUpgrade=true
+    trident upgradev2 --actual-version=${ActualVersion} --desired-version=${DesiredVersion} --force=${ForceUpgrade}
