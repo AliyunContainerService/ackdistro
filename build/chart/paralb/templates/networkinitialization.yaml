@@ -1,4 +1,4 @@
-{{ if and .Release.IsInstall .Values.init }}
+{{- if and .Release.IsInstall .Values.init }}
 ---
 apiVersion: networking.alibaba.com/v1
 kind: VIPNetwork
@@ -9,7 +9,10 @@ spec:
   nodeSelector:
     {{- toYaml .Values.init.networkNodeSelector | trim | nindent 4 }}
 
-{{ if .Values.init.ingressControllerVIP }}
+{{- if .Values.init.ingressControllerVIP }}
+{{- $ingressVips:=(regexSplit "," .Values.init.ingressControllerVIP -1) -}}
+  {{- if gt (len $ingressVips) 0 }}
+  {{- if (first $ingressVips) }}
 ---
 apiVersion: networking.alibaba.com/v1
 kind: VIPSubnet
@@ -19,12 +22,38 @@ spec:
   vipNetwork: cnstack-proxy
   netID: 0
   range:
-    start: {{ .Values.init.ingressControllerVIP }}
-    end: {{ .Values.init.ingressControllerVIP }}
+    {{- with (first $ingressVips) }}
+    start: {{ . }}
+    end: {{ . }}
     version: "4"
-{{ end }}
+    {{- end }}
+  {{- end }}
+  {{- end }}
 
-{{ if .Values.init.iamGatewayVIP }}
+  {{- if gt (len $ingressVips) 1}}
+  {{- if (index $ingressVips 1) }}
+---
+apiVersion: networking.alibaba.com/v1
+kind: VIPSubnet
+metadata:
+  name: ingress-controller-vip-v6
+spec:
+  vipNetwork: cnstack-proxy
+  netID: 0
+  range:
+    {{- with (index $ingressVips 1) }}
+    start: {{ . }}
+    end: {{ . }}
+    version: "6"
+    {{- end }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.init.iamGatewayVIP }}
+{{- $iamVips:=(regexSplit "," .Values.init.iamGatewayVIP -1) -}}
+  {{- if gt (len $iamVips) 0}}
+  {{- if (first $iamVips) }}
 ---
 apiVersion: networking.alibaba.com/v1
 kind: VIPSubnet
@@ -34,12 +63,38 @@ spec:
   vipNetwork: cnstack-proxy
   netID: 0
   range:
-    start: {{ .Values.init.iamGatewayVIP }}
-    end: {{ .Values.init.iamGatewayVIP }}
+    {{- with (first $iamVips) }}
+    start: {{ . }}
+    end: {{ . }}
     version: "4"
-{{ end }}
+    {{- end }}
+  {{- end }}
+  {{- end }}
 
-{{ if .Values.init.apiServerVIP }}
+  {{- if gt (len $iamVips) 1}}
+  {{- if (index $iamVips 1) }}
+---
+apiVersion: networking.alibaba.com/v1
+kind: VIPSubnet
+metadata:
+  name: iam-gateway-vip-v6
+spec:
+  vipNetwork: cnstack-proxy
+  netID: 0
+  range:
+    {{- with (index $iamVips 1) }}
+    start: {{ . }}
+    end: {{ . }}
+    version: "6"
+    {{- end }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.init.apiServerVIP }}
+{{- $apiVips:=(regexSplit "," .Values.init.apiServerVIP -1) -}}
+  {{- if gt (len $apiVips) 0 }}
+  {{- if (first $apiVips)}}
 ---
 apiVersion: networking.alibaba.com/v1
 kind: VIPSubnet
@@ -49,9 +104,31 @@ spec:
   vipNetwork: cnstack-proxy
   netID: 0
   range:
-    start: {{ .Values.init.apiServerVIP }}
-    end: {{ .Values.init.apiServerVIP }}
+    {{- with (first $apiVips) }}
+    start: {{ . }}
+    end: {{ . }}
     version: "4"
-{{ end }}
+    {{- end }}
+  {{- end }}
+  {{- end }}
 
-{{ end }}
+  {{- if gt (len $apiVips) 1}}
+  {{- if (index $apiVips 1)}}
+---
+apiVersion: networking.alibaba.com/v1
+kind: VIPSubnet
+metadata:
+  name: api-server-vip-v6
+spec:
+  vipNetwork: cnstack-proxy
+  netID: 0
+  range:
+    {{- with (index $apiVips 1) }}
+    start: {{ . }}
+    end: {{ . }}
+    version: "6"
+    {{- end }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
