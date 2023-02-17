@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin
+
 utils_version_ge() {
   test "$(echo "$@" | tr ' ' '\n' | sort -rV | head -n 1)" == "$1"
 }

@@ -10,9 +10,6 @@ spec:
     if [ "${SkipPreflight}" = "true" ];then
       exit 0
     fi
-    if [ "${IgnoreErrors}" != "" ];then
-      IgnoreErrorsFlag="--ignore-errors ${IgnoreErrors}"
-    fi
     chmod +x ./bin/trident
     cp -f ./bin/trident /usr/bin/trident
-    trident preflight run -f /root/.sealer/Clusterfile --sealer ${IgnoreErrorsFlag} --ignore-errors OS
+    trident preflight run -f /root/.sealer/Clusterfile --sealer --ignore-errors "OS,${IgnoreErrors}"
