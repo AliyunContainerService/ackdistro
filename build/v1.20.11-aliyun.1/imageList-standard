@@ -1,4 +1,5 @@
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/pause:3.2
+ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/pause:3.5
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/kube-apiserver:v1.20.11-aliyun.1
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/kube-controller-manager:v1.20.11-aliyun.1
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/kube-scheduler:v1.20.11-aliyun.1

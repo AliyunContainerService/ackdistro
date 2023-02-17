@@ -28,6 +28,7 @@ clean_vg_pool()
     for value in ${vglist[*]}
     do
         echo "vgremove $value"
+        suc=false
         for i in `seq 1 6`;do
           vgremove -f $value
           if [ "$?" = "0" ]; then
@@ -85,7 +86,7 @@ then
             panic "invalid input device name, it must be /dev/***"
         fi
     done
-elif [ "$storageDev" != "" ];then
+elif [ "$storageDev" != "" ] && [ "$storageDev" != "/" ];then
     vgName=$storageDev
 fi
 
@@ -93,41 +94,58 @@ fi
 clean_vg_pool "yoda-pool"
 
 # Step 3: clean mount info in /etc/fstab
-sed -i "/\\/var\\/lib\\/etcd/d"  /etc/fstab
-sed -i "/\\/var\\/lib\\/kubelet/d"  /etc/fstab
-sed -i "/\\/var\\/lib\\/${container_runtime}/d"  /etc/fstab
-sed -i "/\\/var\\/lib\\/${container_runtime}\\/logs/d"  /etc/fstab
+if utils_shouldMkFs $etcdDev;then
+  sed -i "/\\/var\\/lib\\/etcd/d"  /etc/fstab
 
-# Step 4: umount
-suc=false
-for i in `seq 1 10`;do
-    sleep 1s
-    for km in `mount -l |grep "/var/lib/kubelet/pods" |awk '{print $3}'`;do
-      umount $km;
-    done
-    umount /var/lib/etcd
-    umount /var/lib/kubelet
-    umount /var/lib/${container_runtime}/logs
-    umount /var/lib/${container_runtime}
-    if findmnt /var/lib/etcd;then
-        continue
-    fi
-    if findmnt /var/lib/kubelet;then
-        continue
-    fi
-    if findmnt /var/lib/${container_runtime};then
-        continue
-    fi
-    if findmnt /var/lib/${container_runtime}/logs;then
-        continue
-    fi
-    suc=true
-    break
-done
-if [ "$suc" != "true" ];then
-    panic "failed to umount [/var/lib/kubelet /var/lib/docker], some unknown error occurs, please run [umount /var/lib/kubelet;umount /var/lib/docker;umount /var/lib/docker/logs] on that node by yourself."
+  # umount etcd
+  suc=false
+  for i in `seq 1 10`;do
+      sleep 1s
+      umount /var/lib/etcd
+      if findmnt /var/lib/etcd;then
+          continue
+      fi
+      suc=true
+      break
+  done
+  if [ "$suc" != "true" ];then
+      panic "failed to umount [/var/lib/etcd], some unknown error occurs, please run [umount /var/lib/etcd] on that node by yourself."
+  fi
+  utils_info "umount etcd done!"
 fi
-utils_info "umount done!"
+
+if utils_shouldMkFs $storageDev;then
+  sed -i "/\\/var\\/lib\\/kubelet/d"  /etc/fstab
+  sed -i "/\\/var\\/lib\\/${container_runtime}/d"  /etc/fstab
+  # umount kubelet/docker
+  suc=false
+  for i in `seq 1 10`;do
+      sleep 1s
+      for km in `mount -l |grep "/var/lib/kubelet/pods" |awk '{print $3}'`;do
+        umount $km;
+      done
+
+      if [ "${container_runtime}" == "containerd" ];then
+        for cm in `mount | grep ^overlay | grep lowerdir=/var/lib/containerd | awk '{print $3}'`;do
+          umount $cm;
+        done
+      fi
+      umount /var/lib/kubelet
+      umount /var/lib/${container_runtime}
+      if findmnt /var/lib/kubelet;then
+          continue
+      fi
+      if findmnt /var/lib/${container_runtime};then
+          continue
+      fi
+      suc=true
+      break
+  done
+  if [ "$suc" != "true" ];then
+      panic "failed to umount [/var/lib/kubelet /var/lib/docker], some unknown error occurs, please run [umount /var/lib/kubelet;umount /var/lib/docker] on that node by yourself."
+  fi
+  utils_info "umount done!"
+fi
 
 # Step 5: clean ackdistro pool
 if [ "$vgName" = "ackdistro-pool" ];then
@@ -147,7 +165,6 @@ if [ "$vgName" = "ackdistro-pool" ];then
         done
     fi
 else
-    # TODO, why not need wipefs
     lv_container_name="container"
     lv_kubelet_name="kubelet"
     lvremove /dev/$vgName/$lv_container_name -y
