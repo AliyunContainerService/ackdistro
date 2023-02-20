@@ -47,8 +47,6 @@ spec:
     export apiServerInternalPort=${apiServerInternalPort}
     export SvcCIDR=${SvcCIDR}
     export PodCIDR=${PodCIDR}
-    export Network=${Network}
-    export PlatformType=${PlatformType}
     export PlatformCAPath=${PlatformCAPath}
     export PlatformCAKeyPath=${PlatformCAKeyPath}
     export GenerateCAFlag=${GenerateCAFlag}

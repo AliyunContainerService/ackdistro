@@ -10,14 +10,14 @@ Get sealer：
 
 ```bash
 ARCH=amd64 # or arm64
-wget https://github.com/sealerio/sealer/releases/download/v0.9.0/sealer-v0.9.0-linux-amd64.tar.gz -O sealer-latest-linux-${ARCH}.tar.gz && \
+wget http://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/sealer/sealer-0.9.2-beta2-linux-${ARCH}.tar.gz -O sealer-latest-linux-${ARCH}.tar.gz && \
       tar -xvf sealer-latest-linux-${ARCH}.tar.gz -C /usr/bin
 ```
 
 Use sealer to get ACK Distro artifacts and create clusters:
 
 ```bash
-sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-3-ack-3 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-15-ack-4 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
 ```
 
 If you want install ACK-D on an air-gap cluster, you can:
@@ -26,11 +26,11 @@ If you want install ACK-D on an air-gap cluster, you can:
 ##########################################################
 # The following command should be run on machine with internet access
 # Use sealer to pull ACK-D cluster image,
-# Also you can use --platform to specify the arch of cluster image you want to pull, if you want pull multi archs, please use ',' to join them, for example: --platform amd64,arm64
-sealer --platform amd64 pull ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-3-ack-3
+# Also you can use --platform to specify the arch of cluster image you want to pull, if you want pull multi archs, please use ',' to join them, for example: --platform linux/amd64,linux/arm64
+sealer --platform linux/amd64 pull ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-15-ack-4
 
 # Save cluster image as a tar
-sealer save ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-3-ack-3 -o ackdistro.tar
+sealer save ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-15-ack-4 -o ackdistro.tar
 
 ##########################################################
 # The following command should be run on the target air gap cluster
@@ -38,7 +38,7 @@ copy ackdistro.tar to the air-gap machine.
 
 sealer load -i ackdistro.tar
 
-# Then execute sealer run or apply as usual
+# Then execute sealer run as usual
 ```
 
 Check cluster status:
@@ -49,57 +49,34 @@ kubectl get cs
 
 ### [Advanced] Install with production-level configuration
 
-ACK Distro has extensive production-level cluster management experience, and we currently provide the following production-level features:
-
-1. Support automatically manage disk capacity for k8s daemons, to avoid affecting the stability of the OS
-2. Support preflight tool, which can determine whether it can be successful before cluster deployment
-3. Support cluster health-check tool, which can check whether the cluster is healthy with one click
-4. Support etcd backup cronjob, which will run a backup every day at 02:00 by default
-5. Support cluster auditing, which only record WRITE request and can use only 1GiB storage to save audit logs for the last 72h on a 3m+3w cluster
+ACK Distro has extensive production-level cluster management experience, and we currently provide the following production-level features.
 
 #### 1) automatically manage disk capacity for k8s daemons
+> Partition isolation and capacity management for K8s control can improve cluster performance and stability.
 
 If you want ACK Distro to better manage the disks it uses, prepare raw data disks as needed (no partitioning and mounting required):
 
 - EtcdDevice: the disk allocated to etcd must be larger than 20GiB and IOPS>3300, only required by the Master node
-- StorageDevice: the disk allocated to docker and kubelet, the recommended capacity is greater than 100GiB
-- DockerRunDiskSize, KubeletRunDiskSize: see the following example
+- StorageDevice: the disk allocated to docker and kubelet
+- DockerRunDiskSize, KubeletRunDiskSize: The size of the disk partition allocated to docker and kubelet is 100GiB by default; ACK-D uses [LVM](https://wiki.archlinux.org/title/LVM) to manage disk partitions, so you can scale the size during the operation and maintenance phase
 
-Configure your ClusterFile.yaml file:
+Configure your ClusterFile:
 
 ```yaml
 apiVersion: sealer.cloud/v2
 kind: Cluster
 metadata:
-  name: my-cluster
+  name: my-cluster # must be my-cluster
 spec:
-  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-3-ack-3
-  env: # all env are NOT necessary
-    - Addons=paralb,kube-prometheus-crds,ack-node-problem-detector # addons to install, now support paralb, kube-prometheus-crds, ack-node-problem-detector
-    - PodCIDR=172.45.0.0/16,5408:4003:10bb:6a01:83b9:6360:c66d:0000/112 # pod subnet, support ipv6 cidr, must be dual stack cidr
-    - SvcCIDR=10.96.0.0/16,6408:4003:10bb:6a01:83b9:6360:c66d:0000/112 # service subnet, support ipv6 cidr, must be dual stack cidr
-    - Network=hybridnet # support hybridnet/calico, default is hybridnet
-    - ContainerRuntime=docker # support docker/containerd, default is docker
+  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-15-ack-4
+  env:
     - EtcdDevice=/dev/vdb # EtcdDevice is device for etcd, default is "", which will use system disk
     - StorageDevice=/dev/vdc # StorageDevice is device for kubelet and container daemon, default is "", which will use system disk
     - YodaDevice=/dev/vdd # YodaDevice is device for open-local, if not specified, open local can't provision pv
     - DockerRunDiskSize=100 # unit is GiB, capacity for /var/lib/docker, default is 100
     - KubeletRunDiskSize=100 # unit is GiB, capacity for /var/lib/kubelet, default is 100
-    - DNSDomain=cluster.local # default is cluster.local
-    - ServiceNodePortRange=30000-32767 # default is 30000-32767
-    - SuspendPeriodHealthCheck=false # suspend period health-check, default is false
-    - EnableLocalDNSCache=false # enable local dns cache component, default is false
-    - RemoveMasterTaint=false # remove master taint or not, default is false
-    - DockerLimitNOFILE=infinity # set LimitNOFILE for docker.service, default is 1048576
-    - gatewayInternalIP=1.1.1.1 # the gateway internal vip
-    - ingressInternalIP=1.1.1.1 # the ingress internal vip
-    - CertSANs=1.1.1.1 # extra cert sans, if gatewayInternalIP not empty, must set it in CertSANs too
   ssh:
     passwd: "password"
-    #user: root # default is root
-    #port: "22" # default is 22
-    #pk: /root/.ssh/id_rsa
-    #pkPasswd: xxx
   hosts:
     - ips: # support ipv6
         - 1.1.1.1
@@ -109,11 +86,6 @@ spec:
       env: # all env are NOT necessary, rewrite some nodes has different env config
         - EtcdDevice=/dev/vdb
         - StorageDevice=/dev/vde
-      # rewrite ssh config if some node has different passwd...
-      # ssh:
-      #  user: root
-      #  passwd: passwd
-      #  port: "22"
     - ips: # support ipv6
         - 4.4.4.4
         - 5.5.5.5
@@ -122,25 +94,86 @@ spec:
 
 ```bash
 # install
-sealer apply -f ClusterFile.yaml
+sealer run -f ClusterFile
 ```
 
-#### 2) Use preflight
+#### 2) Flexible configuration of ssh access channel
+
+- Support ssh private key: need to send the corresponding public key file to all nodes in the cluster through ssh-copy-id or other methods
+- Support configuring different ssh access methods for different node groups
+- Support sudo user mode, requiring the user to have password-free sudo permissions
+
+```yaml
+apiVersion: sealer.cloud/v2
+kind: Cluster
+metadata:
+  name: my-cluster
+spec:
+  ...
+  ssh:
+    passwd: "password"
+    #user: root # default is root
+    #port: "22" # default is 22
+    #pk: /root/.ssh/id_rsa
+    #pkPasswd: xxx
+  hosts:
+    - ips:
+        - 1.1.1.1
+      ssh:
+        user: root # sudo user, default is root
+        passwd: passwd
+        port: "22"
+      ...
+    - ips: # use default ssh
+        - 4.4.4.4
+      roles: [ node ]
+      ...
+  ...
+```
+
+#### 3) Use a lite image
+
+In versions after v1-22-15-ack-4 and v1-20-11-ack-17, ACK-D will provide cluster images of both the full and lite mode. The tag of the lite mode is "${full_mode_tag}-lite", for example v1-22-15-ack-4-lite
+
+The lightweight version of the image (about 0.4GiB) is much smaller than the full version (about 1.4GiB), mainly because the lightweight version of the image does not save all the container images that ACK-D depends on. Therefore, if you need to use the lightweight Version mirroring must meet the following two requirements:
+
+1. All nodes of the cluster to be deployed must be able to access ack-agility-registry.cn-shanghai.cr.aliyuncs.com
+2. Configure .spec.registry as follows, NOTE: both externalRegistry and localRegistry are required
+
+```yaml
+apiVersion: sealer.cloud/v2
+kind: Cluster
+metadata:
+  name: my-cluster
+spec:
+  ...
+  registry:
+    externalRegistry: # external registry configuration
+      domain: ack-agility-registry.cn-shanghai.cr.aliyuncs.com # if use lite mode image, externalRegistry must be set as this
+    localRegistry: # local registry configuration
+      domain: sea.hub # domain for local registry, default is sea.hub 
+      port: 5000 # port for local registry, default is 5000
+  ...
+```
+
+#### 4) Use preflight
+
+The preflight tool can detect hidden dangers that may affect the stability of the cluster before cluster deployment.
 
 ```bash
 # When deploying a cluster, the cluster precheck tool will run by default. If there is a precheck error ErrorX, but you think the error can be ignored, please do as follows
-# specify IgnoreErrors=ErrorX[,ErrorY] in .spec.env of ClusterFile.yaml, and run again
-sealer apply -f ClusterFile.yaml
+# specify IgnoreErrors=ErrorX[,ErrorY] in .spec.env of ClusterFile, and run again
+sealer run -f ClusterFile
 
 # Also you can ignore all errors
 
-# specify SkipPreflight=true in .spec.env of ClusterFile.yaml, and run again
-sealer apply -f ClusterFile.yaml
+# specify SkipPreflight=true in .spec.env of ClusterFile, and run again
+sealer run -f ClusterFile
 ```
 
-#### 3) Use health check
+#### 5) Use health check
 
-After the cluster is deployed, health check will be triggered by default, and an error will be reported if the check fails; after that, the health check will run periodically.
+The cluster health check tool can check whether the cluster is healthy with one click. After the cluster deployment is completed, a health check will be triggered by default. If the check fails, an error will be reported directly; after that, the health check will run periodically.
 
 ```bash
 # You can query the health check result of the last run
@@ -153,15 +186,9 @@ trident health-check --trigger-all
 trident health-check --help
 ```
 
-#### 4) IPv6 dual stack
-> This section is about ipv6 dual stack configuration, if you just need ipv6 only, please use the method described in the previous section.
+#### 6) Configure container runtime
 
-How to configure for IPv6 dual stack mode:
-
-1. Node ip: all node should communicate within the cluster using the same family ip.
-2. SvcCIDR: must give ipv4 cidr and ipv6 cidr, using ',' to join them(no space), and the first cidr should be in the same family as the node IP.
-3. PodCIDR: same as SvcCIDR.
-4. Control plane pod: will use ip from the first cidr.
+Currently, ACK-D provides both docker and containerd container runtimes, and will stop supporting docker in the 1.24 K8s. You can specify the container runtime through the following configuration:
 
 ```yaml
 apiVersion: sealer.cloud/v2
@@ -169,13 +196,32 @@ kind: Cluster
 metadata:
   name: my-cluster
 spec:
-  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-3-ack-3
+  ...
+  containerRuntime:
+    type: docker # which container runtime, support containerd/docker, default is docker
+  ...
+```
+
+#### 7) IPv6 dual stack
+> This section is about ipv6 dual stack configuration, if you just need ipv6 only, please use the method described in the previous section.
+
+How to configure for IPv6 dual stack mode:
+
+1. Node IP: The IP family of all node addresses passed needs to be consistent, either ipv4 or ipv6, ACK-Distro will definitely open the dual-stack mode, so it will try to find an additional IP address on each node corresponding to the default route of another address family, as the Second Host IP
+2. SvcCIDR (if not necessary, you can skip set it, and the default value will be used): two svc network segments (ipv4 segment and ipv6 segment) must be passed, separated by ','. The IP family of the first service cidr need to be consistent with the IP family of all nodes,
+3. PodCIDR (if not necessary, you can skip set it, and the default value will be used): same as SvcCIDR
+4. The control plane pod will use the IP assigned by the first PodCIDR
+
+```yaml
+apiVersion: sealer.cloud/v2
+kind: Cluster
+metadata:
+  name: my-cluster
+spec:
+  ...
   env:
     - PodCIDR=5408:4003:10bb:6a01:83b9:6360:c66d:0000/112,101.64.0.0/16
     - SvcCIDR=6408:4003:10bb:6a01:83b9:6360:c66d:0000/112,11.96.0.0/16
-    - LvsImage=ecp_builder/lvscare:v1.1.3-beta.8
-  ssh:
-    passwd: "passwd"
   hosts:
     - ips:
         - 2408:4003:10bb:6a01:83b9:6360:c66d:ed57
@@ -186,18 +232,85 @@ spec:
       roles: [ node ]
 ```
 
+#### 8) Other configs
+
+In ClusterFile's .spec.env, you can also modify the following configuration
+
+- Addons: Additional components that need to be deployed, currently support [ack-node-problem-detector](https://github.com/AliyunContainerService/node-problem-detector), paralb, kube-prometheus-crds, the default is empty
+- Network: The network plugin to use, currently supports hybridnet, calico, the default is hybridnet
+- DNSDomain: Kubernetes Service Domain suffix, can be customized, the default is "cluster.local"
+- ServiceNodePortRange: Kubernetes NodePort Service port range, which can be customized, the default is 30000-32767
+- EnableLocalDNSCache: Whether to enable the Local DNS Cache, the default is false
+- RemoveMasterTaint: Whether to automatically remove the master taint, the default is false
+- CertSANs: The domain name/IP that needs to be additionally issued for the APIServer certificate
+- IgnoreErrors: Preflight error items to ignore
+- TrustedRegistry: The registry domain that needs to be trusted by the container runtime
+
+```yaml
+apiVersion: sealer.cloud/v2
+kind: Cluster
+metadata:
+  name: my-cluster # must be my-cluster
+spec:
+  ...
+  env: # all env are NOT necessary
+    - Addons=paralb,kube-prometheus-crds,ack-node-problem-detector # addons to install, now support paralb, kube-prometheus-crds, ack-node-problem-detector
+    - Network=hybridnet # support hybridnet/calico, default is hybridnet
+    - DNSDomain=cluster.local # default is cluster.local
+    - ServiceNodePortRange=30000-32767 # default is 30000-32767
+    - EnableLocalDNSCache=false # enable local dns cache component, default is false
+    - RemoveMasterTaint=false # remove master taint or not, default is false
+    - CertSANs=1.1.1.1 # extra cert sans, if gatewayInternalIP not empty, must set it in CertSANs too
+    - IgnoreErrors=OS # ignore errors for preflight
+    - TrustedRegistry=your.registry.url # Registry Domain to be trusted by container runtime
+  ...
+```
+
 ### Operation and maintenance cluster
-Expansion node:
+
+#### Scale-up node
 
 ```bash
 sealer join -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...]
 ```
 
-Capacity reduction node：
+#### Scale-down node
 
 ```bash
 sealer delete -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...]
 ```
+
+#### Add new SANs for APIServer
+
+```bash
+sealer cert --alt-names ${new_apiserver_ip},${new_apiserver_domain}
+```
+
+#### Scale-up open-local pool
+
+```bash
+# if follow not exist, cp /root/.sealer/Clusterfile .
+vim Clusterfile
+
+---
+apiVersion: sealer.cloud/v2
+kind: Cluster
+spec:
+  image: ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-15-ack-4
+  env:
+    # add new device /dev/vde for open-local, if more than one, join them with ','
+    - YodaDevice=/dev/vde
+
+trident on-sealer -f Clusterfile  --sealer
+```
+
+#### etcd cron backup
+
+No configuration is required. By default, etcd is backed up at 2 am every day. If you need to restore etcd, you can check the /backup/etcd/snapshots/ directory of any master node to obtain the backup file, and then follow https://etcd.io/docs/v3.3/op-guide/recovery/ for recovery.
+
+#### K8s cluster audit log
+
+No configuration is required. By default, only write operations are recorded. For a 3m+3w cluster, 1GiB space can be used to record about 72h of cluster write operations. Audit log files are stored in /var/log/kubernetes/audit.log of all Master nodes
 
 ### Cleanup cluster
 
