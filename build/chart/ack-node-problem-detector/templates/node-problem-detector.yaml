@@ -70,7 +70,7 @@ spec:
             cpu: 100m
             memory: 200Mi
           requests:
-            cpu: 100m
+            cpu: "0"
             memory: 200Mi
         securityContext:
           privileged: true

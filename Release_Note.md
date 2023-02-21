@@ -1,5 +1,64 @@
 # Release Note
 
+## v1-22-15-ack-4
+Features:
+
+- [Installation] Add lite mode image, see [community](docs/user-guide/getting-started.md)
+- [Kubernetes] Support HA local registry
+- [CRI] Support choose containerd 1.5.13 as container runtime
+- [CNI] Upgrade hybridnet from v0.7.6 to v0.7.7, [CHANGELOG](https://github.com/alibaba/hybridnet/blob/main/CHANGELOG.md)
+
+Usage:
+
+```bash
+ARCH=amd64 # or arm64
+wget http://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/sealer/sealer-0.9.2-beta2-linux-${ARCH}.tar.gz -O sealer-latest-linux-${ARCH}.tar.gz && \
+      tar -xvf sealer-latest-linux-${ARCH}.tar.gz -C /usr/bin
+
+sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-15-ack-4 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+
+kubectl get cs
+```
+
+## v1-20-11-ack-17
+Features:
+
+- [Installation] Add lite mode image, see [community](docs/user-guide/getting-started.md)
+- [Kubernetes] Support HA local registry
+- [CRI] Support choose containerd 1.5.13 as container runtime
+- [CNI] Upgrade hybridnet from v0.7.6 to v0.7.7, [CHANGELOG](https://github.com/alibaba/hybridnet/blob/main/CHANGELOG.md)
+
+Usage:
+
+```bash
+ARCH=amd64 # or arm64
+wget http://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/sealer/sealer-0.9.2-beta2-linux-${ARCH}.tar.gz -O sealer-latest-linux-${ARCH}.tar.gz && \
+      tar -xvf sealer-latest-linux-${ARCH}.tar.gz -C /usr/bin
+
+sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-11-ack-17 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+
+kubectl get cs
+```
+
+## v1-22-3-ack-3
+Features:
+
+- [K8s] Kubernetes 1.22
+- All features of v1-20-4-ack-*
+
+Usage:
+
+```bash
+ARCH=amd64 # or arm64
+wget -c https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${ARCH}/sealer-latest-linux-${ARCH}.tar.gz && \
+      tar -xvf sealer-latest-linux-${ARCH}.tar.gz -C /usr/bin
+
+sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-3-ack-3 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+
+kubectl get cs
+trident health-check
+```
+
 ## v1-20-4-ack-5
 Features:
 

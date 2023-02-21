@@ -15,6 +15,10 @@
 
 set -e
 set -x
+
+scripts_path=$(cd `dirname $0`; pwd)
+source "${scripts_path}"/utils.sh
+
 # prepare registry storage as directory
 # shellcheck disable=SC2046
 cd $(dirname "$0")

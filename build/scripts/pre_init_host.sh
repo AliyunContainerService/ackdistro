@@ -53,7 +53,7 @@ if [ "${HostIP}" = "" ];then
 else
   KUBELET_EXTRA_ARGS="${KUBELET_EXTRA_ARGS} --node-ip=${HostIP}"
   family_of_ip_need_get=6
-  if [ "${HostIPFamily}" = "6" ];then
+  if [ "${HostIPFamily}" == "6" ];then
     family_of_ip_need_get=4
   fi
 

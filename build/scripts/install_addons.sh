@@ -7,7 +7,7 @@ set -x
 
 helm_install() {
   for i in `seq 1 3`;do
-    sleep $i
+    sleep 1
     helm -n kube-system upgrade -i $1 chart/$1 -f /tmp/ackd-helmconfig.yaml && return 0
   done
   return 1

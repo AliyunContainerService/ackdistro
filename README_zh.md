@@ -49,12 +49,12 @@ ACK Distro作为ACK的下游，会紧跟ACK的发版节奏，具体发版策略�
 
 ## 快速开始
 
-```shell
+```bash
 ARCH=amd64 # or arm64
-wget https://github.com/sealerio/sealer/releases/download/v0.9.0/sealer-v0.9.0-linux-amd64.tar.gz -O sealer-latest-linux-${ARCH}.tar.gz && \
+wget http://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/sealer/sealer-0.9.2-beta2-linux-${ARCH}.tar.gz -O sealer-latest-linux-${ARCH}.tar.gz && \
       tar -xvf sealer-latest-linux-${ARCH}.tar.gz -C /usr/bin
 
-sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-11-ack-16 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-15-ack-4 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
 
 kubectl get cs
 ```
@@ -78,13 +78,10 @@ kubectl get cs
 
 ## 联系我们
 
-- [钉钉群:](https://h5.dingtalk.com/circle/healthCheckin.html?dtaction=os&corpId=dingc6fc0a2fc2f6079fcc358aa147c3dfd3&eaa3ff=6eb60f&cbdbhh=qwertyuiop)
+客户支持钉钉群
 
-<!-- markdownlint-disable -->
-<div align="">
-  <img src="https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/tmp/C99AB6D2-826D-4546-BEE1-63435972F2C8.png" width="300" title="dingtalk">
-</div>
-<!-- markdownlint-restore -->
+![image](https://user-images.githubusercontent.com/8002217/219262258-f3ced02a-c361-4191-b55b-99e932dfbc6e.png)
+
 
 ## License
 ACK Distro is licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the full license text.

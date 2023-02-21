@@ -1,0 +1,12 @@
+---
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: post_init_host_master # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: post-init-host
+  scope: master
+  data: |
+    set -e;set -x
+    bash scripts/post_init_master.sh

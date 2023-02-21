@@ -44,10 +44,10 @@ ACK Distro, as a downstream of ACK, will keep up-to-date with ACK's release. ACK
 
 ```bash
 ARCH=amd64 # or arm64
-wget https://github.com/sealerio/sealer/releases/download/v0.9.0/sealer-v0.9.0-linux-amd64.tar.gz -O sealer-latest-linux-${ARCH}.tar.gz && \
+wget http://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/sealer/sealer-0.9.2-beta2-linux-${ARCH}.tar.gz -O sealer-latest-linux-${ARCH}.tar.gz && \
       tar -xvf sealer-latest-linux-${ARCH}.tar.gz -C /usr/bin
 
-sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-20-11-ack-16 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
+sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-15-ack-4 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
 
 kubectl get cs
 ```
@@ -76,13 +76,9 @@ Please refer to: [community](docs/community.md)
 
 ## Communication Channels
 
-- [DingTalk:](https://h5.dingtalk.com/circle/healthCheckin.html?dtaction=os&corpId=dingc6fc0a2fc2f6079fcc358aa147c3dfd3&eaa3ff=6eb60f&cbdbhh=qwertyuiop)
+dingtalk support group
 
-<!-- markdownlint-disable -->
-<div align="">
-  <img src="https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/6e13f507-51d0-48be-80e4-1929331f88ac.jpg" width="300" title="dingtalk">
-</div>
-<!-- markdownlint-restore -->
+![image](https://user-images.githubusercontent.com/8002217/219262137-9c809d26-fc37-4bef-b0ba-4c7fbe4bbdeb.png)
 
 ## License
 ACK Distro is licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the full license text.

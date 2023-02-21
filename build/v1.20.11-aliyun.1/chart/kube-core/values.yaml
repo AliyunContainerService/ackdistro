@@ -1,0 +1,47 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+images:
+  pause:
+    image: ecp_builder/pause
+    tag: 3.2
+  apiserver:
+    image: ecp_builder/kube-apiserver
+    tag: v1.20.11-aliyun.1
+  controllermanager:
+    image: ecp_builder/kube-controller-manager
+    tag: v1.20.11-aliyun.1
+  scheduler:
+    image: ecp_builder/kube-scheduler
+    tag: v1.20.11-aliyun.1
+  etcd:
+    image: ecp_builder/etcd
+    tag: 3.5.4
+  lvscare:
+    image: ecp_builder/lvscare
+    tag: v1.1.3-beta.8
+  k8sdeviceplugin:
+    image: ecp_builder/k8s-device-plugin
+    tag: v1.0.0.3-bd49899-aliyun
+  metricsserver:
+    image: ecp_builder/metrics-server
+    tag: v0.3.8.5-307cf45-aliyun
+  kubeproxy:
+    image: ecp_builder/kube-proxy
+    tag: v1.20.11-aliyun.1
+  coredns:
+    image: ecp_builder/coredns
+    tag: v1.8.4.5-2ce07fd2-aliyun
+  localdnscache:
+    image: ecp_builder/k8s-dns-node-cache
+    tag: 1.17.0
+global:
+  EnableLocalDNSCache: false
+  # replace "169.254.20.10" with "fd00::aaaa::ffff:a" for ipv6
+  LocalDNSCacheIP: 169.254.20.10
+  DNSDomain: cluster.local
+  RegistryURL: sea.hub:5000
+  CoreDnsIP: 10.96.0.10
+  IPv6DualStack: true
+  IPVSExcludeCIDRs: ""
+metricsServer:
+  replicas: 2

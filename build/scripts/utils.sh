@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin
+
 utils_version_ge() {
   test "$(echo "$@" | tr ' ' '\n' | sort -rV | head -n 1)" == "$1"
 }
@@ -88,9 +90,73 @@ utils_os_env() {
     fi
 }
 
+utils_get_distribution() {
+  lsb_dist=""
+  # Every system that we officially support has /etc/os-release
+  if [ -r /etc/os-release ]; then
+    lsb_dist="$(. /etc/os-release && echo "$ID")"
+  fi
+  # Returning an empty string here should be alright since the
+  # case statements don't act unless you provide an actual value
+  echo "$lsb_dist"
+}
+
 utils_shouldMkFs() {
     if [ "$1" != "" ] && [ "$1" != "/" ] && [ "$1" != "\"/\"" ];then
         return 0
     fi
     return 1
+}
+
+disable_selinux() {
+  if [ -s /etc/selinux/config ] && grep 'SELINUX=enforcing' /etc/selinux/config; then
+    sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+    setenforce 0
+  fi
+}
+
+public::nvidia::check(){
+    if [ "$ARCH" != "amd64" ];then
+        utils_info "gpu now not support $ARCH"
+        return 1
+    fi
+    if which nvidia-smi;then
+        return 0
+    fi
+
+    return 1
+}
+
+kube::nvidia::setup_lspci(){
+    if utils_command_exists lspci; then
+        return
+    fi
+    utils_info "lspci command not exist, install it"
+    rpm -ivh --force --nodeps ${1}/../rpm/nvidia/pciutils*.rpm
+    if [[ "$?" != "0" ]]; then
+        panic "failed to install pciutils via command (rpm -ivh --force --nodeps ${1}/../rpm/nvidia/pciutils*.rpm) in dir ${PWD}, please run it for debug"
+    fi
+}
+
+kube::nvidia::detect_gpu(){
+    tar -xvf ${1}/../tgz/nvidia.tgz -C ${1}/../rpm/
+    kube::nvidia::setup_lspci ${1}
+    lspci | grep -i nvidia > /dev/null 2>&1
+    if [[ "$?" == "0" ]]; then
+        return 0
+    fi
+    return 1
+}
+
+public::nvidia::check_has_gpu(){
+    utils_arch_env
+    if ! public::nvidia::check;then
+        return 1
+    fi
+
+    if ! kube::nvidia::detect_gpu ${1};then
+        return 1
+    fi
+
+    return 0
 }
