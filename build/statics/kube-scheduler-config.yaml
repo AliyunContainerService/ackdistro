@@ -9,58 +9,51 @@ leaderElection:
   resourceNamespace: kube-system
 profiles:
   - pluginConfig:
-      - name: Open-Local
-        args:
-          schedulerStrategy: "spread"
-      - name: NodeResourcesFit
-        args:
-          apiVersion: kubescheduler.config.k8s.io/v1beta2
-          kind: NodeResourcesFitArgs
-          scoringStrategy:
-            type: LeastAllocated
-            resources:
-              - name: cpu
-                weight: 1
-              - name: memory
-                weight: 1
-              - name: "kubernetes.io/batch-cpu"
-                weight: 1
-              - name: "kubernetes.io/batch-memory"
-                weight: 1
-      - name: LoadAwareScheduling
-        args:
-          apiVersion: kubescheduler.config.k8s.io/v1beta2
-          kind: LoadAwareSchedulingArgs
-          filterExpiredNodeMetrics: false
-          nodeMetricExpirationSeconds: 300
-          resourceWeights:
-            cpu: 1
-            memory: 1
-          usageThresholds:
-            cpu: 65
-            memory: 95
-          # disable by default
-          # prodUsageThresholds indicates the resource utilization threshold of Prod Pods compared to the whole machine.
-          # prodUsageThresholds:
-          #   cpu: 55
-          #   memory: 75
-          # scoreAccordingProdUsage controls whether to score according to the utilization of Prod Pod
-          # scoreAccordingProdUsage: true
-          # aggregated supports resource utilization filtering and scoring based on percentile statistics
-          # aggregated:
-          #   usageThresholds:
-          #     cpu: 65
-          #     memory: 95
-          #   usageAggregationType: "p95"
-          #   scoreAggregationType: "p95"
-          estimatedScalingFactors:
-            cpu: 85
-            memory: 70
-      - name: ElasticQuota
-        args:
-          apiVersion: kubescheduler.config.k8s.io/v1beta2
-          kind: ElasticQuotaArgs
-          quotaGroupNamespace: kube-system
+    - name: gpushare
+      args:
+        policy:
+          - algorithm: binpack
+          - algorithm: spread
+            nodeSelectors:
+              ack.node.gpu.placement: "spread"
+    - name: Open-Local
+      args:
+        schedulerStrategy: "spread"
+    - name: NodeResourcesFit
+      args:
+        apiVersion: kubescheduler.config.k8s.io/v1beta2
+        kind: NodeResourcesFitArgs
+        scoringStrategy:
+          type: LeastAllocated
+          resources:
+            - name: cpu
+              weight: 1
+            - name: memory
+              weight: 1
+            - name: "kubernetes.io/batch-cpu"
+              weight: 1
+            - name: "kubernetes.io/batch-memory"
+              weight: 1
+    - name: LoadAwareScheduling
+      args:
+        apiVersion: kubescheduler.config.k8s.io/v1beta2
+        kind: LoadAwareSchedulingArgs
+        filterExpiredNodeMetrics: false
+        nodeMetricExpirationSeconds: 300
+        resourceWeights:
+          cpu: 1
+          memory: 1
+        usageThresholds:
+          cpu: 65
+          memory: 95
+        estimatedScalingFactors:
+          cpu: 85
+          memory: 70
+    - name: ElasticQuota
+      args:
+        apiVersion: kubescheduler.config.k8s.io/v1beta2
+        kind: ElasticQuotaArgs
+        quotaGroupNamespace: kube-system
     plugins:
       queueSort:
         disabled:
@@ -69,6 +62,7 @@ profiles:
           - name: Coscheduling
       preFilter:
         enabled:
+          - name: gpushare
           - name: NodeNUMAResource
           - name: DeviceShare
           - name: Open-Local
@@ -78,6 +72,7 @@ profiles:
           - name: BatchResourceFit
       filter:
         enabled:
+          - name: gpushare
           - name: LoadAwareScheduling
           - name: NodeNUMAResource
           - name: DeviceShare
@@ -99,6 +94,8 @@ profiles:
           - name: Reservation
       score:
         enabled:
+          - name: gpushare
+            weight: 20000
           - name: LoadAwareScheduling
             weight: 1
           - name: NodeNUMAResource
@@ -109,6 +106,7 @@ profiles:
             weight: 5000
       reserve:
         enabled:
+          - name: gpushare
           - name: LoadAwareScheduling
           - name: NodeNUMAResource
           - name: DeviceShare
