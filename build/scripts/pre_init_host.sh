@@ -28,13 +28,13 @@ EOF
   fi
 }
 
-set_logrotate
+if [ "${DisableLogRotate}" != "true" ];then
+  set_logrotate
+fi
 
 # copy bins
 chmod +x ${scripts_path}/../bin/*
 cp -f ${scripts_path}/../bin/* /usr/bin/ || true
-
-sysctl -w net.ipv6.conf.all.forwarding=1
 
 configure_ipv6="net.ipv6.conf.all.disable_ipv6 = 0"
 echo $configure_ipv6 > /etc/sysctl.d/ack-d-enable-ipv6.conf

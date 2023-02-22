@@ -10,6 +10,7 @@ spec:
     set -e;set -x
     export HostIPFamily=${HostIPFamily}
     export HostIP=${HostIP}
+    export DisableLogRotate=${DisableLogRotate}
 
     bash scripts/pre_init_host.sh
 ---
@@ -25,6 +26,7 @@ spec:
     set -e;set -x
     export HostIPFamily=${HostIPFamily}
     export HostIP=${HostIP}
+    export DisableLogRotate=${DisableLogRotate}
 
     bash scripts/pre_init_host.sh
     
