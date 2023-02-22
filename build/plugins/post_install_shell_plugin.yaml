@@ -51,5 +51,7 @@ spec:
     export PlatformCAKeyPath=${PlatformCAKeyPath}
     export GenerateCAFlag=${GenerateCAFlag}
     export SkipHealthCheck=${SkipHealthCheck}
+    export LocalRegistryURL=${LocalRegistryURL}
+    export LocalRegistryDomain=${LocalRegistryDomain}
 
     bash scripts/post_install.sh
