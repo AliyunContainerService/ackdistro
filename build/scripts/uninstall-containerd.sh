@@ -8,6 +8,7 @@ if which nvidia-docker;then
 fi
 
 # remove containers and images
+nerdctl rm -f sealer-registry
 crictl ps -aq | xargs crictl stop
 crictl ps -aq | xargs crictl rm
 crictl images -q | xargs crictl rmi
