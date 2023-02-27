@@ -8,7 +8,7 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/kube-proxy:v1.22.15
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/l-zero:v1.1.0-6829307
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/httpd:alpine3.15
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/opsbase-alpine:v0.2
-ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/hybridnet:v0.7.7
+ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/hybridnet:v0.7.8
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/paralb:v0.2.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/open-local:v0.6.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-node-driver-registrar:v2.3.0

@@ -66,6 +66,7 @@ init:
   apiServerVIP: "${apiServerInternalIP}"
   iamGatewayVIP: "${gatewayInternalIP}"
 defaultIPFamily: IPv${HostIPFamily}
+defaultIPRetain: ${DefaultIPRetain}
 multiCluster: true
 daemon:
   vtepAddressCIDRs: ${VtepAddressCIDRs}
