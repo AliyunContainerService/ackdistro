@@ -91,7 +91,7 @@ profiles:
           - name: Reservation
           - name: Coscheduling
           - name: ElasticQuota
-          - name: DefaultPreemption
+          - name: CompatibleDefaultPreemption
       preScore:
         enabled:
           - name: Reservation
