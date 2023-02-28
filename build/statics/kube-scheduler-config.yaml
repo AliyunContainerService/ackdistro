@@ -64,7 +64,6 @@ profiles:
         enabled:
           - name: gpushare
           - name: NodeNUMAResource
-          - name: DeviceShare
           - name: Open-Local
           - name: Reservation
           - name: Coscheduling
@@ -75,7 +74,6 @@ profiles:
           - name: gpushare
           - name: LoadAwareScheduling
           - name: NodeNUMAResource
-          - name: DeviceShare
           - name: Hybridnet
           - name: MaxInstance
           - name: Open-Local
@@ -109,7 +107,6 @@ profiles:
           - name: gpushare
           - name: LoadAwareScheduling
           - name: NodeNUMAResource
-          - name: DeviceShare
           - name: Reservation
           - name: Coscheduling
           - name: ElasticQuota
@@ -121,7 +118,6 @@ profiles:
       preBind:
         enabled:
           - name: NodeNUMAResource
-          - name: DeviceShare
           - name: Open-Local
           - name: Reservation
       bind:
