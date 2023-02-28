@@ -15,7 +15,8 @@ fi
 utils_os_env
 
 if [ "$OSRelease" == "" ]; then
-  panic "install s3fs now only support redhat like OS"
+  echo "install s3fs now only support Redhat-like OS, skip install it"
+  exit 0
 fi
 
 tar -xvf ${scripts_path}/../tgz/s3fs-${OSRelease}.tgz -C ${scripts_path}/../rpm/

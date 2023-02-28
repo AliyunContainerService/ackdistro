@@ -15,7 +15,7 @@ fi
 utils_os_env
 
 if [ "$OSRelease" == "" ]; then
-  panic "install lvm now only support redhat like OS"
+  panic "install lvm now only support Redhat-like OS"
 fi
 
 tar -xvf ${scripts_path}/../tgz/lvm-${OSRelease}.tgz -C ${scripts_path}/../rpm/
