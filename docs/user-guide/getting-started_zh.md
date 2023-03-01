@@ -151,7 +151,7 @@ spec:
     externalRegistry: # external registry configuration
       domain: ack-agility-registry.cn-shanghai.cr.aliyuncs.com # if use lite mode image, externalRegistry must be set as this
     localRegistry: # local registry configuration
-      domain: sea.hub # domain for local registry, default is sea.hub 
+      domain: sea.hub # domain for local registry, default is sea.hub
       port: 5000 # port for local registry, default is 5000
   ...
 ```
@@ -306,7 +306,7 @@ trident on-sealer -f Clusterfile  --sealer
 
 #### etcd周期备份
 
-无需配置，默认每天凌晨2点进行etcd备份，如需恢复etcd，可以查看任意master节点的/backup/etcd/snapshots/目录，获取备份文件，然后根据 https://etcd.io/docs/v3.3/op-guide/recovery/ 进行恢复。
+无需配置，默认每天凌晨2点进行etcd备份，如需恢复etcd，可以查看任意master节点的/backup/etcd/snapshots/目录，获取备份文件，然后根据 [Etcd 恢复](https://etcd.io/docs/v3.3/op-guide/recovery/) 进行恢复。
 
 #### K8s集群审计日志
 
