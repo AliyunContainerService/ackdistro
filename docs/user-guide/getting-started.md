@@ -151,7 +151,7 @@ spec:
     externalRegistry: # external registry configuration
       domain: ack-agility-registry.cn-shanghai.cr.aliyuncs.com # if use lite mode image, externalRegistry must be set as this
     localRegistry: # local registry configuration
-      domain: sea.hub # domain for local registry, default is sea.hub 
+      domain: sea.hub # domain for local registry, default is sea.hub
       port: 5000 # port for local registry, default is 5000
   ...
 ```
@@ -306,7 +306,7 @@ trident on-sealer -f Clusterfile  --sealer
 
 #### etcd cron backup
 
-No configuration is required. By default, etcd is backed up at 2 am every day. If you need to restore etcd, you can check the /backup/etcd/snapshots/ directory of any master node to obtain the backup file, and then follow https://etcd.io/docs/v3.3/op-guide/recovery/ for recovery.
+No configuration is required. By default, etcd is backed up at 2 am every day. If you need to restore etcd, you can check the /backup/etcd/snapshots/ directory of any master node to obtain the backup file, and then follow [Etcd Recovery](https://etcd.io/docs/v3.3/op-guide/recovery/) for recovery.
 
 #### K8s cluster audit log
 

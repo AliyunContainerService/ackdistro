@@ -98,8 +98,6 @@ spec:
         - mountPath: /run/systemd
           name: systemd
           readOnly: true
-        - mountPath: /bin/systemctl
-          name: systemctl
         - mountPath: /etc/systemd/system
           name: system
           readOnly: true
@@ -132,9 +130,6 @@ spec:
       - name: systemd
         hostPath:
           path: /run/systemd
-      - name: systemctl
-        hostPath:
-          path: /bin/systemctl
       - name: system
         hostPath:
           path: /etc/systemd/system
@@ -182,8 +177,6 @@ spec:
               path: kubelet-custom-plugin-monitor.json
             - key: container-custom-plugin-monitor.json
               path: container-custom-plugin-monitor.json
-
-
             - key: check_ntp.sh
               path: plugin/check_ntp.sh
             - key: check_fd.sh
