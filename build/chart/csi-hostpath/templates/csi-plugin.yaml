@@ -13,6 +13,8 @@ spec:
     metadata:
       labels:
         app: {{ .Values.hostpath_name }}
+      annotations:
+        networking.alibaba.com/network-type: Overlay
     spec:
       tolerations:
       - operator: Exists
