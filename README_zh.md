@@ -82,6 +82,5 @@ kubectl get cs
 
 ![image](https://user-images.githubusercontent.com/8002217/219262258-f3ced02a-c361-4191-b55b-99e932dfbc6e.png)
 
-
 ## License
 ACK Distro is licensed under the Apache License, Version 2.0. See LICENSE for the full license text.
