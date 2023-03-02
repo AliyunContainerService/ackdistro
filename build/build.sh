@@ -123,10 +123,9 @@ fi
 # shellcheck disable=SC2016
 #sudo sed -i "s/v1.19.8/$k8s_version/g" rootfs/etc/kubeadm.yml ##change k8s_version
 
-if [ "$BUILD_MODE" == "lite" ];then
-  cp -f imageList-lite imageList
-else
-  cp -f imageList-standard imageList
+cat imageList-lite > imageList
+if [ "$BUILD_MODE" != "lite" ];then
+  cat imageList-standard >> imageList
 fi
 
 # Build sealer image

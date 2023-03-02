@@ -1,0 +1,12 @@
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: upgrade_host # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: upgrade-host
+  scope: master|node
+  data: |
+    set -e;set -x
+    cp -f bin/seautil /usr/local/bin/seautil
+    chmod +x /usr/local/bin/seautil
