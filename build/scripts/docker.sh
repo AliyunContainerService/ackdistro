@@ -93,3 +93,6 @@ disable_selinux
 systemctl daemon-reload
 systemctl restart docker.service
 check_docker_valid
+
+mkdir -p /etc/sealer-cri/
+echo "/var/run/dockershim.sock" > /etc/sealer-cri/socket-path

@@ -84,3 +84,6 @@ disable_selinux
 systemctl daemon-reload
 systemctl enable containerd.service
 systemctl restart containerd.service
+
+mkdir -p /etc/sealer-cri/
+echo -n "/run/containerd/containerd.sock" > /etc/sealer-cri/socket-path
