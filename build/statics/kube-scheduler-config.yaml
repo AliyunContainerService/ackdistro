@@ -1,6 +1,9 @@
 apiVersion: kubescheduler.config.k8s.io/v1beta2
 kind: KubeSchedulerConfiguration
+percentageOfNodesToScore: 15
 clientConnection:
+  qps: 2000
+  burst: 2000
   kubeconfig: /etc/kubernetes/scheduler.conf
 leaderElection:
   leaderElect: true
