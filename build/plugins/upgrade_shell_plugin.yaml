@@ -12,4 +12,7 @@ spec:
     export ActualVersion=v1.20.11-aliyun.1
     export DesiredVersion=v1.22.15-aliyun.1
     export ForceUpgrade=true
+    export SkipHealthCheck=false
     trident upgradev2 --actual-version=${ActualVersion} --desired-version=${DesiredVersion} --force=${ForceUpgrade}
+
+    bash scripts/post_upgrade.sh

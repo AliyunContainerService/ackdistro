@@ -8,9 +8,10 @@ if ! which sealer;then
 fi
 
 KUBE_VERSION=$1
-TAG=$2
-MULTI_ARCH=$3
-ARCH=$4
+ROLL_BACK_KUBE_VERSION=$2
+TAG=$3
+MULTI_ARCH=$4
+ARCH=$5
 
 if [[ "$KUBE_VERSION" == "" ]];then
     echo "Usage: bash build.sh VERSION"
