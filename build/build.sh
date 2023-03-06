@@ -104,7 +104,7 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
             wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/${tgz} -O ${arch}/tgz/${tgz}
         done
 
-        wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/cri-containerd-cni-1.5.13-linux-${arch}.tar.gz -O ${arch}/tgz/containerd.tgz
+        wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/containerd-1.6.19-linux-${arch}.tar.gz -O ${arch}/tgz/containerd.tgz
     done
 fi
 

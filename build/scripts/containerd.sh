@@ -80,6 +80,42 @@ if ! containerd --version; then
   cp -f ${scripts_path}/../etc/containerd-config.toml /etc/containerd/config.toml
 fi
 
+LocalRegistryPort=${LocalRegistryPort:-5000}
+mkdir -p /etc/containerd/certs.d
+
+mkdir -p /etc/containerd/certs.d/docker.io
+cat > /etc/containerd/certs.d/docker.io/hosts.toml <<EOF
+server = "https://registry-1.docker.io"
+EOF
+
+mkRegistryHostToml() {
+  mkdir -p /etc/containerd/certs.d/${1}
+  cat > /etc/containerd/certs.d/${1}/hosts.toml <<EOF
+server = "https://${1}"
+[host."https://${1}"]
+  skip_verify = true
+EOF
+}
+
+mkRegistryHostToml 127.0.0.1:${LocalRegistryPort}
+mkRegistryHostToml sea.hub:${LocalRegistryPort}
+mkRegistryHostToml registry-internal.adp.aliyuncs.com:${LocalRegistryPort}
+mkRegistryHostToml ack-agility-registry.cn-shanghai.cr.aliyuncs.com
+mkRegistryHostToml 127.0.0.1:${LocalRegistryPort}
+if [ "${TrustedRegistry}" != "" ];then
+  mkRegistryHostToml ${TrustedRegistry}
+fi
+
+harborURL=""
+if [ "${harborAddress}" != "" ];then
+  harborURL=${harborAddress}
+elif [ "${gatewayDomain}" != "" ];then
+  harborURL=harbor.${gatewayDomain}
+else
+  harborURL=harbor.cnstack.local
+fi
+mkRegistryHostToml ${harborURL}
+
 disable_selinux
 systemctl daemon-reload
 systemctl enable containerd.service
