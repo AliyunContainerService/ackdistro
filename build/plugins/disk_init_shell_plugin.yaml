@@ -8,13 +8,6 @@ spec:
   scope: master
   data: |
     set -e; set -x
-    export EtcdDevice="${EtcdDevice}"
-    export StorageDevice="${StorageDevice}"
-    export DockerRunDiskSize="${DockerRunDiskSize}"
-    export KubeletRunDiskSize="${KubeletRunDiskSize}"
-    export DaemonFileSystem="${DaemonFileSystem}"
-    export ContainerRuntime="${ContainerRuntime}"
-    export OSRelease="${OSRelease}"
     bash scripts/install-lvm.sh || exit 1
     bash scripts/disk_init_v2.sh
 ---
@@ -28,11 +21,6 @@ spec:
   scope: node
   data: |
     set -e; set -x
-    export StorageDevice="${StorageDevice}"
-    export DockerRunDiskSize="${DockerRunDiskSize}"
-    export KubeletRunDiskSize="${KubeletRunDiskSize}"
-    export DaemonFileSystem="${DaemonFileSystem}"
-    export ContainerRuntime="${ContainerRuntime}"
-    export OSRelease="${OSRelease}"
+    export EtcdDevice=""
     bash scripts/install-lvm.sh || exit 1
     bash scripts/disk_init_v2.sh

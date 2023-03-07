@@ -8,9 +8,6 @@ spec:
   scope: master
   data: |
     set -e; set -x
-    export EtcdDevice="${EtcdDevice}"
-    export StorageDevice="${StorageDevice}"
-    export ContainerRuntime="${ContainerRuntime}"
     bash scripts/disk_init_rollback_v2.sh
 ---
 apiVersion: sealer.aliyun.com/v1alpha1
@@ -23,6 +20,5 @@ spec:
   scope: node
   data: |
     set -e; set -x
-    export StorageDevice="${StorageDevice}"
-    export ContainerRuntime="${ContainerRuntime}"
+    export EtcdDevice=""
     bash scripts/disk_init_rollback_v2.sh

@@ -1,0 +1,12 @@
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: upgrade # Specify this plugin name,will dump in $rootfs/plugin dir.
+spec:
+  type: SHELL
+  action: upgrade
+  data: |
+    set -x
+    # TODO check
+    trident upgrade-trident --sealer -f /root/.sealer/Clusterfile --debug --force
+    bash scripts/upgrade-trident-addons.sh

@@ -10,3 +10,5 @@ spec:
     set -e;set -x
     cp -f bin/seautil /usr/local/bin/seautil
     chmod +x /usr/local/bin/seautil
+    cp -f bin/trident /usr/bin/trident
+    chmod +x /usr/bin/trident

@@ -13,6 +13,8 @@ clean_vg_pool()
     pvs=`pvs|grep $tridentVGName|awk '{print $1}'`
     vgs=`vgs|grep $tridentVGName|awk '{print $1}'`
     c=0
+    pvlist=()
+    vglist=()
     for v in $pvs
     do
         pvlist[$c]=$v
