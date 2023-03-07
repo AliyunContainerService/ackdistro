@@ -169,8 +169,123 @@ if [ "${Network}" == "calico" ];then
     exit 1
   fi
 else
+  # for vivo
   if helm -n kube-system get hybridnet;then
     kubectl apply -f chart/hybridnet/crds/
+    helm_install hybridnet || panic "failed to install hybridnet"
+  elif helm -n default get rama;then
+    kubectl -n kube-system delete ds hybridnet-daemon hybridnet-manager hybridnet-webhook
+    kubectl -n kube-system delete sa hybridnet
+    kubectl delete clusterrole system:hybridnet
+    kubectl delete clusterrolebinding hybridnet
+    kubectl -n kube-system delete svc hybridnet-webhook
+    kubectl delete MutatingWebhookConfiguration hybridnet-mutating-webhook
+    kubectl delete ValidatingWebhookConfiguration hybridnet-validating-webhook
+    kubectl apply -f chart/hybridnet/crds/
+
+    kubectl apply -f -<<EOF
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    meta.helm.sh/release-name: hybridnet
+    meta.helm.sh/release-namespace: kube-system
+  generation: 4
+  labels:
+    app: hybridnet
+    app.kubernetes.io/managed-by: Helm
+    component: manager
+  name: hybridnet-manager
+  namespace: kube-system
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: hybridnet
+      component: manager
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: hybridnet
+        component: manager
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app: hybridnet
+                component: manager
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - command:
+        - /hybridnet/hybridnet-manager
+        - --default-ip-retain=true
+        - --controller-concurrency=Pod=1,IPAM=1,IPInstance=1
+        - --kube-client-qps=300
+        - --kube-client-burst=600
+        - --metrics-port=9899
+        env:
+        - name: DEFAULT_NETWORK_TYPE
+          value: Overlay
+        - name: DEFAULT_IP_FAMILY
+          value: IPv4
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        image: ${RegistryURL}/ecp_builder/hybridnet:v0.5.1
+        imagePullPolicy: IfNotPresent
+        name: hybridnet-manager
+        ports:
+        - containerPort: 9899
+          hostPort: 9899
+          name: http-metrics
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      priorityClassName: system-cluster-critical
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: hybridnet
+      serviceAccountName: hybridnet
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+EOF
+    sleep 3
+    suc=false
+    for i in `seq 1 24`;do
+      updatedReplicas=`kubectl -n kube-system get deploy hybridnet-manager -ojsonpath='{.status.updatedReplicas}'`
+      availableReplicas=`kubectl -n kube-system get deploy hybridnet-manager -ojsonpath='{.status.availableReplicas}'`
+      readyReplicas=`kubectl -n kube-system get deploy hybridnet-manager -ojsonpath='{.status.readyReplicas}'`
+      if [ "$updatedReplicas" == "1" ] && [ "$availableReplicas" == "1" ] && [ "$availableReplicas" == "1" ];then
+        suc=true
+        break
+      fi
+    done
+
+    if [ "$suc" != "true" ];then
+      echo "failed to update hybridnet to v0.5.1"
+      exit 1
+    fi
     helm_install hybridnet || panic "failed to install hybridnet"
   else
     echo "failed to check hybridnet exist"

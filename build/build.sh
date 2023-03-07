@@ -59,7 +59,7 @@ for arch in $archs;do
 done
 platform=${platform:1}
 
-trident_version=1.14.2
+trident_version=1.14.3
 if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
     for arch in $archs;do
         rm -rf ${arch}
