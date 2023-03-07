@@ -152,7 +152,7 @@ fi
 # Step 5: clean ackdistro pool
 if [ "$vgName" = "ackdistro-pool" ];then
     clean_vg_pool "ackdistro-pool"
-    if [ "$storageDev" != "" ];then
+    if utils_shouldMkFs $storageDev;then
         OLD_IFS="$IFS"
         IFS=${NEW_IFS}
         arr=($storageDev)
