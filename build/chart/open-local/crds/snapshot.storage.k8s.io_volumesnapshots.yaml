@@ -14,8 +14,6 @@ spec:
     kind: VolumeSnapshot
     listKind: VolumeSnapshotList
     plural: volumesnapshots
-    shortNames:
-    - vs
     singular: volumesnapshot
   scope: Namespaced
   versions:
