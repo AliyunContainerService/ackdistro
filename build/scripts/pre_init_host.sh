@@ -94,7 +94,7 @@ if ! echo $KUBELET_EXTRA_ARGS > /etc/sysconfig/kubelet;then
 fi
 
 acceptRaIfname=`trident get-accept-ra-ifname`
-if [ "${acceptRaIfname}" != "" ];then
+if [ "$?" == "0" ] && [ "${acceptRaIfname}" != "" ];then
   sysctl -w net.ipv6.conf.${acceptRaIfname}.accept_ra=2
 fi
 sysctl -w net.ipv6.conf.all.forwarding=1
