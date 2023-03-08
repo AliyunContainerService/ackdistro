@@ -142,5 +142,5 @@ if [ "$BUILD_MODE" != "lite" ];then
 fi
 
 # Build sealer image
-sealer rmi ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${TAG} || true
+sealer rmi ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${TAG} --force || true
 sealer build -f Kubefile -t ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:${TAG} --platform ${platform} .
