@@ -47,6 +47,9 @@ elif echo "${ingressInternalIP}" | grep ":";then
   ingressControllerVIP=",${ingressInternalIP}"
 else
   ingressControllerVIP="${ingressInternalIP},"
+  if [ "$ingressControllerVIP" == "," ];then
+    ingressControllerVIP=""
+  fi
 fi
 if echo "${apiServerInternalIP}" | grep ",";then
   apiServerVIP="${apiServerInternalIP}"
@@ -54,6 +57,9 @@ elif echo "${apiServerInternalIP}" | grep ":";then
   apiServerVIP=",${apiServerInternalIP}"
 else
   apiServerVIP="${apiServerInternalIP},"
+  if [ "$apiServerVIP" == "," ];then
+    apiServerVIP=""
+  fi
 fi
 
 # Prepare helm config
