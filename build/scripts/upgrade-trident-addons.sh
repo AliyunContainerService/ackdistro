@@ -157,17 +157,6 @@ for NS in kube-system acs-system;do
   fi
 done
 
-kubectl -n kube-system annotate psp ack.privileged meta.helm.sh/release-namespace=kube-system --overwrite
-kubectl -n kube-system annotate sa coredns kube-proxy metrics-server meta.helm.sh/release-namespace=kube-system --overwrite
-kubectl -n kube-system annotate cm kube-proxy-worker kube-proxy-master meta.helm.sh/release-namespace=kube-system --overwrite
-kubectl -n kube-system annotate clusterrole system:coredns ack:podsecuritypolicy:privileged  meta.helm.sh/release-namespace=kube-system --overwrite
-kubectl -n kube-system annotate clusterrolebinding system:coredns ack:podsecuritypolicy:authenticated kubeadm:node-proxier metrics-server  meta.helm.sh/release-namespace=kube-system --overwrite
-kubectl -n kube-system annotate service kube-dns heapster  metrics-server meta.helm.sh/release-namespace=kube-system --overwrite
-kubectl -n kube-system annotate ds coredns kube-proxy-master kube-proxy-worker meta.helm.sh/release-namespace=kube-system --overwrite
-kubectl -n kube-system annotate deploy metrics-server meta.helm.sh/release-namespace=kube-system --overwrite
-kubectl -n kube-system annotate APIService v1beta1.metrics.k8s.io meta.helm.sh/release-namespace=kube-system --overwrite
-helm_install kube-core || panic "failed to install kube-core"
-
 if [ "${Network}" == "calico" ];then
   if helm -n default status calico;then
     helm_install calico || panic "failed to install calico"
@@ -242,6 +231,7 @@ spec:
         - /hybridnet/hybridnet-manager
         - --default-ip-retain=true
         - --controller-concurrency=Pod=1,IPAM=1,IPInstance=1
+        - --feature-gates=DualStack=true
         - --kube-client-qps=300
         - --kube-client-burst=600
         - --metrics-port=9899
@@ -303,6 +293,17 @@ EOF
     exit 1
   fi
 fi
+
+kubectl -n kube-system annotate psp ack.privileged meta.helm.sh/release-namespace=kube-system --overwrite
+kubectl -n kube-system annotate sa coredns kube-proxy metrics-server meta.helm.sh/release-namespace=kube-system --overwrite
+kubectl -n kube-system annotate cm kube-proxy-worker kube-proxy-master meta.helm.sh/release-namespace=kube-system --overwrite
+kubectl -n kube-system annotate clusterrole system:coredns ack:podsecuritypolicy:privileged  meta.helm.sh/release-namespace=kube-system --overwrite
+kubectl -n kube-system annotate clusterrolebinding system:coredns ack:podsecuritypolicy:authenticated kubeadm:node-proxier metrics-server  meta.helm.sh/release-namespace=kube-system --overwrite
+kubectl -n kube-system annotate service kube-dns heapster  metrics-server meta.helm.sh/release-namespace=kube-system --overwrite
+kubectl -n kube-system annotate ds coredns kube-proxy-master kube-proxy-worker meta.helm.sh/release-namespace=kube-system --overwrite
+kubectl -n kube-system annotate deploy metrics-server meta.helm.sh/release-namespace=kube-system --overwrite
+kubectl -n kube-system annotate APIService v1beta1.metrics.k8s.io meta.helm.sh/release-namespace=kube-system --overwrite
+helm_install kube-core || panic "failed to install kube-core"
 
 if helm -n default status yoda;then
   helm -n default delete yoda
