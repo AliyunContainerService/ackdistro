@@ -158,12 +158,7 @@ for NS in kube-system acs-system;do
 done
 
 if [ "${Network}" == "calico" ];then
-  if helm -n default status calico;then
-    helm_install calico || panic "failed to install calico"
-  else
-    echo "failed to check calico exist"
-    exit 1
-  fi
+  helm -n default upgrade calico --reuse-values /root/workspace/ecp/kube-current/addons/net-plugins/calico --set images.calicocni.image=ecp_builder/calico-cni  --set images.calicoflexvol.image=ecp_builder/calico-pod2daemon-flexvol --set images.caliconode.image=ecp_builder/calico-node --set images.calicocontrollers.image=ecp_builder/calico-kube-controllers
 else
   # for vivo
   if helm -n kube-system status hybridnet &>/dev/null;then
@@ -421,6 +416,7 @@ data:
   harborAddress: "${harborAddress}"
   vcnsOssAddress: "${vcnsOssAddress}"
   clusterDomain: "${DNSDomain}"
+  defaultIPStack: "4"
   registryURL: "${LocalRegistryURL}"
   registryExternalURL: "${LocalRegistryDomain}:5001"
   RegistryURL: "${LocalRegistryURL}"

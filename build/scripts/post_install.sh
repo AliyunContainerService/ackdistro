@@ -114,6 +114,7 @@ data:
   harborAddress: "${harborAddress}"
   vcnsOssAddress: "${vcnsOssAddress}"
   clusterDomain: "${DNSDomain}"
+  defaultIPStack: "${HostIPFamily}"
   registryURL: "${LocalRegistryURL}"
   registryExternalURL: "${LocalRegistryDomain}:5001"
   RegistryURL: "${LocalRegistryURL}"
