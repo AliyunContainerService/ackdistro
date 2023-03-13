@@ -146,7 +146,7 @@ spec:
           image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.localdnscache.image }}:{{ .Values.images.localdnscache.tag }}"
           resources:
             requests:
-              cpu: 25m
+              cpu: "0"
               memory: 5Mi
           args: [ "-localip", "{{ .Values.global.LocalDNSCacheIP }}", "-conf", "/etc/Corefile", "-upstreamsvc", "kube-dns-upstream" ]
           securityContext:
