@@ -142,8 +142,18 @@ kubelet_size=$kubelet_size"Gi"
 
 lvs|grep $lv_container_name
 if [ "$?" != "0" ]; then
-    output1=$(lvcreate --name $lv_container_name --size $container_runtime_size $vgName -y 2>&1)
-    if [ "$?" != "0" ]; then
+    suc=false
+    for i in `seq 1 12`;do
+        if [ "$i" != "1" ];then
+            sleep 5
+        fi
+        output1=$(lvcreate --name $lv_container_name --size $container_runtime_size $vgName -y 2>&1)
+        if [ "$?" == "0" ]; then
+            suc=true
+            break
+        fi
+    done
+    if [ "$suc" != "true" ]; then
         panic "failed to create $lv_container_name lv: $output1"
     fi
 else
@@ -152,8 +162,18 @@ fi
 
 lvs|grep $lv_kubelet_name
 if [ "$?" != "0" ]; then
-    output2=$(lvcreate --name $lv_kubelet_name --size $kubelet_size $vgName -y 2>&1)
-    if [ "$?" != "0" ]; then
+    suc=false
+    for i in `seq 1 12`;do
+        if [ "$i" != "1" ];then
+            sleep 5
+        fi
+        output2=$(lvcreate --name $lv_kubelet_name --size $kubelet_size $vgName -y 2>&1)
+        if [ "$?" == "0" ]; then
+            suc=true
+            break
+        fi
+    done
+    if [ "$suc" != "true" ]; then
         panic "failed to create $lv_kubelet_name lv: $output2"
     fi
 else

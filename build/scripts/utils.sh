@@ -77,11 +77,14 @@ utils_os_env() {
         Anolis)
             export OSVersion="$(cat /etc/anolis-release | awk '{print $4}')"
             ;;
+        RedHat)
+            export OSVersion=`utils_get_redhat_release`
+            ;;
         *)
             echo -e "Not support get OS version of ${OS}"
     esac
 
-    if [[ "$OS" == "CentOS" ]] || [[ "$OS" == "Anolis" ]] ||  [[ "$OS" == "AliOS" ]];then
+    if [[ "$OS" == "CentOS" ]] || [[ "$OS" == "Anolis" ]] || [[ "$OS" == "AliOS" ]] || [[ "$OS" == "RedHat" ]];then
         export OSRelease="el7"
         # vague compare: 8.x.xxx
         if [[ $OSVersion =~ ^8\..*$ ]];then
@@ -99,6 +102,14 @@ utils_get_distribution() {
   # Returning an empty string here should be alright since the
   # case statements don't act unless you provide an actual value
   echo "$lsb_dist"
+}
+
+utils_get_redhat_release() {
+  redhat_release=""
+  if [ -r /etc/os-release ]; then
+    redhat_release="$(. /etc/os-release && echo "$VERSION_ID")"
+  fi
+  echo "$redhat_release"
 }
 
 utils_shouldMkFs() {

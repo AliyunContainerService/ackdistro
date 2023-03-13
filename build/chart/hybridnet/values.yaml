@@ -1,7 +1,7 @@
 images:
   hybridnet:
     image: ecp_builder/hybridnet
-    tag: v0.7.7
+    tag: v0.8.0
     imagePullPolicy: IfNotPresent
 global:
   RegistryURL: "sea.hub:5000"
@@ -66,8 +66,7 @@ webhook:
       operator: NotIn
       values: [ "l-zero" ]
     - key: k8s-webhook
-      operator: In
-      values: [ "ahe-extension" ]
+      operator: Exists
 
   # -- The number of webhook pods, which is supposed to be less than or equal to the number of master nodes
   replicas: 3

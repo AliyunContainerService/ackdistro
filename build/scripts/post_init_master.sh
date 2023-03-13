@@ -13,6 +13,10 @@ if ! grep "config=/etc/kubernetes/kube-scheduler-config.yaml" /etc/kubernetes/ma
     sed -i "/    - kube-scheduler/a \    - --config=/etc/kubernetes/kube-scheduler-config.yaml" /etc/kubernetes/manifests/kube-scheduler.yaml
 fi
 
+if ! grep "dnsPolicy: ClusterFirstWithHostNet" /etc/kubernetes/manifests/kube-scheduler.yaml; then
+    sed -i "/  hostNetwork: true/a \  dnsPolicy: ClusterFirstWithHostNet" /etc/kubernetes/manifests/kube-scheduler.yaml
+fi
+
 if ! grep "start-cnstack-koord-scheduler.sh" /etc/kubernetes/manifests/kube-scheduler.yaml; then
     sed -i "s#- kube-scheduler#- /start-cnstack-koord-scheduler.sh#g" /etc/kubernetes/manifests/kube-scheduler.yaml
 fi

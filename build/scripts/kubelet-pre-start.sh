@@ -53,9 +53,9 @@ net.bridge.bridge-nf-call-iptables = 1
 net.ipv4.ip_forward = 1
 net.ipv4.tcp_tw_reuse = 1
 net.ipv4.tcp_fin_timeout = 15
-net.ipv6.conf.all.forwarding = 1
 net.ipv4.conf.all.arp_filter = 0
 net.ipv4.conf.all.rp_filter = 0
+fs.may_detach_mounts = 1
 EOF
 
   while read -r line;do

@@ -1,0 +1,140 @@
+apiVersion: kubescheduler.config.k8s.io/v1beta2
+kind: KubeSchedulerConfiguration
+percentageOfNodesToScore: 15
+clientConnection:
+  qps: 2000
+  burst: 2000
+  kubeconfig: /etc/kubernetes/scheduler.conf
+leaderElection:
+  leaderElect: true
+  resourceLock: leases
+  resourceName: kube-scheduler
+  resourceNamespace: kube-system
+profiles:
+  - pluginConfig:
+    - name: gpushare
+      args:
+        policy:
+          - algorithm: binpack
+          - algorithm: spread
+            nodeSelectors:
+              ack.node.gpu.placement: "spread"
+    - name: Open-Local
+      args:
+        schedulerStrategy: "spread"
+    - name: NodeResourcesFit
+      args:
+        apiVersion: kubescheduler.config.k8s.io/v1beta2
+        kind: NodeResourcesFitArgs
+        scoringStrategy:
+          type: LeastAllocated
+          resources:
+            - name: cpu
+              weight: 1
+            - name: memory
+              weight: 1
+            - name: "kubernetes.io/batch-cpu"
+              weight: 1
+            - name: "kubernetes.io/batch-memory"
+              weight: 1
+            - name: "alibabacloud.com/reclaimed-cpu"
+              weight: 1
+            - name: "alibabacloud.com/reclaimed-memory"
+              weight: 1
+    - name: LoadAwareScheduling
+      args:
+        apiVersion: kubescheduler.config.k8s.io/v1beta2
+        kind: LoadAwareSchedulingArgs
+        filterExpiredNodeMetrics: false
+        nodeMetricExpirationSeconds: 300
+        resourceWeights:
+          cpu: 1
+          memory: 1
+        usageThresholds:
+          cpu: 0
+          memory: 0
+        estimatedScalingFactors:
+          cpu: 85
+          memory: 70
+    - name: ElasticQuota
+      args:
+        apiVersion: kubescheduler.config.k8s.io/v1beta2
+        kind: ElasticQuotaArgs
+        quotaGroupNamespace: kube-system
+    plugins:
+      queueSort:
+        disabled:
+          - name: "*"
+        enabled:
+          - name: Coscheduling
+      preFilter:
+        enabled:
+          - name: FirstFitInterceptor
+          - name: gpushare
+          - name: NodeNUMAResource
+          - name: Open-Local
+          - name: Reservation
+          - name: Coscheduling
+          - name: ElasticQuota
+          - name: BatchResourceFit
+      filter:
+        enabled:
+          - name: gpushare
+          - name: LoadAwareScheduling
+          - name: NodeNUMAResource
+          - name: Hybridnet
+          - name: MaxInstance
+          - name: Open-Local
+          - name: Reservation
+          - name: BatchResourceFit
+      postFilter:
+        disabled:
+          - name: "*"
+        enabled:
+          - name: Reservation
+          - name: Coscheduling
+          - name: ElasticQuota
+          - name: DefaultPreemption
+      preScore:
+        enabled:
+          - name: Reservation
+      score:
+        enabled:
+          - name: gpushare
+            weight: 20000
+          - name: LoadAwareScheduling
+            weight: 1
+          - name: NodeNUMAResource
+            weight: 1
+          - name: Open-Local
+            weight: 1
+          - name: Reservation
+            weight: 5000
+      reserve:
+        enabled:
+          - name: gpushare
+          - name: LoadAwareScheduling
+          - name: NodeNUMAResource
+          - name: Reservation
+          - name: Coscheduling
+          - name: ElasticQuota
+          - name: MaxInstance
+          - name: Open-Local
+      permit:
+        enabled:
+          - name: Coscheduling
+      preBind:
+        enabled:
+          - name: NodeNUMAResource
+          - name: Open-Local
+          - name: Reservation
+      bind:
+        disabled:
+          - name: "*"
+        enabled:
+          - name: Reservation
+          - name: DefaultBinder
+      postBind:
+        enabled:
+          - name: Coscheduling
+    schedulerName: default-scheduler

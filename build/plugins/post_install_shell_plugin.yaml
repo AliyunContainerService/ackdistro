@@ -7,49 +7,4 @@ spec:
   action: post-install
   data: |
     set -e;set -x
-    export DNSDomain=${DNSDomain}
-    export HostIPFamily=${HostIPFamily}
-    export HostIP=${HostIP}
-    export RegistryIP=${RegistryIP}
-    export EnableLocalDNSCache=${EnableLocalDNSCache}
-    export MTU=${MTU}
-    export IPIP=${IPIP}
-    export IPv6DualStack=${IPv6DualStack}
-    export IPAutoDetectionMethod=${IPAutoDetectionMethod}
-    export DisableFailureDomain=${DisableFailureDomain}
-    export RegistryURL=${RegistryURL}
-    export SuspendPeriodHealthCheck=${SuspendPeriodHealthCheck}
-    export SuspendPeriodBroadcastHealthCheck=${SuspendPeriodBroadcastHealthCheck}
-    export Addons=${Addons}
-    export Network=${Network}
-    export RemoveMasterTaint=${RemoveMasterTaint}
-    export PlatformType=${PlatformType}
-    export DefaultStorageClass=${DefaultStorageClass}
-    export ComponentToInstall=${ComponentToInstall}
-    export GenerateClusterInfo=${GenerateClusterInfo}
-    export ParalbHostInterface=${ParalbHostInterface}
-    export deployMode=${deployMode}
-    export gatewayDomain=${gatewayDomain}
-    export DisableGateway=${DisableGateway}
-    export gatewayExposeMode=${gatewayExposeMode}
-    export gatewayInternalIP=${gatewayInternalIP}
-    export gatewayExternalIP=${gatewayExternalIP}
-    export gatewayPort=${gatewayPort}
-    export gatewayAPIServerPort=${gatewayAPIServerPort}
-    export ingressAddress=${ingressAddress}
-    export ingressInternalIP=${ingressInternalIP}
-    export ingressExternalIP=${ingressExternalIP}
-    export ingressHttpPort=${ingressHttpPort}
-    export ingressHttpsPort=${ingressHttpsPort}
-    export harborAddress=${harborAddress}
-    export vcnsOssAddress=${vcnsOssAddress}
-    export apiServerInternalIP=${apiServerInternalIP}
-    export apiServerInternalPort=${apiServerInternalPort}
-    export SvcCIDR=${SvcCIDR}
-    export PodCIDR=${PodCIDR}
-    export PlatformCAPath=${PlatformCAPath}
-    export PlatformCAKeyPath=${PlatformCAKeyPath}
-    export GenerateCAFlag=${GenerateCAFlag}
-    export SkipHealthCheck=${SkipHealthCheck}
-
     bash scripts/post_install.sh

@@ -41,6 +41,27 @@ if [ $NumOfMasters -eq 1 ];then
   MetricsServerReplicas=1
 fi
 
+if echo "${ingressInternalIP}" | grep ",";then
+  ingressControllerVIP="${ingressInternalIP}"
+elif echo "${ingressInternalIP}" | grep ":";then
+  ingressControllerVIP=",${ingressInternalIP}"
+else
+  ingressControllerVIP="${ingressInternalIP},"
+  if [ "$ingressControllerVIP" == "," ];then
+    ingressControllerVIP=""
+  fi
+fi
+if echo "${apiServerInternalIP}" | grep ",";then
+  apiServerVIP="${apiServerInternalIP}"
+elif echo "${apiServerInternalIP}" | grep ":";then
+  apiServerVIP=",${apiServerInternalIP}"
+else
+  apiServerVIP="${apiServerInternalIP},"
+  if [ "$apiServerVIP" == "," ];then
+    apiServerVIP=""
+  fi
+fi
+
 # Prepare helm config
 cat >/tmp/ackd-helmconfig.yaml <<EOF
 global:
@@ -62,10 +83,11 @@ global:
 init:
   cidr: ${PodCIDR%,*}
   ipVersion: "${HostIPFamily}"
-  ingressControllerVIP: "${ingressInternalIP}"
-  apiServerVIP: "${apiServerInternalIP}"
+  ingressControllerVIP: "${ingressControllerVIP}"
+  apiServerVIP: "${apiServerVIP}"
   iamGatewayVIP: "${gatewayInternalIP}"
 defaultIPFamily: IPv${HostIPFamily}
+defaultIPRetain: ${DefaultIPRetain:-true}
 multiCluster: true
 daemon:
   vtepAddressCIDRs: ${VtepAddressCIDRs}

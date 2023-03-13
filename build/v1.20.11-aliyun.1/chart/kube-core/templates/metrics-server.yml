@@ -65,6 +65,8 @@ spec:
       labels:
         k8s-app: metrics-server
         task: monitoring
+      annotations:
+        networking.alibaba.com/network-type: Overlay
     spec:
       affinity:
         nodeAffinity:

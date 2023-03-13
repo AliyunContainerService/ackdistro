@@ -28,13 +28,13 @@ EOF
   fi
 }
 
-set_logrotate
+if [ "${DisableLogRotate}" != "true" ];then
+  set_logrotate
+fi
 
 # copy bins
 chmod +x ${scripts_path}/../bin/*
 cp -f ${scripts_path}/../bin/* /usr/bin/ || true
-
-sysctl -w net.ipv6.conf.all.forwarding=1
 
 configure_ipv6="net.ipv6.conf.all.disable_ipv6 = 0"
 echo $configure_ipv6 > /etc/sysctl.d/ack-d-enable-ipv6.conf
@@ -92,3 +92,9 @@ fi
 if ! echo $KUBELET_EXTRA_ARGS > /etc/sysconfig/kubelet;then
   echo $KUBELET_EXTRA_ARGS > /etc/default/kubelet
 fi
+
+acceptRaIfname=`trident get-accept-ra-ifname`
+if [ "$?" == "0" ] && [ "${acceptRaIfname}" != "" ];then
+  sysctl -w net.ipv6.conf.${acceptRaIfname}.accept_ra=2
+fi
+sysctl -w net.ipv6.conf.all.forwarding=1

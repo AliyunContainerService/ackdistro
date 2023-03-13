@@ -109,6 +109,7 @@ spec:
         app: hybridnet
         component: webhook
         webhook.hybridnet.io/ignore: "true"
+        k8s-webhook: hybridnet
     spec:
       tolerations:
         - operator: Exists

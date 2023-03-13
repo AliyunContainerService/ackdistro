@@ -12,6 +12,8 @@ spec:
       app.kubernetes.io/component: {{ .Values.name }}-controller
   template:
     metadata:
+      annotations:
+        networking.alibaba.com/network-type: Overlay
 {{ include "local.labels" . | indent 6 }}
         app.kubernetes.io/component: {{ .Values.name }}-controller
     spec:

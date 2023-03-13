@@ -7,8 +7,4 @@ spec:
   action: post-scaleup
   data: |
     set -e;set -x
-    export RemoveMasterTaint=${RemoveMasterTaint}
-    export PlatformType=${PlatformType}
-    export ComponentToInstall=${ComponentToInstall}
-    
     bash scripts/post_scaleup.sh

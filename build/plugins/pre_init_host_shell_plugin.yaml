@@ -8,9 +8,6 @@ spec:
   scope: node
   data: |
     set -e;set -x
-    export HostIPFamily=${HostIPFamily}
-    export HostIP=${HostIP}
-
     bash scripts/pre_init_host.sh
 ---
 apiVersion: sealer.aliyun.com/v1alpha1
@@ -23,9 +20,6 @@ spec:
   scope: master
   data: |
     set -e;set -x
-    export HostIPFamily=${HostIPFamily}
-    export HostIP=${HostIP}
-
     bash scripts/pre_init_host.sh
     
     mkdir -p /etc/kubernetes/

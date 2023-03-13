@@ -32,8 +32,11 @@ apiVersion: snapshot.storage.k8s.io/v1
 kind: VolumeSnapshotClass
 metadata:
   name: {{ .Values.storageclass.lvm.name }}
+  annotations:
+    snapshot.storage.kubernetes.io/is-default-class: "true"
 {{ include "local.labels" . | indent 2 }}
     velero.io/csi-volumesnapshot-class: "true"
+    csi.aliyun.com/kind-of-snapshot: "ro"
 driver: {{ .Values.driver }}
 deletionPolicy: Delete
 parameters:
