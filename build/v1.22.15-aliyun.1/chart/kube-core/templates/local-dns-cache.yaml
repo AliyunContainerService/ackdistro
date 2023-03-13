@@ -68,6 +68,11 @@ data:
                   force_tcp
           }
           prometheus :9253
+          {{ if contains ":" .Values.global.LocalDNSCacheIP }}
+          health [{{ .Values.global.LocalDNSCacheIP }}]:8080
+          {{ else }}
+          health {{ .Values.global.LocalDNSCacheIP }}:8080
+          {{ end }}
           }
       in-addr.arpa:53 {
           errors
