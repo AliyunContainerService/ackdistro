@@ -92,12 +92,33 @@ multiCluster: true
 daemon:
   vtepAddressCIDRs: ${VtepAddressCIDRs}
   hostInterface: "${ParalbHostInterface}"
+  resources:
+    requests:
+      cpu: "0"
+      memory: 100Mi
+  felix:
+    resources:
+      requests:
+        cpu: "0"
+        memory: 200Mi
 manager:
   replicas: ${NumOfMasters}
+  resources:
+    requests:
+      cpu: 250m
+      memory: 1024Mi
 webhook:
   replicas: ${NumOfMasters}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
 typha:
   replicas: ${NumOfMasters}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
 metricsServer:
   replicas: ${MetricsServerReplicas}
 EOF
