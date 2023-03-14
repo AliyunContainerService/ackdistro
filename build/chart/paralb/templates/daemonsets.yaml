@@ -33,13 +33,10 @@ spec:
         - name: paralb-daemon
           image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.paralb.image }}:{{ .Values.images.paralb.tag }}"
           imagePullPolicy: IfNotPresent
+          {{- with .Values.daemon.resources }}
           resources:
-            limits:
-              cpu: "1"
-              memory: 1024Mi
-            requests:
-              cpu: 200m
-              memory: 128Mi
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           command:
             - /paralb-daemon
           args:
@@ -48,6 +45,8 @@ spec:
             runAsUser: 0
             privileged: true
           env:
+            - name: IP_FAMILY
+              value:
             - name: NODE_NAME
               valueFrom:
                 fieldRef:

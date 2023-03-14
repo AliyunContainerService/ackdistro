@@ -40,7 +40,10 @@ spec:
           ports:
             - containerPort: 9891
               name: webhook-port
-
+          {{- with .Values.webhook.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
 ---
 kind: Deployment
 apiVersion: apps/v1
@@ -87,13 +90,10 @@ spec:
             - --enable-class-filter=true
             - --enable-leader-election=true
             - --metrics-bind-address=:16800
+          {{- with .Values.manager.resources }}
           resources:
-            limits:
-              cpu: 500m
-              memory: 1Gi
-            requests:
-              cpu: 250m
-              memory: 256Mi
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: NODE_NAME
               valueFrom:
