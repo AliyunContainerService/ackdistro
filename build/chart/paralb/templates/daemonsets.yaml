@@ -33,17 +33,14 @@ spec:
         - name: paralb-daemon
           image: "{{ .Values.global.RegistryURL }}/{{ .Values.images.paralb.image }}:{{ .Values.images.paralb.tag }}"
           imagePullPolicy: IfNotPresent
+          {{- with .Values.paralb.daemon.resources }}
           resources:
-            limits:
-              cpu: "1"
-              memory: 1024Mi
-            requests:
-              cpu: 200m
-              memory: 128Mi
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           command:
             - /paralb-daemon
           args:
-            - --prefer-interfaces={{ .Values.daemon.hostInterface }}
+            - --prefer-interfaces={{ .Values.paralb.daemon.hostInterface }}
           securityContext:
             runAsUser: 0
             privileged: true

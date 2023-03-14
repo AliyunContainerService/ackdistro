@@ -7,16 +7,35 @@ images:
 global:
   RegistryURL: sea.hub:5000
 
-daemon:
-  hostInterface: ""
+paralb:
+  daemon:
+    hostInterface: ""
+    resources:
+      requests:
+        cpu: "0"
+        memory: 128Mi
 
-manager:
-  # -- The number of manager pods, which is supposed to be less than or equal to the number of master nodes
-  replicas: 3
+  manager:
+    # -- The number of manager pods, which is supposed to be less than or equal to the number of master nodes
+    replicas: 3
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 256Mi
 
-webhook:
-  # -- The number of manager pods, which is supposed to be less than or equal to the number of master nodes
-  replicas: 3
+  webhook:
+    # -- The number of manager pods, which is supposed to be less than or equal to the number of master nodes
+    replicas: 3
+    resources:
+      limits:
+        cpu: 100m
+        memory: 200Mi
+      requests:
+        cpu: 30m
+        memory: 50Mi
 
 init:
   # labels
