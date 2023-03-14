@@ -45,8 +45,6 @@ spec:
             runAsUser: 0
             privileged: true
           env:
-            - name: IP_FAMILY
-              value:
             - name: NODE_NAME
               valueFrom:
                 fieldRef:
