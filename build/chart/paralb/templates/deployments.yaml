@@ -6,7 +6,7 @@ metadata:
   annotations:
     kubernetes.io/description: "paralb webhook"
 spec:
-  replicas: {{ .Values.webhook.replicas }}
+  replicas: {{ .Values.paralb.webhook.replicas }}
   selector:
     matchLabels:
       app: paralb
@@ -40,7 +40,7 @@ spec:
           ports:
             - containerPort: 9891
               name: webhook-port
-          {{- with .Values.webhook.resources }}
+          {{- with .Values.paralb.webhook.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -53,7 +53,7 @@ metadata:
   annotations:
     kubernetes.io/description: "paralb manager"
 spec:
-  replicas: {{ .Values.manager.replicas }}
+  replicas: {{ .Values.paralb.manager.replicas }}
   selector:
     matchLabels:
       app: paralb
@@ -90,7 +90,7 @@ spec:
             - --enable-class-filter=true
             - --enable-leader-election=true
             - --metrics-bind-address=:16800
-          {{- with .Values.manager.resources }}
+          {{- with .Values.paralb.manager.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
