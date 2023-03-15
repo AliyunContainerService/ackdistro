@@ -14,26 +14,26 @@ rollback_log() {
 }
 
 downgrade_cni() {
-  rpm -ivh --force --nodeps $DIR_KUBE/rollback/$(ls $DIR_KUBE/rollback | grep cni)
+  rpm -ivh --force --nodeps $DIR_KUBE/rpm/$(ls $DIR_KUBE/rpm | grep cni)
   rollback_log "downgrade kubernetes cni succeeded"
 }
 
 #TODO
 downgrade_kubectl() {
-  /usr/bin/cp -f $DIR_KUBE/rollback/kubelet /usr/bin/
+  /usr/bin/cp -f $DIR_KUBE/bin/kubelet /usr/bin/
   chmod +x /usr/bin/kubectl
   rollback_log "downgrade kubectl succeeded"
 }
 
 downgrade_kubeadm() {
-  /usr/bin/cp -f $DIR_KUBE/rollback/kubeadm /usr/bin/
+  /usr/bin/cp -f $DIR_KUBE/bin/kubeadm /usr/bin/
   chmod +x /usr/bin/kubeadm
   cp -f $DIR_BACKUP/10-kubeadm.conf /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
   rollback_log "rollback kubeadm succeeded"
 }
 
 downgrade_kubelet() {
-  /usr/bin/cp -f $DIR_KUBE/rollback/kubelet /usr/bin/
+  /usr/bin/cp -f $DIR_KUBE/bin/kubelet /usr/bin/
   cp -f $DIR_BACKUP/kubernetes/config.yaml /var/lib/kubelet/config.yaml
   chmod +x /usr/bin/kubelet
 

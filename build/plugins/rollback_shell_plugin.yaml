@@ -1,0 +1,10 @@
+apiVersion: sealer.aliyun.com/v1alpha1
+kind: Plugin
+metadata:
+  name: rollback
+spec:
+  type: SHELL
+  action: rollback
+  data: |
+    set -x
+    trident rollbackv2 --desired-version=v1.20.11-aliyun.1 --actual-version=v1.22.15-aliyun.1
