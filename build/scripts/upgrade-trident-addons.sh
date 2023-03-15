@@ -7,7 +7,7 @@ set -x
 
 export DNSDomain=${DNSDomain:-cluster.local}
 export HostIPFamily=${HostIPFamily:-4}
-export EnableLocalDNSCache=${EnableLocalDNSCache:-false}
+export EnableLocalDNSCache=${EnableLocalDNSCache:-true}
 export MTU=${MTU:-1440}
 export IPIP=${IPIP:-Always}
 export IPv6DualStack=${IPv6DualStack:-true}
