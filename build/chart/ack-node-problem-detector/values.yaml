@@ -7,3 +7,4 @@ images:
 k8s_namespace: kube-system
 global:
   RegistryURL: sea.hub:5000
+  ClusterScale: small

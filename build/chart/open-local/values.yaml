@@ -56,3 +56,4 @@ monitor:
 global:
   RegistryURL: sea.hub:5000
   NumOfMasters: 3
+  ClusterScale: small

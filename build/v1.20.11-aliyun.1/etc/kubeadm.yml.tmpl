@@ -62,6 +62,10 @@ apiServer:
     enable-aggregator-routing: 'true'
     tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
     profiling: 'false'
+    {{- if and (.ClusterScale) (ne .ClusterScale "small") }}
+    max-requests-inflight: '600'
+    max-mutating-requests-inflight: '300'
+    {{- end }}
   extraVolumes:
     - name: "audit"
       hostPath: "/etc/kubernetes"
@@ -92,6 +96,10 @@ controllerManager:
     tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
     node-cidr-mask-size-ipv6: "120"
     node-cidr-mask-size-ipv4: "24"
+    {{- if and (.ClusterScale) (ne .ClusterScale "small") }}
+    kube-api-qps: '500'
+    kube-api-burst: '500'
+    {{- end }}
   extraVolumes:
     - hostPath: /etc/localtime
       mountPath: /etc/localtime
@@ -110,6 +118,10 @@ scheduler:
     {{- end }}
     profiling: 'false'
     tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+    {{- if and (.ClusterScale) (ne .ClusterScale "small") }}
+    kube-api-qps: '1000'
+    kube-api-burst: '1000'
+    {{- end }}
   extraVolumes:
     - hostPath: /etc/localtime
       mountPath: /etc/localtime
@@ -135,6 +147,14 @@ etcd:
       listen-metrics-urls: http://0.0.0.0:2381
       {{- end }}
       cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+      {{- if and (.ClusterScale) (ne .ClusterScale "small") }}
+      quota-backend-bytes: '8589934592'
+      max-request-bytes: '33554432'
+      experimental-compaction-batch-limit: '1000'
+      auto-compaction-retention: 5m
+      backend-batch-interval: 10ms
+      backend-batch-limit: '100'
+      {{- end }}
     imageRepository: {{or .RegistryURL "sea.hub:5000"}}/ecp_builder
     imageTag: 3.5.4
 featureGates:

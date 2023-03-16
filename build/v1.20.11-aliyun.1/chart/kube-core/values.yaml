@@ -43,5 +43,6 @@ global:
   CoreDnsIP: 10.96.0.10
   IPv6DualStack: true
   IPVSExcludeCIDRs: ""
+  ClusterScale: small
 metricsServer:
   replicas: 2

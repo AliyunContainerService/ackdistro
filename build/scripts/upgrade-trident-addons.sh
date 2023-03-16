@@ -305,7 +305,6 @@ if helm -n default status yoda;then
 fi
 kubectl delete crd nodelocalstorageinitconfigs.storage.yoda.io nodelocalstorages.storage.yoda.io || true
 kubectl delete crd nodelocalstorageinitconfigs.csi.aliyun.com nodelocalstorages.csi.aliyun.com || true
-cp -f chart/open-local/values-acka.yaml chart/open-local/values.yaml
 kubectl apply -f chart/open-local/crds/
 helm_install open-local || panic "failed to install open-local"
 
