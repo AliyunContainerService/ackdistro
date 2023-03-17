@@ -3,7 +3,7 @@ kind: StorageClass
 metadata:
   name: {{ .Values.hostpath_name }}
   annotations:
-    paas.cnstack.alibabacloud.com/description: "用于创建hostpath类型本地存储卷"
+    paas.cnstack.alibabacloud.com/description: "用于创建hostpath类型本地存储卷,使用节点的/var/lib/csi-hostpath-data/路径"
   labels:
     app: {{ .Values.hostpath_name }}
 provisioner: {{ .Values.driver_name }}
