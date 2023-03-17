@@ -160,10 +160,14 @@ done
 if [ "${Network}" == "calico" ];then
   helm -n default upgrade calico --reuse-values /root/workspace/ecp/kube-current/addons/net-plugins/calico --set images.calicocni.image=ecp_builder/calico-cni  --set images.calicoflexvol.image=ecp_builder/calico-pod2daemon-flexvol --set images.caliconode.image=ecp_builder/calico-node --set images.calicocontrollers.image=ecp_builder/calico-kube-controllers
 else
-  # for vivo
   if helm -n kube-system status hybridnet &>/dev/null;then
-    kubectl apply -f chart/hybridnet/crds/
-    helm_install_hybridnet hybridnet || panic "failed to install hybridnet"
+    # for vivo
+    if [ "${HasRecreateOldHybridnet}" == "true" ] && [ "${UpgradeHybridnet}" == "true"];then
+      kubectl apply -f chart/hybridnet/crds/
+      helm_install_hybridnet hybridnet || panic "failed to install hybridnet"
+    else
+      echo "HasRecreateOldHybridnet or UpgradeHybridnet not true, skipping upgrade hybridnet"
+    fi
   elif helm -n default status rama &>/dev/null;then
     kubectl -n kube-system annotate sa hybridnet meta.helm.sh/release-namespace=kube-system --overwrite
     kubectl -n kube-system annotate sa hybridnet meta.helm.sh/release-name=hybridnet --overwrite

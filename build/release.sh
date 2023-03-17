@@ -21,8 +21,8 @@ if [[ "$ADP_ACCESSKEYID" == "" ]];then
 fi
 
 if [ "$AUTO_BUILD" == "true" ];then
-    export BUILD_MODE=standard; bash build.sh ${KUBE_VERSION} "" ${TAG} true
-    export BUILD_MODE=lite; bash build.sh ${KUBE_VERSION} "" ${TAG}-lite true
+    export BUILD_MODE=standard; bash build.sh ${KUBE_VERSION} ${TAG} true
+    export BUILD_MODE=lite; bash build.sh ${KUBE_VERSION} ${TAG}-lite true
 fi
 
 sealer login ack-agility-registry.cn-shanghai.cr.aliyuncs.com -u ${EcpDefImageHubUsername} -p ${EcpDefImageHubPassword}
