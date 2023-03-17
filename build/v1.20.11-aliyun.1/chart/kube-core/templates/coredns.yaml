@@ -41,7 +41,14 @@ spec:
           imagePullPolicy: IfNotPresent
           resources:
             limits:
+              {{- if eq .Values.global.ClusterScale "xlarge" }}
+              cpu: 3
+              memory: 6Gi
+              {{- else if or (eq .Values.global.ClusterScale "medium") (eq .Values.global.ClusterScale "large") }}
+              memory: 2Gi
+              {{- else }}
               memory: 170Mi
+              {{- end }}
             requests:
               cpu: 100m
               memory: 70Mi

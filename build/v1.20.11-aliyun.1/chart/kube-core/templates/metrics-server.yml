@@ -101,7 +101,13 @@ spec:
         resources:
           limits:
             cpu: "2"
-            memory: 2000Mi
+            {{- if eq .Values.global.ClusterScale "xlarge" }}
+            memory: 4Gi
+            {{- else if or (eq .Values.global.ClusterScale "medium") (eq .Values.global.ClusterScale "large") }}
+            memory: 4Gi
+            {{- else }}
+            memory: 2Gi
+            {{- end }}
           requests:
             cpu: 125m
             memory: 500Mi

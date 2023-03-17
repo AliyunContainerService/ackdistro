@@ -67,8 +67,13 @@ spec:
         name: ack-node-problem-detector
         resources:
           limits:
+            {{- if eq .Values.global.ClusterScale "small" }}
             cpu: 100m
             memory: 200Mi
+            {{- else }}
+            cpu: "4"
+            memory: 8Gi
+            {{- end }}
           requests:
             cpu: "0"
             memory: 200Mi
