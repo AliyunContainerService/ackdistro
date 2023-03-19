@@ -196,12 +196,15 @@ healthzBindAddress: "::1"
 systemReserved:
   memory: 300Mi
   pid: "10000"
-{{- if and (.EnableLocalDNSCache) (eq .EnableLocalDNSCache "true") }}
+{{- if and (.EnableLocalDNSCache) (eq .EnableLocalDNSCache "false") }}
+{{else}}
 clusterDNS:
   {{- if and (.HostIPFamily) (eq .HostIPFamily "6") }}
   - fd00:aaaa::ffff:a
+  - {{or .DNSSvcIP "4408:4003:10bb:6a01:83b9:6360:c66d:a" }}
   {{else}}
   - 169.254.20.10
+  - {{or .DNSSvcIP "10.96.0.10" }}
   {{- end }}
 {{- end }}
 tlsCipherSuites:
