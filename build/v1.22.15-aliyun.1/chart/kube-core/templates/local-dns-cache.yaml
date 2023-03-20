@@ -102,7 +102,7 @@ data:
           reload
           loop
           bind {{ .Values.global.LocalDNSCacheIP }}
-          forward . __PILLAR__UPSTREAM__SERVERS__
+          forward . {{ .Values.global.CoreDnsIP }}
           prometheus :9253
           }
 ---
