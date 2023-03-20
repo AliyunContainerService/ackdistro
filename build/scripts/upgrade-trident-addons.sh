@@ -96,7 +96,7 @@ done
 LocalDNSCacheIP=169.254.20.10
 VtepAddressCIDRs="0.0.0.0/0,::/0"
 if [ "$HostIPFamily" == "6" ];then
-  LocalDNSCacheIP=fd00::aaaa::ffff:a
+  LocalDNSCacheIP=fd00:aaaa::ffff:a
   VtepAddressCIDRs="::/0"
 fi
 NumOfMasters=$(kubectl get no -l node-role.kubernetes.io/master="" | grep -v NAME | wc -l)

@@ -199,7 +199,7 @@ systemReserved:
 {{- if and (.EnableLocalDNSCache) (eq .EnableLocalDNSCache "true") }}
 clusterDNS:
   {{- if and (.HostIPFamily) (eq .HostIPFamily "6") }}
-  - fd00::aaaa::ffff:a
+  - fd00:aaaa::ffff:a
   {{else}}
   - 169.254.20.10
   {{- end }}

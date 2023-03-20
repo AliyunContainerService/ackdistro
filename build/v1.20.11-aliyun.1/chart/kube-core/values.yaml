@@ -36,7 +36,7 @@ images:
     tag: 1.17.0
 global:
   EnableLocalDNSCache: true
-  # replace "169.254.20.10" with "fd00::aaaa::ffff:a" for ipv6
+  # replace "169.254.20.10" with "fd00:aaaa::ffff:a" for ipv6
   LocalDNSCacheIP: 169.254.20.10
   DNSDomain: cluster.local
   RegistryURL: sea.hub:5000
