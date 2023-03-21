@@ -12,3 +12,5 @@ spec:
     chmod +x /usr/local/bin/seautil
     cp -f bin/trident /usr/bin/trident
     chmod +x /usr/bin/trident
+    cp -f bin/helm /usr/bin/helm
+    chmod +x /usr/bin/helm

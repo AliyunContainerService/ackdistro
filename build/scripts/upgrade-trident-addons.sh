@@ -168,16 +168,19 @@ else
     else
       echo "HasRecreateOldHybridnet or UpgradeHybridnet not true, skipping upgrade hybridnet"
     fi
-  elif helm -n default status rama &>/dev/null;then
+  elif helm -n default status hybridnet &>/dev/null || helm -n default status rama &>/dev/null;then
     kubectl -n kube-system annotate sa hybridnet meta.helm.sh/release-namespace=kube-system --overwrite
     kubectl -n kube-system annotate sa hybridnet meta.helm.sh/release-name=hybridnet --overwrite
     kubectl -n kube-system annotate clusterrole system:hybridnet meta.helm.sh/release-namespace=kube-system --overwrite
     kubectl -n kube-system annotate clusterrole system:hybridnet meta.helm.sh/release-name=hybridnet --overwrite
     kubectl -n kube-system annotate clusterrolebinding hybridnet meta.helm.sh/release-namespace=kube-system --overwrite
     kubectl -n kube-system annotate clusterrolebinding hybridnet meta.helm.sh/release-name=hybridnet --overwrite
+    kubectl -n kube-system annotate cm hybridnet-cni-conf meta.helm.sh/release-namespace=kube-system --overwrite
+    kubectl -n kube-system annotate cm hybridnet-cni-conf meta.helm.sh/release-name=hybridnet --overwrite
 
     kubectl -n kube-system delete ds hybridnet-daemon hybridnet-manager hybridnet-webhook
     kubectl -n kube-system delete svc hybridnet-webhook
+    kubectl -n kube-system delete deploy hybridnet-manager hybridnet-webhook || true
     kubectl delete MutatingWebhookConfiguration hybridnet-mutating-webhook
     kubectl delete ValidatingWebhookConfiguration hybridnet-validating-webhook
     kubectl apply -f chart/hybridnet/crds/
