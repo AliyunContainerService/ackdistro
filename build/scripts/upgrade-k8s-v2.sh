@@ -34,9 +34,6 @@ upgrade_kubeadm_config() {
   if ! grep "admissionregistration.k8s.io/v1beta1=true" $DIR_KUBE/kubeadm.yaml; then
     sed -i "/runtime-config/ s/$/,admissionregistration.k8s.io\/v1beta1=true/" $DIR_KUBE/kubeadm.yaml
   fi
-  if ! grep "kubelet-certificate-authority" $DIR_KUBE/kubeadm.yaml; then
-    sed -i "/enable-aggregator-routing/a\ \ \ \ kubelet-certificate-authority: /etc/kubernetes/pki/ca.crt" $DIR_KUBE/kubeadm.yaml
-  fi
   if ! grep "tls-cipher-suites" $DIR_KUBE/kubeadm.yaml; then
     sed -i "/enable-aggregator-routing/a\ \ \ \ tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384" $DIR_KUBE/kubeadm.yaml
   fi
