@@ -9,7 +9,7 @@ export DNSDomain=${DNSDomain:-cluster.local}
 export HostIPFamily=${HostIPFamily:-4}
 export Master0IP=${HostIP}
 export RegistryIP=${RegistryIP:-${Master0IP}}
-export EnableLocalDNSCache=${EnableLocalDNSCache:-false}
+export EnableLocalDNSCache=${EnableLocalDNSCache:-true}
 export MTU=${MTU:-1440}
 export IPIP=${IPIP:-Always}
 export IPv6DualStack=${IPv6DualStack:-true}
@@ -114,6 +114,7 @@ data:
   harborAddress: "${harborAddress}"
   vcnsOssAddress: "${vcnsOssAddress}"
   clusterDomain: "${DNSDomain}"
+  defaultIPStack: "${HostIPFamily}"
   registryURL: "${LocalRegistryURL}"
   registryExternalURL: "${LocalRegistryDomain}:5001"
   RegistryURL: "${LocalRegistryURL}"

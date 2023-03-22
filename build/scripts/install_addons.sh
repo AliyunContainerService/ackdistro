@@ -32,7 +32,7 @@ done
 LocalDNSCacheIP=169.254.20.10
 VtepAddressCIDRs="0.0.0.0/0,::/0"
 if [ "$HostIPFamily" == "6" ];then
-  LocalDNSCacheIP=fd00::aaaa::ffff:a
+  LocalDNSCacheIP=fd00:aaaa::ffff:a
   VtepAddressCIDRs="::/0"
 fi
 NumOfMasters=$(kubectl get no -l node-role.kubernetes.io/master="" | grep -v NAME | wc -l)
@@ -62,6 +62,8 @@ else
   fi
 fi
 
+ClusterScale=${ClusterScale:-small}
+
 # Prepare helm config
 cat >/tmp/ackd-helmconfig.yaml <<EOF
 global:
@@ -70,6 +72,7 @@ global:
   YodaSchedulerSvcIP: ${YodaSchedulerSvcIP}
   CoreDnsIP: ${CoreDnsIP}
   PodCIDR: ${PodCIDR}
+  ClusterScale: "${ClusterScale}"
   MTU: "${MTU}"
   IPIP: ${IPIP}
   IPAutoDetectionMethod: ${IPAutoDetectionMethod}
@@ -159,7 +162,6 @@ fi
 
 # install required addons
 helm_install l-zero || panic "failed to install l-zero"
-cp -f chart/open-local/values-acka.yaml chart/open-local/values.yaml
 if [ "${DefaultStorageClass}" == "yoda-lvm-default" ];then
   helm_install open-local || panic "failed to install open-local"
 fi

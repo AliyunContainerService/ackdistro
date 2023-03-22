@@ -7,7 +7,7 @@ set -x
 
 export DNSDomain=${DNSDomain:-cluster.local}
 export HostIPFamily=${HostIPFamily:-4}
-export EnableLocalDNSCache=${EnableLocalDNSCache:-false}
+export EnableLocalDNSCache=${EnableLocalDNSCache:-true}
 export MTU=${MTU:-1440}
 export IPIP=${IPIP:-Always}
 export IPv6DualStack=${IPv6DualStack:-true}
@@ -96,7 +96,7 @@ done
 LocalDNSCacheIP=169.254.20.10
 VtepAddressCIDRs="0.0.0.0/0,::/0"
 if [ "$HostIPFamily" == "6" ];then
-  LocalDNSCacheIP=fd00::aaaa::ffff:a
+  LocalDNSCacheIP=fd00:aaaa::ffff:a
   VtepAddressCIDRs="::/0"
 fi
 NumOfMasters=$(kubectl get no -l node-role.kubernetes.io/master="" | grep -v NAME | wc -l)
@@ -157,39 +157,30 @@ for NS in kube-system acs-system;do
   fi
 done
 
-kubectl -n kube-system annotate psp ack.privileged meta.helm.sh/release-namespace=kube-system --overwrite
-kubectl -n kube-system annotate sa coredns kube-proxy metrics-server meta.helm.sh/release-namespace=kube-system --overwrite
-kubectl -n kube-system annotate cm kube-proxy-worker kube-proxy-master meta.helm.sh/release-namespace=kube-system --overwrite
-kubectl -n kube-system annotate clusterrole system:coredns ack:podsecuritypolicy:privileged  meta.helm.sh/release-namespace=kube-system --overwrite
-kubectl -n kube-system annotate clusterrolebinding system:coredns ack:podsecuritypolicy:authenticated kubeadm:node-proxier metrics-server  meta.helm.sh/release-namespace=kube-system --overwrite
-kubectl -n kube-system annotate service kube-dns heapster  metrics-server meta.helm.sh/release-namespace=kube-system --overwrite
-kubectl -n kube-system annotate ds coredns kube-proxy-master kube-proxy-worker meta.helm.sh/release-namespace=kube-system --overwrite
-kubectl -n kube-system annotate deploy metrics-server meta.helm.sh/release-namespace=kube-system --overwrite
-kubectl -n kube-system annotate APIService v1beta1.metrics.k8s.io meta.helm.sh/release-namespace=kube-system --overwrite
-helm_install kube-core || panic "failed to install kube-core"
-
 if [ "${Network}" == "calico" ];then
-  if helm -n default status calico;then
-    helm_install calico || panic "failed to install calico"
-  else
-    echo "failed to check calico exist"
-    exit 1
-  fi
+  helm -n default upgrade calico --reuse-values /root/workspace/ecp/kube-current/addons/net-plugins/calico --set images.calicocni.image=ecp_builder/calico-cni  --set images.calicoflexvol.image=ecp_builder/calico-pod2daemon-flexvol --set images.caliconode.image=ecp_builder/calico-node --set images.calicocontrollers.image=ecp_builder/calico-kube-controllers
 else
-  # for vivo
   if helm -n kube-system status hybridnet &>/dev/null;then
-    kubectl apply -f chart/hybridnet/crds/
-    helm_install_hybridnet hybridnet || panic "failed to install hybridnet"
-  elif helm -n default status rama &>/dev/null;then
+    # for vivo
+    if [ "${HasRecreateOldHybridnet}" == "true" ] && [ "${UpgradeHybridnet}" == "true"];then
+      kubectl apply -f chart/hybridnet/crds/
+      helm_install_hybridnet hybridnet || panic "failed to install hybridnet"
+    else
+      echo "HasRecreateOldHybridnet or UpgradeHybridnet not true, skipping upgrade hybridnet"
+    fi
+  elif helm -n default status hybridnet &>/dev/null || helm -n default status rama &>/dev/null;then
     kubectl -n kube-system annotate sa hybridnet meta.helm.sh/release-namespace=kube-system --overwrite
     kubectl -n kube-system annotate sa hybridnet meta.helm.sh/release-name=hybridnet --overwrite
     kubectl -n kube-system annotate clusterrole system:hybridnet meta.helm.sh/release-namespace=kube-system --overwrite
     kubectl -n kube-system annotate clusterrole system:hybridnet meta.helm.sh/release-name=hybridnet --overwrite
     kubectl -n kube-system annotate clusterrolebinding hybridnet meta.helm.sh/release-namespace=kube-system --overwrite
     kubectl -n kube-system annotate clusterrolebinding hybridnet meta.helm.sh/release-name=hybridnet --overwrite
+    kubectl -n kube-system annotate cm hybridnet-cni-conf meta.helm.sh/release-namespace=kube-system --overwrite
+    kubectl -n kube-system annotate cm hybridnet-cni-conf meta.helm.sh/release-name=hybridnet --overwrite
 
     kubectl -n kube-system delete ds hybridnet-daemon hybridnet-manager hybridnet-webhook
     kubectl -n kube-system delete svc hybridnet-webhook
+    kubectl -n kube-system delete deploy hybridnet-manager hybridnet-webhook || true
     kubectl delete MutatingWebhookConfiguration hybridnet-mutating-webhook
     kubectl delete ValidatingWebhookConfiguration hybridnet-validating-webhook
     kubectl apply -f chart/hybridnet/crds/
@@ -242,6 +233,7 @@ spec:
         - /hybridnet/hybridnet-manager
         - --default-ip-retain=true
         - --controller-concurrency=Pod=1,IPAM=1,IPInstance=1
+        - --feature-gates=DualStack=true
         - --kube-client-qps=300
         - --kube-client-burst=600
         - --metrics-port=9899
@@ -304,12 +296,22 @@ EOF
   fi
 fi
 
+kubectl -n kube-system annotate psp ack.privileged meta.helm.sh/release-namespace=kube-system --overwrite
+kubectl -n kube-system annotate sa coredns kube-proxy metrics-server meta.helm.sh/release-namespace=kube-system --overwrite
+kubectl -n kube-system annotate cm kube-proxy-worker kube-proxy-master meta.helm.sh/release-namespace=kube-system --overwrite
+kubectl -n kube-system annotate clusterrole system:coredns ack:podsecuritypolicy:privileged  meta.helm.sh/release-namespace=kube-system --overwrite
+kubectl -n kube-system annotate clusterrolebinding system:coredns ack:podsecuritypolicy:authenticated kubeadm:node-proxier metrics-server  meta.helm.sh/release-namespace=kube-system --overwrite
+kubectl -n kube-system annotate service kube-dns heapster  metrics-server meta.helm.sh/release-namespace=kube-system --overwrite
+kubectl -n kube-system annotate ds coredns kube-proxy-master kube-proxy-worker meta.helm.sh/release-namespace=kube-system --overwrite
+kubectl -n kube-system annotate deploy metrics-server meta.helm.sh/release-namespace=kube-system --overwrite
+kubectl -n kube-system annotate APIService v1beta1.metrics.k8s.io meta.helm.sh/release-namespace=kube-system --overwrite
+helm_install kube-core || panic "failed to install kube-core"
+
 if helm -n default status yoda;then
   helm -n default delete yoda
 fi
 kubectl delete crd nodelocalstorageinitconfigs.storage.yoda.io nodelocalstorages.storage.yoda.io || true
 kubectl delete crd nodelocalstorageinitconfigs.csi.aliyun.com nodelocalstorages.csi.aliyun.com || true
-cp -f chart/open-local/values-acka.yaml chart/open-local/values.yaml
 kubectl apply -f chart/open-local/crds/
 helm_install open-local || panic "failed to install open-local"
 
@@ -420,6 +422,7 @@ data:
   harborAddress: "${harborAddress}"
   vcnsOssAddress: "${vcnsOssAddress}"
   clusterDomain: "${DNSDomain}"
+  defaultIPStack: "4"
   registryURL: "${LocalRegistryURL}"
   registryExternalURL: "${LocalRegistryDomain}:5001"
   RegistryURL: "${LocalRegistryURL}"

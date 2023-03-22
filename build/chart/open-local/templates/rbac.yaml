@@ -39,6 +39,7 @@ rules:
       - persistentvolumes
       - persistentvolumes/status
       - secrets
+      - namespaces
     verbs:
       - create
       - get

@@ -9,7 +9,7 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/l-zero:v1.1.0-68293
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/opsbase-alpine:v0.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/hybridnet:v0.8.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/paralb:v0.2.0
-ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/open-local:v0.7.0-dev
+ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/open-local:v0.7.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-node-driver-registrar:v2.3.0
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-provisioner:v2.2.2
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/csi-resizer:v1.3.0
@@ -23,4 +23,4 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-cni:v3.23.1
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-node:v3.23.1
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/node-problem-detector:v0.2.1-ubuntu-71bd5f8
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/hostpathplugin:v1.7.1
-ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/koord-scheduler:update-open-local_20230307211339_9d1214f
+ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/koord-scheduler:ack-main_20230322165826_6bc2185

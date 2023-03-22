@@ -1,11 +1,11 @@
-name: open-local
+name: yoda
 namespace: kube-system
-driver: local.csi.aliyun.com
+driver: yodaplugin.csi.alibabacloud.com
 customLabels: {}
 images:
   local:
     image: ecp_builder/open-local
-    tag: v0.7.0-dev
+    tag: v0.7.0
   registrar:
     image: ecp_builder/csi-node-driver-registrar
     tag: v2.3.0
@@ -22,38 +22,38 @@ images:
     image: ecp_builder/snapshot-controller
     tag: v4.2.1
 agent:
-  name: open-local-agent
-  # This block device will be used to create as a Volume Group in every node
-  # Open-Local does nothing if the device has been formatted or mountted
-  device: /dev/vdb
+  name: yoda-agent
   kubelet_dir: /var/lib/kubelet
-  volume_name_prefix: local
+  volume_name_prefix: yoda
   spdk: false
 extender:
-  name: open-local-scheduler-extender
+  name: yoda-scheduler-extender
   # scheduling strategy: binpack/spread
   strategy: spread
   # scheduler extender http port
   port: 23000
   # you can also configure your kube-scheduler manually, see docs/user-guide/kube-scheduler-configuration.md to get more details
-  init_job: true
+  init_job: false
 controller:
-  update_nls: "true"
+  update_nls: "false"
+  framework_scheduler_names: default-scheduler
 storageclass:
   lvm:
-    name: open-local-lvm
+    name: yoda-lvm-default
   lvm_xfs:
-    name: open-local-lvm-xfs
+    name: yoda-lvm-xfs
   lvm_io:
-    name: open-local-lvm-io-throttling
+    name: yoda-lvm-io-throttling
   device_ssd:
-    name: open-local-device-ssd
+    name: yoda-device-ssd
   device_hdd:
-    name: open-local-device-hdd
+    name: yoda-device-hdd
 monitor:
   # install grafana dashboard
   enabled: false
   # grafana namespace
   namespace: monitoring
 global:
-  RegistryURL: ack-agility-registry.cn-shanghai.cr.aliyuncs.com
+  RegistryURL: sea.hub:5000
+  NumOfMasters: 3
+  ClusterScale: small

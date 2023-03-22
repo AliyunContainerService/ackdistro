@@ -35,8 +35,16 @@ spec:
         imagePullPolicy: Always
         resources:
           limits:
+            {{- if eq .Values.global.ClusterScale "xlarge" }}
+            cpu: 2
+            memory: 4Gi
+            {{- else if or (eq .Values.global.ClusterScale "medium") (eq .Values.global.ClusterScale "large") }}
+            cpu: 2
+            memory: 4Gi
+            {{- else }}
             cpu: 500m
             memory: 512Mi
+            {{- end }}
           requests:
             cpu: 50m
             memory: 128Mi
@@ -55,8 +63,16 @@ spec:
         imagePullPolicy: Always
         resources:
           limits:
+            {{- if eq .Values.global.ClusterScale "xlarge" }}
+            cpu: 2
+            memory: 4Gi
+            {{- else if or (eq .Values.global.ClusterScale "medium") (eq .Values.global.ClusterScale "large") }}
+            cpu: 2
+            memory: 4Gi
+            {{- else }}
             cpu: 500m
             memory: 512Mi
+            {{- end }}
           requests:
             cpu: 50m
             memory: 128Mi
@@ -76,8 +92,16 @@ spec:
         imagePullPolicy: Always
         resources:
           limits:
+            {{- if eq .Values.global.ClusterScale "xlarge" }}
+            cpu: 2
+            memory: 4Gi
+            {{- else if or (eq .Values.global.ClusterScale "medium") (eq .Values.global.ClusterScale "large") }}
+            cpu: 2
+            memory: 4Gi
+            {{- else }}
             cpu: 500m
             memory: 512Mi
+            {{- end }}
           requests:
             cpu: 50m
             memory: 128Mi
@@ -118,8 +142,16 @@ spec:
         imagePullPolicy: Always
         resources:
           limits:
+            {{- if eq .Values.global.ClusterScale "xlarge" }}
+            cpu: 2
+            memory: 4Gi
+            {{- else if or (eq .Values.global.ClusterScale "medium") (eq .Values.global.ClusterScale "large") }}
+            cpu: 2
+            memory: 4Gi
+            {{- else }}
             cpu: 500m
             memory: 512Mi
+            {{- end }}
           requests:
             cpu: 50m
             memory: 128Mi
@@ -135,8 +167,16 @@ spec:
         imagePullPolicy: Always
         resources:
           limits:
+            {{- if eq .Values.global.ClusterScale "xlarge" }}
+            cpu: 4
+            memory: 8Gi
+            {{- else if or (eq .Values.global.ClusterScale "medium") (eq .Values.global.ClusterScale "large") }}
+            cpu: 4
+            memory: 8Gi
+            {{- else }}
             cpu: 200m
             memory: 256Mi
+            {{- end }}
           requests:
             cpu: 50m
             memory: 64Mi
@@ -151,8 +191,16 @@ spec:
         imagePullPolicy: Always
         resources:
           limits:
+            {{- if eq .Values.global.ClusterScale "xlarge" }}
+            cpu: 2
+            memory: 4Gi
+            {{- else if or (eq .Values.global.ClusterScale "medium") (eq .Values.global.ClusterScale "large") }}
+            cpu: 2
+            memory: 4Gi
+            {{- else }}
             cpu: 500m
             memory: 512Mi
+            {{- end }}
           requests:
             cpu: 50m
             memory: 128Mi

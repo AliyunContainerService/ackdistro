@@ -59,8 +59,16 @@ spec:
         imagePullPolicy: Always
         resources:
           limits:
+            {{- if eq .Values.global.ClusterScale "xlarge" }}
+            cpu: 1
+            memory: 2Gi
+            {{- else if or (eq .Values.global.ClusterScale "medium") (eq .Values.global.ClusterScale "large") }}
+            cpu: 1
+            memory: 2Gi
+            {{- else }}
             cpu: 200m
             memory: 256Mi
+            {{- end }}
           requests:
             cpu: "0"
             memory: 64Mi

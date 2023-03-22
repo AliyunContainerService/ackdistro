@@ -63,6 +63,10 @@ else
   if [ $? -eq 0 ] && [ "${anotherIP}" != "" ];then
     KUBELET_EXTRA_ARGS="${KUBELET_EXTRA_ARGS},${anotherIP}"
   fi
+
+  if [ "${UseIPasNodeName}" = "true" ];then
+    KUBELET_EXTRA_ARGS="${KUBELET_EXTRA_ARGS} --hostname-override ${HostIP}"
+  fi
 fi
 
 ARCH=`arch`

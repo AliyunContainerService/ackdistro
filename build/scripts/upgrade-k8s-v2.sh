@@ -25,13 +25,6 @@ upgrade_kubeadm() {
 }
 
 upgrade_kubeadm_config() {
-  /usr/bin/cp -f $DIR_KUBE/kubeadm.yaml $DIR_KUBE/kubeadm-master0.yaml
-  /usr/bin/cp -f /etc/kubernetes/kubeadm.yaml $DIR_KUBE/kubeadm-join.yaml
-  if [ "$1" = "0" ]; then
-    sed -i '264,277d' $DIR_KUBE/kubeadm-master0.yaml
-    sed -i '20,117d' $DIR_KUBE/kubeadm-join.yaml
-    cat $DIR_KUBE/kubeadm-master0.yaml $DIR_KUBE/kubeadm-join.yaml > $DIR_KUBE/kubeadm.yaml
-  fi
   sed -i "/advertiseAddress/d" $DIR_KUBE/kubeadm.yaml
   sed -i "s#kubeadm.k8s.io/v1beta2#kubeadm.k8s.io/v1beta3#g" $DIR_KUBE/kubeadm.yaml
   sed -i "s#kubeadm.k8s.io/v1beta1#kubeadm.k8s.io/v1beta3#g" $DIR_KUBE/kubeadm.yaml
@@ -52,7 +45,7 @@ upgrade_kube_controller() {
 
 upgrade_nodes() {
   if [ "$1" = "master" ]; then
-    upgrade_kubeadm_config $2
+    upgrade_kubeadm_config
     if ! curl -k https://localhost:6443/version 2>&1 | grep gitVersion | grep $VERSION_NUM; then
       kubeadm upgrade apply $TARGET_VERSION --config=$DIR_KUBE/kubeadm.yaml --experimental-patches=$DIR_KUBE/patch_files --force --ignore-preflight-errors=CoreDNSUnsupportedPlugins,CoreDNSMigration --certificate-renewal=false
     else
@@ -101,7 +94,7 @@ upgrade_summary() {
 upgrade_main() {
   upgrade_kubernetescni
   upgrade_kubeadm
-  upgrade_nodes $ROLE $ON_MASTER0
+  upgrade_nodes $ROLE
   upgrade_kubectl
   upgrade_kubelet
   upgrade_summary $ROLE
@@ -132,10 +125,6 @@ main() {
       ;;
     --dir-backup)
       DIR_BACKUP=$2
-      shift
-      ;;
-    --on-master0)
-      ON_MASTER0=$2
       shift
       ;;
     esac

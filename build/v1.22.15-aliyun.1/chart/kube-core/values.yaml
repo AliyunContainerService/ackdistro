@@ -35,13 +35,14 @@ images:
     image: ecp_builder/k8s-dns-node-cache
     tag: 1.17.0
 global:
-  EnableLocalDNSCache: false
-  # replace "169.254.20.10" with "fd00::aaaa::ffff:a" for ipv6
+  EnableLocalDNSCache: true
+  # replace "169.254.20.10" with "fd00:aaaa::ffff:a" for ipv6
   LocalDNSCacheIP: 169.254.20.10
   DNSDomain: cluster.local
   RegistryURL: sea.hub:5000
   CoreDnsIP: 10.96.0.10
   IPv6DualStack: true
   IPVSExcludeCIDRs: ""
+  ClusterScale: small
 metricsServer:
   replicas: 2

@@ -8,10 +8,9 @@ if ! which sealer;then
 fi
 
 KUBE_VERSION=$1
-ROLL_BACK_KUBE_VERSION=$2
-TAG=$3
-MULTI_ARCH=$4
-ARCH=$5
+TAG=$2
+MULTI_ARCH=$3
+ARCH=$4
 
 if [[ "$KUBE_VERSION" == "" ]];then
     echo "Usage: bash build.sh VERSION"
@@ -66,17 +65,11 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
         mkdir -p ${arch}/bin
         mkdir -p ${arch}/rpm
         mkdir -p ${arch}/tgz
-        mkdir -p ${arch}/rollback
 
         bins=(kubectl kubelet kubeadm)
         for bin in ${bins[@]};do
             wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${KUBE_VERSION}/${bin} -O ${arch}/bin/${bin}
         done
-        if [ "$ROLL_BACK_KUBE_VERSION" != "" ];then
-            for bin in ${bins[@]};do
-                wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/bin/${arch}/${ROLL_BACK_KUBE_VERSION}/${bin} -O ${arch}/rollback/${bin}
-            done
-        fi
 
         bins=(helm seautil mc etcdctl nerdctl velero)
         for bin in ${bins[@]};do
@@ -96,12 +89,6 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
             rpmfile=${rpm}.${rpm_suffix}.rpm
             wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/rpm/${arch}/${KUBE_VERSION}/${rpmfile} -O ${arch}/rpm/${rpmfile}
         done
-        if [ "$ROLL_BACK_KUBE_VERSION" != "" ];then
-            for rpm in ${rpms[@]};do
-                rpmfile=${rpm}.${rpm_suffix}.rpm
-                wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/rpm/${arch}/${ROLL_BACK_KUBE_VERSION}/${rpmfile} -O ${arch}/rollback/${rpmfile}
-            done
-        fi
 
         rpms=(socat-1.7.3.2-2.el7 libseccomp-2.3.1-4.el7)
         for rpm in ${rpms[@]};do
