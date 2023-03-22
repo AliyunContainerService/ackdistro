@@ -44,6 +44,8 @@ rm -f $(which -a ctr)
 rm -f $(which -a crictl)
 rm -r $(which -a nerdctl)
 
+fuser -m /dev/mapper/ackdistro--pool-container -k || true
+
 # umount and clean containerd related directories
 rm -rf /var/lib/containerd/*
 if [[ $? != 0 ]]; then
