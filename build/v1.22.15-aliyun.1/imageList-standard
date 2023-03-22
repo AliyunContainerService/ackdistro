@@ -23,4 +23,4 @@ ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-cni:v3.23.1
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/calico-node:v3.23.1
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/node-problem-detector:v0.2.1-ubuntu-71bd5f8
 ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/hostpathplugin:v1.7.1
-ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/koord-scheduler:ack-main_20230314163723_6251e12
+ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/koord-scheduler:ack-main_20230322165826_6bc2185
