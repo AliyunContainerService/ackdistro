@@ -46,14 +46,18 @@ fi
 
 split_image_name $FullName
 
+label=hostalias-set-by-push-registry
 for m in `kubectl get no -owide  |grep master|awk '{print $6}'`;do
+  sed -i "/${label}/d" /etc/hosts
+  echo "${m} sealer.push.temp.url #${label}" >> /etc/hosts
   if which docker;then
-    docker tag $ImageUrl ${m}:5000/$Domain/$Image
-    docker push ${m}:5000/$Domain/$Image
+    docker tag $ImageUrl sealer.push.temp.url:5000/$Domain/$Image
+    docker push sealer.push.temp.url:5000/$Domain/$Image
   else
-    nerdctl -n k8s.io tag $ImageUrl ${m}:5000/$Domain/$Image
-    ctr -n k8s.io i push ${m}:5000/$Domain/$Image -k
+    nerdctl -n k8s.io tag $ImageUrl sealer.push.temp.url:5000/$Domain/$Image
+    ctr -n k8s.io i push sealer.push.temp.url:5000/$Domain/$Image -k
   fi
 done
+sed -i "/${label}/d" /etc/hosts
 
 echo "已成功转存到 registry-internal.adp.aliyuncs.com:5000/$Domain/$Image"
