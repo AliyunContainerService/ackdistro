@@ -42,7 +42,7 @@ spec:
           imagePullPolicy: IfNotPresent
           name: l-zero
           command:
-            - manager
+            - l-zero
             - --v=3
             - --logtostderr=true
             - --server-addr=:16789
