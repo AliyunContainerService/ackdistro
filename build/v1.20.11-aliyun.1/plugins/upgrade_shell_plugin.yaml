@@ -7,5 +7,4 @@ spec:
   action: upgrade
   data: |
     set -x
-    # TODO check
     trident upgrade-trident --sealer -f /root/Clusterfile-from-trident --debug --force

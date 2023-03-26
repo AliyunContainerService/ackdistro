@@ -55,7 +55,9 @@ for m in `kubectl get no -owide  |grep master|awk '{print $6}'`;do
     docker push sealer.push.temp.url:5000/$Domain/$Image
   else
     nerdctl -n k8s.io tag $ImageUrl sealer.push.temp.url:5000/$Domain/$Image
-    ctr -n k8s.io i push sealer.push.temp.url:5000/$Domain/$Image -k
+    if ! ctr -n k8s.io i push sealer.push.temp.url:5000/$Domain/$Image -k;then
+      nerdctl -n k8s.io push sealer.push.temp.url:5000/$Domain/$Image --insecure-registry
+    fi
   fi
 done
 sed -i "/${label}/d" /etc/hosts

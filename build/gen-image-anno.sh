@@ -25,7 +25,7 @@ for f in imageList-lite imageList-standard;do
     if grep $l image-anno-${KUBE_VERSION};then
       continue
     fi
-    echo "    ack-d-ctr-image${i}: $l" >> image-anno-${KUBE_VERSION}
+    echo "    ack-d-ctr-${i}-image: $l" >> image-anno-${KUBE_VERSION}
     let i=i+1
   done
 done

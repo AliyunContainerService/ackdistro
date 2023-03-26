@@ -14,3 +14,5 @@ spec:
     chmod +x /usr/bin/trident
     cp -f bin/helm /usr/bin/helm
     chmod +x /usr/bin/helm
+    cp -f bin/etcdctl /usr/bin/etcdctl
+    chmod +x /usr/bin/etcdctl
