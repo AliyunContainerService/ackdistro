@@ -54,7 +54,7 @@ else
     kubectl delete ValidatingWebhookConfiguration hybridnet-validating-webhook
     kubectl apply -f chart/hybridnet/crds/
 
-    kubectl apply -f -<<EOF
+    cat > /tmp/hybridnet-manager-0.5.yaml <<EOF
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -142,13 +142,14 @@ spec:
       - effect: NoSchedule
         operator: Exists
 EOF
+    kubectl apply -f /tmp/hybridnet-manager-0.5.yaml
     suc=false
     for i in `seq 1 24`;do
       sleep 5
       updatedReplicas=`kubectl -n kube-system get deploy hybridnet-manager -ojsonpath='{.status.updatedReplicas}'`
       availableReplicas=`kubectl -n kube-system get deploy hybridnet-manager -ojsonpath='{.status.availableReplicas}'`
       readyReplicas=`kubectl -n kube-system get deploy hybridnet-manager -ojsonpath='{.status.readyReplicas}'`
-      if [ "$updatedReplicas" == "1" ] && [ "$availableReplicas" == "1" ] && [ "$availableReplicas" == "1" ];then
+      if [ "$updatedReplicas" == "1" ] && [ "$availableReplicas" == "1" ] && [ "$readyReplicas" == "1" ];then
         suc=true
         break
       fi
@@ -158,6 +159,7 @@ EOF
       echo "failed to update hybridnet to v0.5.1"
       exit 1
     fi
+    sleep 60
     helm_install_hybridnet hybridnet || panic "failed to install hybridnet"
   else
     echo "failed to check hybridnet exist"
