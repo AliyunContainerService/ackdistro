@@ -85,6 +85,8 @@ spec:
           operator: Exists
         - key: node-role.kubernetes.io/cnstack-infra
           effect: NoSchedule
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
       volumes:
         - hostPath:
             path: /etc/localtime
