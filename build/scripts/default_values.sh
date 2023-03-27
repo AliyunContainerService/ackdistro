@@ -83,6 +83,10 @@ if [ "$HostIPFamily" == "6" ];then
 fi
 export NumOfMasters=$(kubectl get no -l node-role.kubernetes.io/master="" | grep -v NAME | wc -l)
 export MetricsServerReplicas=2
+if [ $NumOfMasters -eq 0 ] || [ "$NumOfMasters" == "" ];then
+  echo "No master found, please check"
+  exit 1
+fi
 if [ $NumOfMasters -eq 1 ];then
   export MetricsServerReplicas=1
 fi

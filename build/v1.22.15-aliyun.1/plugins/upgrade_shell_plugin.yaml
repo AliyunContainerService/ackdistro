@@ -6,7 +6,7 @@ spec:
   type: SHELL
   action: upgrade
   data: |
-    set -x
+    set -x; set -e
     HealthCheckBeforeUpgrade=${HealthCheckBeforeUpgrade:=true}
-    trident upgradev2 --actual-version=v1.20.11-aliyun.1 --desired-version=v1.22.15-aliyun.1 --force --pre-health-check=${HealthCheckBeforeUpgrade}
+    trident upgradev2 --actual-version=v1.20.11-aliyun.1 --desired-version=v1.22.15-aliyun.1 --force --debug --pre-health-check=${HealthCheckBeforeUpgrade}
     bash scripts/post_upgrade.sh
