@@ -211,7 +211,7 @@ helm_install l-zero-library || panic "failed to install l-zero-library"
 # install optional addons
 install_optional_addons ${Addons}
 
-if [ "$Network" == "hybridnet" ];then
+if [ "$Network" == "hybridnet" ] || [ "$Network" == "rama" ];then
   create_subnet "${HostIPFamily}" "$PodCIDR" "network-0" || exit 1
 fi
 
