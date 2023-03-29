@@ -401,7 +401,6 @@ EOF
     echo "failed to run kubectl apply -f /tmp/subnet2.yaml, ignore this, please apply it by yourself"
     return 1
   fi
-  kubectl -n kube-system delete pod -lk8s-app=kube-dns
 }
 
 health_check() {

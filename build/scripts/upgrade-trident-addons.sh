@@ -10,7 +10,7 @@ source "${scripts_path}"/default_values.sh
 helm_install_hybridnet() {
   for i in `seq 1 3`;do
     sleep 1
-    helm -n kube-system upgrade -i --reuse-values $1 chart/$1 -f /tmp/ackd-helmconfig.yaml --set init=null && return 0
+    helm -n kube-system upgrade -i --reuse-values $1 chart/$1 -f /tmp/ackd-helmconfig.yaml --set init=null --set daemon.enableFelixPolicy=true --set typha.serverPort=5473 --set images.hybridnet.image=ecp_builder/hybridnet --set images.hybridnet.tag=v0.8.0 && return 0
   done
   return 1
 }
@@ -31,9 +31,15 @@ if [ "${Network}" == "calico" ];then
 else
   if helm -n kube-system status hybridnet &>/dev/null;then
     # for vivo
-    if [ "${HasRecreateOldHybridnet}" == "true" ] && [ "${UpgradeHybridnet}" == "true"];then
+    if [ "${HasRecreateOldHybridnet}" == "true" ] && [ "${UpgradeHybridnet}" == "true" ];then
       kubectl apply -f chart/hybridnet/crds/
-      helm_install_hybridnet hybridnet || panic "failed to install hybridnet"
+      for i in `seq 1 3`;do
+        sleep 1
+        helm -n kube-system upgrade -i --reuse-values hybridnet chart/hybridnet -f /tmp/ackd-helmconfig.yaml --set init=null --set daemon.enableFelixPolicy=true --set typha.serverPort=5473 --set images.hybridnet.image=ecp_builder/hybridnet --set images.hybridnet.tag=v0.8.0 --set defaultIPRetain=false && break
+      done
+      if [ $? -ne 0 ]; then
+        panic "failed to install hybridnet"
+      fi
     else
       echo "HasRecreateOldHybridnet or UpgradeHybridnet not true, skipping upgrade hybridnet"
     fi
@@ -214,8 +220,6 @@ install_optional_addons ${Addons}
 if [ "$Network" == "hybridnet" ] || [ "$Network" == "rama" ];then
   create_subnet "${HostIPFamily}" "$PodCIDR" "network-0" || exit 1
 fi
-
-docker rm trident-registry || true
 
 for f in admin.conf controller-manager.conf scheduler.conf;do
   cp -n /etc/kubernetes/${f} /var/lib/sealer/data/my-cluster/rootfs/

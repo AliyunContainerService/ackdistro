@@ -11,6 +11,8 @@ process_taints_labels "$RemoveMasterTaint" "$PlatformType" || exit 1
 
 bash ${scripts_path}/install_addons.sh || exit 1
 
+kubectl -n kube-system delete pod -lk8s-app=kube-dns
+
 if [ "$GenerateClusterInfo" == "true" ];then
   gen_clusterinfo || exit 1
   GenerateCAFlag="--generate-ca"

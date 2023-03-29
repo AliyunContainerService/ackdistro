@@ -70,7 +70,7 @@ if ! containerd --version; then
     cp -f "${scripts_path}"/../etc/containerd.service /etc/systemd/system/containerd.service
     ;;
   *)
-    utils_error "unknown system to use /etc/systemd/system/containerd.service"
+    echo "unknown system to use /etc/systemd/system/containerd.service"
     cp -f "${scripts_path}"/../etc/containerd.service /etc/systemd/system/containerd.service
     ;;
   esac
