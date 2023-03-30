@@ -70,6 +70,8 @@ spec:
               netID:
                 format: int32
                 type: integer
+              reserved:
+                type: boolean
               range:
                 description: Range is the ip address range
                 properties:
