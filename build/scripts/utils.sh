@@ -61,7 +61,7 @@ utils_os_env() {
     elif [ "$anolis" == 1 ];then
         export OS="Anolis"
     else
-       panic "unkown os...   exit"
+       echo "unkown os..."
     fi
 
     case "$OS" in
