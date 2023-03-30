@@ -25,17 +25,17 @@ upgrade_kubeadm() {
 }
 
 upgrade_kubeadm_config() {
-  sed -i "/advertiseAddress/d" $DIR_KUBE/kubeadm.yaml
-  sed -i "s#kubeadm.k8s.io/v1beta2#kubeadm.k8s.io/v1beta3#g" $DIR_KUBE/kubeadm.yaml
-  sed -i "s#kubeadm.k8s.io/v1beta1#kubeadm.k8s.io/v1beta3#g" $DIR_KUBE/kubeadm.yaml
-  if ! grep "kubernetesVersion: ${TARGET_VERSION}" $DIR_KUBE/kubeadm.yaml; then
-    sed -i "/kubernetesVersion:/ s/${CURRENT_VERSION}/${TARGET_VERSION}/" $DIR_KUBE/kubeadm.yaml
+  sed -i "/advertiseAddress/d" $DIR_KUBE/kubeadm-1.20.yaml
+  sed -i "s#kubeadm.k8s.io/v1beta2#kubeadm.k8s.io/v1beta3#g" $DIR_KUBE/kubeadm-1.20.yaml
+  sed -i "s#kubeadm.k8s.io/v1beta1#kubeadm.k8s.io/v1beta3#g" $DIR_KUBE/kubeadm-1.20.yaml
+  if ! grep "kubernetesVersion: ${TARGET_VERSION}" $DIR_KUBE/kubeadm-1.20.yaml; then
+    sed -i "/kubernetesVersion:/ s/${CURRENT_VERSION}/${TARGET_VERSION}/" $DIR_KUBE/kubeadm-1.20.yaml
   fi
-  if ! grep "admissionregistration.k8s.io/v1beta1=true" $DIR_KUBE/kubeadm.yaml; then
-    sed -i "/runtime-config/ s/$/,admissionregistration.k8s.io\/v1beta1=true/" $DIR_KUBE/kubeadm.yaml
+  if ! grep "admissionregistration.k8s.io/v1beta1=true" $DIR_KUBE/kubeadm-1.20.yaml; then
+    sed -i "/runtime-config/ s/$/,admissionregistration.k8s.io\/v1beta1=true/" $DIR_KUBE/kubeadm-1.20.yaml
   fi
-  if ! grep "tls-cipher-suites" $DIR_KUBE/kubeadm.yaml; then
-    sed -i "/enable-aggregator-routing/a\ \ \ \ tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384" $DIR_KUBE/kubeadm.yaml
+  if ! grep "tls-cipher-suites" $DIR_KUBE/kubeadm-1.20.yaml; then
+    sed -i "/enable-aggregator-routing/a\ \ \ \ tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384" $DIR_KUBE/kubeadm-1.20.yaml
   fi
 }
 
@@ -60,7 +60,7 @@ upgrade_nodes() {
   if [ "$1" = "master" ]; then
     upgrade_kubeadm_config
     if ! curl -k https://localhost:6443/version 2>&1 | grep gitVersion | grep $VERSION_NUM; then
-      kubeadm upgrade apply $TARGET_VERSION --config=$DIR_KUBE/kubeadm.yaml --experimental-patches=$DIR_KUBE/patch_files --force --ignore-preflight-errors=CoreDNSUnsupportedPlugins,CoreDNSMigration --certificate-renewal=false
+      kubeadm upgrade apply $TARGET_VERSION --config=$DIR_KUBE/kubeadm-1.20.yaml --experimental-patches=$DIR_KUBE/patch_files --force --ignore-preflight-errors=CoreDNSUnsupportedPlugins,CoreDNSMigration --certificate-renewal=false
     else
       upgrade_log "Control Plane has been upgraded to [$VERSION_NUM], skip."
     fi
@@ -95,7 +95,7 @@ upgrade_kubelet() {
 upgrade_summary() {
   if [ "$1" = "master" ]; then
     echo ">>>>>> master change summary begin >>>>>>>>" | tee $DIR_BACKUP/upgrade-change.log
-    diff $DIR_KUBE/kubeadm.yaml $DIR_KUBE/kubeadm.yaml | tee -a $DIR_BACKUP/upgrade-change.log
+    diff $DIR_BACKUP/kubeadm.yaml $DIR_KUBE/kubeadm-1.20.yaml | tee -a $DIR_BACKUP/upgrade-change.log
     diff $DIR_BACKUP/kubernetes/manifests /etc/kubernetes/manifests | tee -a $DIR_BACKUP/upgrade-change.log
     diff $DIR_BACKUP/10-kubeadm.conf /etc/systemd/system/kubelet.service.d/10-kubeadm.conf | tee -a $DIR_BACKUP/upgrade-change.log
     echo ">>>>>> master change summary end >>>>>>>>" | tee -a $DIR_BACKUP/upgrade-change.log
