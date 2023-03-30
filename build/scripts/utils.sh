@@ -171,3 +171,253 @@ public::nvidia::check_has_gpu(){
 
     return 0
 }
+
+process_taints_labels() {
+  local RemoveMasterTaint=$1
+  local PlatformType=$2
+
+  # process taints first
+  if [ "${RemoveMasterTaint}" == "true" ];then
+    kubectl taint node node-role.kubernetes.io/master- --all || true
+  fi
+
+  if [ "${PlatformType}" != "enterprise" ];then
+    kubectl label node node-role.kubernetes.io/cnstack-infra="" --all --overwrite
+    kubectl label node node-role.kubernetes.io/proxy="" --all --overwrite
+  else
+    kubectl taint node node-role.kubernetes.io/cnstack-infra=:NoSchedule -l node-role.kubernetes.io/cnstack-infra="" --overwrite
+    kubectl taint node node-role.kubernetes.io/cnstack-infra=:NoSchedule -l node-role.kubernetes.io/proxy="" --overwrite
+  fi
+}
+
+trident_process_init() {
+  local ComponentToInstall=$1
+  local PlatformCAPath=$2
+  local PlatformCAKeyPath=$3
+  local GenerateCAFlag=$4
+
+  if [ "${ComponentToInstall}" != "" ];then
+    local ComponentToInstallFlag="--component-to-install ${ComponentToInstall}"
+  fi
+  if [ "${PlatformCAPath}" != "" ];then
+    local PlatformCAFlag="--ca-path ${PlatformCAPath} --key-path ${PlatformCAKeyPath}"
+  fi
+  trident on-sealer -f /root/.sealer/Clusterfile --sealer --dump-managed-cluster ${GenerateCAFlag} ${ComponentToInstallFlag} ${PlatformCAFlag}
+}
+
+trident_process_reconcile() {
+  local ComponentToInstall=$1
+
+  if [ "${ComponentToInstall}" != "" ];then
+    local ComponentToInstallFlag="--component-to-install ${ComponentToInstall}"
+  fi
+  if [ ! -f /root/.sealer/Clusterfile ];then
+    mkdir -p /root/.sealer/
+    kubectl -n kube-system get cm sealer-clusterfile -ojsonpath='{.data.Clusterfile}' > /root/.sealer/Clusterfile
+  fi
+  trident on-sealer -f /root/.sealer/Clusterfile --sealer --dump-managed-cluster ${ComponentToInstallFlag}
+}
+
+gen_clusterinfo() {
+  cat >/tmp/clusterinfo-cm.yaml <<EOF
+---
+apiVersion: v1
+data:
+  deployMode: "${deployMode}"
+  gatewayExposeMode: "${gatewayExposeMode}"
+  gatewayAddress: "${gatewayAddress}"
+  gatewayDomain: "${gatewayDomain}"
+  gatewayExternalIP: "${gatewayExternalIP}"
+  gatewayInternalIP: "${gatewayInternalIP}"
+  gatewayPort: "${gatewayPort}"
+  gatewayAPIServerPort: "${gatewayAPIServerPort}"
+  ingressAddress: "${ingressAddress}"
+  ingressExternalIP: "${ingressExternalIP}"
+  ingressInternalIP: "${ingressInternalIP}"
+  ingressHttpPort: "${ingressHttpPort}"
+  ingressHttpsPort: "${ingressHttpsPort}"
+  harborAddress: "${harborAddress}"
+  vcnsOssAddress: "${vcnsOssAddress}"
+  clusterDomain: "${DNSDomain}"
+  defaultIPStack: "${HostIPFamily}"
+  registryURL: "${LocalRegistryURL}"
+  registryExternalURL: "${LocalRegistryDomain}:5001"
+  RegistryURL: "${LocalRegistryURL}"
+  platformType: "${PlatformType}"
+  clusterName: "cluster-local"
+kind: ConfigMap
+metadata:
+  name: clusterinfo
+  namespace: kube-public
+EOF
+
+  kubectl apply -f /tmp/clusterinfo-cm.yaml
+}
+
+helm_install() {
+  for i in `seq 1 3`;do
+    sleep 1
+    helm -n kube-system upgrade -i $1 chart/$1 -f /tmp/ackd-helmconfig.yaml && return 0
+  done
+  return 1
+}
+
+prepare_helm_config() {
+  cat >/tmp/ackd-helmconfig.yaml <<EOF
+global:
+  EnableLocalDNSCache: ${EnableLocalDNSCache}
+  LocalDNSCacheIP: ${LocalDNSCacheIP}
+  YodaSchedulerSvcIP: ${YodaSchedulerSvcIP}
+  CoreDnsIP: ${CoreDnsIP}
+  PodCIDR: ${PodCIDR}
+  ClusterScale: "${ClusterScale}"
+  MTU: "${MTU}"
+  IPIP: ${IPIP}
+  IPAutoDetectionMethod: ${IPAutoDetectionMethod}
+  DisableFailureDomain: ${DisableFailureDomain}
+  RegistryURL: ${RegistryURL}
+  SuspendPeriodHealthCheck: ${SuspendPeriodHealthCheck}
+  SuspendPeriodBroadcastHealthCheck: ${SuspendPeriodBroadcastHealthCheck}
+  NumOfMasters: ${NumOfMasters}
+  IPv6DualStack: ${IPv6DualStack}
+  IPVSExcludeCIDRs: 10.103.97.2/32,1248:4003:10bb:6a01:83b9:6360:c66d:0002/128
+init:
+  cidr: ${PodCIDR%,*}
+  ipVersion: "${HostIPFamily}"
+  ingressControllerVIP: "${ingressControllerVIP}"
+  apiServerVIP: "${apiServerVIP}"
+  iamGatewayVIP: "${gatewayInternalIP}"
+defaultIPFamily: IPv${HostIPFamily}
+defaultIPRetain: ${DefaultIPRetain:-true}
+multiCluster: true
+daemon:
+  vtepAddressCIDRs: ${VtepAddressCIDRs}
+  hostInterface: "${ParalbHostInterface}"
+  resources:
+    requests:
+      cpu: "0"
+      memory: 100Mi
+  felix:
+    resources:
+      requests:
+        cpu: "0"
+        memory: 200Mi
+manager:
+  replicas: ${NumOfMasters}
+  resources:
+    requests:
+      cpu: 250m
+      memory: 1024Mi
+webhook:
+  replicas: ${NumOfMasters}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+typha:
+  replicas: ${NumOfMasters}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+metricsServer:
+  replicas: ${MetricsServerReplicas}
+EOF
+}
+
+create_etcd_secret() {
+  for NS in kube-system acs-system;do
+    if kubectl get secret etcd-client-cert -n ${NS};then
+      continue
+    fi
+
+    if ! kubectl create secret generic etcd-client-cert  \
+      --from-file=ca.pem=/etc/kubernetes/pki/etcd/ca.crt --from-file=etcd-client.pem=/etc/kubernetes/pki/apiserver-etcd-client.crt  \
+      --from-file=etcd-client-key.pem=/etc/kubernetes/pki/apiserver-etcd-client.key -n ${NS};then
+      echo "failed to create etcd secret"
+      return 1
+    fi
+  done
+}
+
+install_optional_addons() {
+  Addons=$1
+  IFS=,
+  for addon in ${Addons};do
+    if [ "$addon" == "kube-prometheus-stack" ];then
+      addon="kube-prometheus-crds"
+    fi
+    helm_install ${addon} || utils_info "failed to install ${addon}"
+  done
+IFS="
+"
+}
+
+wait_for_apiserver() {
+  for i in `seq 1 24`;do
+    sleep 5
+    kubectl get ns && break
+  done
+  if [ $? -ne 0 ];then
+    echo "failed to wait for apiserver ready"
+    exit $?
+  fi
+}
+
+create_subnet() {
+  if kubectl get subnet init-2;then
+    return 0
+  fi
+
+  HostIPFamily=$1
+  PodCIDR=$2
+  networkName=$3
+
+  secondFamily=6
+  if [ "$HostIPFamily" == "6" ];then
+    secondFamily=4
+  fi
+  cat >/tmp/subnet2.yaml <<EOF
+---
+apiVersion: networking.alibaba.com/v1
+kind: Subnet
+metadata:
+  name: init-2
+  labels:
+    webhook.hybridnet.io/ignore: "true"
+spec:
+  config:
+    autoNatOutgoing: true
+  network: ${networkName}
+  range:
+    cidr: ${PodCIDR##*,}
+    version: "${secondFamily}"
+EOF
+  for i in `seq 1 16`;do
+    kubectl apply -f /tmp/subnet2.yaml && break
+    sleep 30
+  done
+  if [ $? -ne 0 ];then
+    echo "failed to run kubectl apply -f /tmp/subnet2.yaml, ignore this, please apply it by yourself"
+    return 1
+  fi
+}
+
+health_check() {
+  local SkipHealthCheck=$1
+
+  if [ "${SkipHealthCheck}" = "true" ];then
+    return 0
+  fi
+
+  sleep 15
+  trident health-check && return 0
+
+  echo "First time health check fail, sleep 30 and try again"
+  sleep 30
+  trident health-check --trigger-mode OnlyUnsuccessful && return 0
+
+  echo "Second time health check fail, sleep 60 and try again"
+  sleep 60
+  trident health-check --trigger-mode OnlyUnsuccessful
+}

@@ -6,5 +6,5 @@ spec:
   type: SHELL
   action: rollback
   data: |
-    set -x
-    trident rollbackv2 --desired-version=v1.20.11-aliyun.1 --actual-version=v1.22.15-aliyun.1
+    set -x; set -e
+    trident rollbackv2 --desired-version=v1.20.11-aliyun.1 --actual-version=v1.22.15-aliyun.1 --debug

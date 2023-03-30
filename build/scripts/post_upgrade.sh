@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 
+scripts_path=$(cd `dirname $0`; pwd)
+source "${scripts_path}"/utils.sh
+
 set -x
 
-if [ "${SkipHealthCheck}" = "true" ];then
-  exit 0
+source "${scripts_path}"/default_values.sh
+
+bash ${scripts_path}/install_addons.sh || exit 1
+
+kubectl -n kube-system delete deploy yoda-scheduler-extender || true
+
+if [ "$GenerateClusterInfo" == "true" ];then
+  gen_clusterinfo || exit 1
+  GenerateCAFlag="--generate-ca"
 fi
+
 sleep 15
-trident health-check
-if [ $? -eq 0 ];then
-  exit 0
-fi
-echo "First time health check fail, sleep 30 and try again"
-sleep 30
-trident health-check --trigger-mode OnlyUnsuccessful
-if [ $? -eq 0 ];then
-  exit 0
-fi
-echo "Second time health check fail, sleep 60 and try again"
-sleep 60
-trident health-check --trigger-mode OnlyUnsuccessful
-exit $?
+trident_process_init "$ComponentToInstall" "$PlatformCAPath" "$PlatformCAKeyPath" "$GenerateCAFlag" || exit 1
+
+health_check "$SkipHealthCheck" || exit 1

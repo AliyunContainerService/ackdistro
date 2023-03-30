@@ -39,8 +39,21 @@ upgrade_kubeadm_config() {
   fi
 }
 
+upgrade_kube_apiserver() {
+  sed -i "/--allow-privileged=true/a\ \ \ \ - --api-audiences=https://kubernetes.default.svc" /etc/kubernetes/manifests/kube-apiserver.yaml
+}
+
 upgrade_kube_controller() {
   sed -i "s#--port=10252#--port=0#g" /etc/kubernetes/manifests/kube-controller-manager.yaml
+  sed -i "/--cluster-signing-cert-file/a\ \ \ \ - --cluster-signing-duration=876000h" /etc/kubernetes/manifests/kube-controller-manager.yaml
+}
+
+upgrade_kube_scheduler_to_koordinator() {
+  cp -f ../statics/kube-scheduler-config.yaml /etc/kubernetes/kube-scheduler-config.yaml
+  KOORD_SCHE_VERSION=`cat ../KOORD_SCHE_VERSION`
+  koordinatorImage=${REGISTRY_URL}/ecp_builder/${KOORD_SCHE_VERSION}
+
+	sed "s@##KoordinatorSchedulerImage##@${koordinatorImage}@g" ../ack-distro-yamls/koordinator-scheduler.yaml > /etc/kubernetes/manifests/kube-scheduler.yaml
 }
 
 upgrade_nodes() {
@@ -51,7 +64,9 @@ upgrade_nodes() {
     else
       upgrade_log "Control Plane has been upgraded to [$VERSION_NUM], skip."
     fi
+    upgrade_kube_apiserver
     upgrade_kube_controller
+    upgrade_kube_scheduler_to_koordinator
   fi
 
   if [ "$1" = "worker" ]; then
@@ -127,6 +142,10 @@ main() {
       DIR_BACKUP=$2
       shift
       ;;
+    --registry-url)
+      REGISTRY_URL=$2
+      shift
+      ;;
     esac
     shift
   done
@@ -136,6 +155,7 @@ main() {
   assert_empty TARGET_VERSION ${TARGET_VERSION}
   assert_empty DIR_KUBE ${DIR_KUBE}
   assert_empty DIR_BACKUP ${DIR_BACKUP}
+  assert_empty REGISTRY_URL ${REGISTRY_URL}
 
   VERSION_NUM=$(echo $TARGET_VERSION | sed 's/v//' | sed 's/-aliyun.1//g')
 

@@ -36,15 +36,25 @@ fi
 chmod +x ${scripts_path}/../bin/*
 cp -f ${scripts_path}/../bin/* /usr/bin/ || true
 
-configure_ipv6="net.ipv6.conf.all.disable_ipv6 = 0"
-echo $configure_ipv6 > /etc/sysctl.d/ack-d-enable-ipv6.conf
-if ! grep "${configure_ipv6}" /etc/sysctl.conf;then
-  echo "${configure_ipv6}" >> /etc/sysctl.conf
-fi
-if ! sysctl --system;then
-  echo "failed to run sysctl, please check"
-  exit 1
-fi
+configure_sysctl() {
+  local config=$1
+  local dest=$2
+
+  echo "$config" >> "$dest"
+  if ! grep "${config}" /etc/sysctl.conf;then
+    echo "${config}" >> /etc/sysctl.conf
+  fi
+
+  if ! sysctl --system;then
+    echo "failed to run sysctl, please check"
+    exit 1
+  fi
+}
+
+rm -f /etc/sysctl.d/ack-d-enable-ipv6.conf
+
+configure_sysctl "net.ipv6.conf.all.disable_ipv6 = 0" /etc/sysctl.d/ack-d-enable-ipv6.conf
+configure_sysctl "net.ipv6.conf.all.forwarding = 1" /etc/sysctl.d/ack-d-enable-ipv6.conf
 
 KUBELET_EXTRA_ARGS="KUBELET_EXTRA_ARGS=--node-labels=ack-d.alibabacloud.com/managed-node=true"
 
@@ -99,6 +109,5 @@ fi
 
 acceptRaIfname=`trident get-accept-ra-ifname`
 if [ "$?" == "0" ] && [ "${acceptRaIfname}" != "" ];then
-  sysctl -w net.ipv6.conf.${acceptRaIfname}.accept_ra=2
+  configure_sysctl "net.ipv6.conf.${acceptRaIfname}.accept_ra = 2" /etc/sysctl.d/ack-d-enable-ipv6.conf
 fi
-sysctl -w net.ipv6.conf.all.forwarding=1

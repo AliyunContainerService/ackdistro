@@ -5,166 +5,41 @@ source "${scripts_path}"/utils.sh
 
 set -x
 
-export DNSDomain=${DNSDomain:-cluster.local}
-export HostIPFamily=${HostIPFamily:-4}
-export EnableLocalDNSCache=${EnableLocalDNSCache:-true}
-export MTU=${MTU:-1440}
-export IPIP=${IPIP:-Always}
-export IPv6DualStack=${IPv6DualStack:-true}
-export IPAutoDetectionMethod=${IPAutoDetectionMethod:-can-reach=8.8.8.8}
-export DisableFailureDomain=${DisableFailureDomain:-false}
-export RegistryURL=${RegistryURL:-sea.hub:5000}
-export RegistryDomain=${RegistryDomain}
-export Addons=${Addons}
-export Network=${Network}
-export GenerateClusterInfo=${GenerateClusterInfo:-true}
-export SuspendPeriodBroadcastHealthCheck=${SuspendPeriodBroadcastHealthCheck:-false}
-export ParalbHostInterface=${ParalbHostInterface}
-export deployMode=${deployMode:-offline}
-export PlatformType=${PlatformType}
-export gatewayDomain=${gatewayDomain:-cnstack.local}
-if [ "$DisableGateway" != "true" ];then
-  export gatewayExposeMode=${gatewayExposeMode:-ip_domain}
-  export gatewayInternalIP=${gatewayInternalIP:-${Master0IP}}
-  export gatewayExternalIP=${gatewayExternalIP:-${Master0IP}}
-  export gatewayPort=${gatewayPort:-30383}
-  export gatewayAPIServerPort=${gatewayAPIServerPort:-30384}
-fi
-export ingressAddress=${ingressAddress:-ingress.${gatewayDomain}}
-export ingressInternalIP=${ingressInternalIP:-${Master0IP}}
-export ingressExternalIP=${ingressExternalIP:-${Master0IP}}
-export ingressHttpPort=${ingressHttpPort:-80}
-export ingressHttpsPort=${ingressHttpsPort:-443}
-export harborAddress=${harborAddress:-harbor.${gatewayDomain}}
-export vcnsOssAddress=${vcnsOssAddress:-vcns-oss.${gatewayDomain}}
-export apiServerInternalIP=${apiServerInternalIP}
-export apiServerInternalPort=${apiServerInternalPort}
-export KUBECONFIG=/etc/kubernetes/admin.conf
-export DefaultStorageClass=${DefaultStorageClass:-yoda-lvm-default}
-
-if [ "$Master0IP" == "" ];then
-  echo "Master0IP is required"
-  exit 1
-fi
-if [ "$HostIPFamily" == "6" ];then
-  export SvcCIDR=${SvcCIDR:-4408:4003:10bb:6a01:83b9:6360:c66d:0000/112,10.96.0.0/16}
-  export PodCIDR=${PodCIDR:-3408:4003:10bb:6a01:83b9:6360:c66d:0000/112,100.64.0.0/16}
-else
-  export SvcCIDR=${SvcCIDR:-10.96.0.0/16,4408:4003:10bb:6a01:83b9:6360:c66d:0000/112}
-  if ! echo "$SvcCIDR" | grep ",";then
-    export SvcCIDR=${SvcCIDR},4408:4003:10bb:6a01:83b9:6360:c66d:0000/112
-  fi
-  if [ "$Network" == "calico" ];then
-    export PodCIDR=${PodCIDR:-100.64.0.0/16}
-  else
-    export PodCIDR=${PodCIDR:-100.64.0.0/16,3408:4003:10bb:6a01:83b9:6360:c66d:0000/112}
-    if ! echo "$PodCIDR" | grep ",";then
-      export PodCIDR=${PodCIDR},3408:4003:10bb:6a01:83b9:6360:c66d:0000/112
-    fi
-  fi
-fi
-
-OLD_IS_TRIDENT=false
-
-helm_install() {
-  for i in `seq 1 3`;do
-    sleep 1
-    helm -n kube-system upgrade -i --reuse-values $1 chart/$1 -f /tmp/ackd-helmconfig.yaml && return 0
-  done
-  return 1
-}
+source "${scripts_path}"/default_values.sh
 
 helm_install_hybridnet() {
   for i in `seq 1 3`;do
     sleep 1
-    helm -n kube-system upgrade -i --reuse-values $1 chart/$1 -f /tmp/ackd-helmconfig.yaml --set init=null && return 0
+    helm -n kube-system upgrade -i --reuse-values $1 chart/$1 -f /tmp/ackd-helmconfig.yaml --set init=null --set daemon.enableFelixPolicy=true --set typha.serverPort=5473 --set images.hybridnet.image=ecp_builder/hybridnet --set images.hybridnet.tag=v0.8.0 && return 0
   done
   return 1
 }
 
-# Prepare envs
-CoreDnsIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 10` || panic "failed to get coredns svc ip"
-
-YodaSchedulerSvcIP=`trident get-indexed-ip --cidr ${SvcCIDR%,*} --index 4` || panic "failed to get yoda svc ip"
-
 # Apply yamls
-#TODO, check guest coredns configuration and ask him to provide
-for f in `ls ack-distro-yamls`;do
-  sed "s/##DNSDomain##/${DNSDomain}/g" ack-distro-yamls/${f} | sed "s/##REGISTRY_DOMAIN##/${RegistryDomain}/g" | kubectl apply -f -
-done
-
-LocalDNSCacheIP=169.254.20.10
-VtepAddressCIDRs="0.0.0.0/0,::/0"
-if [ "$HostIPFamily" == "6" ];then
-  LocalDNSCacheIP=fd00:aaaa::ffff:a
-  VtepAddressCIDRs="::/0"
-fi
-NumOfMasters=$(kubectl get no -l node-role.kubernetes.io/master="" | grep -v NAME | wc -l)
-MetricsServerReplicas=2
-if [ $NumOfMasters -eq 1 ];then
-  MetricsServerReplicas=1
-fi
+sed "s/##DNSDomain##/${DNSDomain}/g" ack-distro-yamls/coredns-cm.yaml | sed "s/##REGISTRY_IP##/${RegistryIP}/g" | sed "s/##REGISTRY_DOMAIN##/${RegistryDomain}/g" | kubectl apply -f -
+kubectl apply -f ack-distro-yamls/apiserver-lb-svc.yaml
+kubectl apply -f ack-distro-yamls/clusters.open-cluster-management.io_managedclusters.crd.yaml
 
 # Prepare helm config
-cat >/tmp/ackd-helmconfig.yaml <<EOF
-global:
-  EnableLocalDNSCache: ${EnableLocalDNSCache}
-  LocalDNSCacheIP: ${LocalDNSCacheIP}
-  YodaSchedulerSvcIP: ${YodaSchedulerSvcIP}
-  CoreDnsIP: ${CoreDnsIP}
-  PodCIDR: ${PodCIDR}
-  MTU: "${MTU}"
-  IPIP: ${IPIP}
-  IPAutoDetectionMethod: ${IPAutoDetectionMethod}
-  DisableFailureDomain: ${DisableFailureDomain}
-  RegistryURL: ${RegistryURL}
-  SuspendPeriodHealthCheck: false
-  SuspendPeriodBroadcastHealthCheck: ${SuspendPeriodBroadcastHealthCheck}
-  NumOfMasters: ${NumOfMasters}
-  IPv6DualStack: ${IPv6DualStack}
-  IPVSExcludeCIDRs: 10.103.97.2/32,1248:4003:10bb:6a01:83b9:6360:c66d:0002/128
-init:
-  cidr: ${PodCIDR%,*}
-  ipVersion: "${HostIPFamily}"
-  ingressControllerVIP: "${ingressInternalIP}"
-  apiServerVIP: "${apiServerInternalIP}"
-  iamGatewayVIP: "${gatewayInternalIP}"
-defaultIPFamily: IPv${HostIPFamily}
-multiCluster: true
-daemon:
-  vtepAddressCIDRs: ${VtepAddressCIDRs}
-  hostInterface: "${ParalbHostInterface}"
-manager:
-  replicas: ${NumOfMasters}
-webhook:
-  replicas: ${NumOfMasters}
-typha:
-  replicas: ${NumOfMasters}
-metricsServer:
-  replicas: ${MetricsServerReplicas}
-EOF
+prepare_helm_config
 
 # create etcd secret
-for NS in kube-system acs-system;do
-	if kubectl get secret etcd-client-cert -n ${NS};then
-	  continue
-	fi
-
-	if ! kubectl create secret generic etcd-client-cert  \
-    --from-file=ca.pem=/etc/kubernetes/pki/etcd/ca.crt --from-file=etcd-client.pem=/etc/kubernetes/pki/apiserver-etcd-client.crt  \
-    --from-file=etcd-client-key.pem=/etc/kubernetes/pki/apiserver-etcd-client.key -n ${NS};then
-    panic "failed to create etcd secret"
-  fi
-done
+create_etcd_secret || exit 1
 
 if [ "${Network}" == "calico" ];then
   helm -n default upgrade calico --reuse-values /root/workspace/ecp/kube-current/addons/net-plugins/calico --set images.calicocni.image=ecp_builder/calico-cni  --set images.calicoflexvol.image=ecp_builder/calico-pod2daemon-flexvol --set images.caliconode.image=ecp_builder/calico-node --set images.calicocontrollers.image=ecp_builder/calico-kube-controllers
 else
   if helm -n kube-system status hybridnet &>/dev/null;then
     # for vivo
-    if [ "${HasRecreateOldHybridnet}" == "true" ] && [ "${UpgradeHybridnet}" == "true"];then
+    if [ "${HasRecreateOldHybridnet}" == "true" ] && [ "${UpgradeHybridnet}" == "true" ];then
       kubectl apply -f chart/hybridnet/crds/
-      helm_install_hybridnet hybridnet || panic "failed to install hybridnet"
+      for i in `seq 1 3`;do
+        sleep 1
+        helm -n kube-system upgrade -i --reuse-values hybridnet chart/hybridnet -f /tmp/ackd-helmconfig.yaml --set init=null --set daemon.enableFelixPolicy=true --set typha.serverPort=5473 --set images.hybridnet.image=ecp_builder/hybridnet --set images.hybridnet.tag=v0.8.0 --set defaultIPRetain=false && break
+      done
+      if [ $? -ne 0 ]; then
+        panic "failed to install hybridnet"
+      fi
     else
       echo "HasRecreateOldHybridnet or UpgradeHybridnet not true, skipping upgrade hybridnet"
     fi
@@ -185,7 +60,7 @@ else
     kubectl delete ValidatingWebhookConfiguration hybridnet-validating-webhook
     kubectl apply -f chart/hybridnet/crds/
 
-    kubectl apply -f -<<EOF
+    cat > /tmp/hybridnet-manager-0.5.yaml <<EOF
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -273,13 +148,14 @@ spec:
       - effect: NoSchedule
         operator: Exists
 EOF
+    kubectl apply -f /tmp/hybridnet-manager-0.5.yaml
     suc=false
     for i in `seq 1 24`;do
       sleep 5
       updatedReplicas=`kubectl -n kube-system get deploy hybridnet-manager -ojsonpath='{.status.updatedReplicas}'`
       availableReplicas=`kubectl -n kube-system get deploy hybridnet-manager -ojsonpath='{.status.availableReplicas}'`
       readyReplicas=`kubectl -n kube-system get deploy hybridnet-manager -ojsonpath='{.status.readyReplicas}'`
-      if [ "$updatedReplicas" == "1" ] && [ "$availableReplicas" == "1" ] && [ "$availableReplicas" == "1" ];then
+      if [ "$updatedReplicas" == "1" ] && [ "$availableReplicas" == "1" ] && [ "$readyReplicas" == "1" ];then
         suc=true
         break
       fi
@@ -289,6 +165,7 @@ EOF
       echo "failed to update hybridnet to v0.5.1"
       exit 1
     fi
+    sleep 60
     helm_install_hybridnet hybridnet || panic "failed to install hybridnet"
   else
     echo "failed to check hybridnet exist"
@@ -306,6 +183,7 @@ kubectl -n kube-system annotate ds coredns kube-proxy-master kube-proxy-worker m
 kubectl -n kube-system annotate deploy metrics-server meta.helm.sh/release-namespace=kube-system --overwrite
 kubectl -n kube-system annotate APIService v1beta1.metrics.k8s.io meta.helm.sh/release-namespace=kube-system --overwrite
 helm_install kube-core || panic "failed to install kube-core"
+kubectl create ns cluster-local || true
 
 if helm -n default status yoda;then
   helm -n default delete yoda
@@ -314,6 +192,9 @@ kubectl delete crd nodelocalstorageinitconfigs.storage.yoda.io nodelocalstorages
 kubectl delete crd nodelocalstorageinitconfigs.csi.aliyun.com nodelocalstorages.csi.aliyun.com || true
 kubectl apply -f chart/open-local/crds/
 helm_install open-local || panic "failed to install open-local"
+# set default storageclass and snapshot
+kubectl annotate storageclass ${DefaultStorageClass} snapshot.storage.kubernetes.io/is-default-class="true" --overwrite
+kubectl annotate storageclass ${DefaultStorageClass} storageclass.kubernetes.io/is-default-class="true" --overwrite
 
 kubectl -n kube-system annotate sa l-zero meta.helm.sh/release-namespace=kube-system --overwrite
 kubectl -n kube-system annotate cm l0-utils l0-pyutils meta.helm.sh/release-namespace=kube-system --overwrite
@@ -334,120 +215,23 @@ kubectl -n acs-system annotate opstask meta.helm.sh/release-namespace=kube-syste
 helm_install l-zero-library || panic "failed to install l-zero-library"
 
 # install optional addons
-IFS=,
-for addon in ${Addons};do
-  if [ "$addon" == "kube-prometheus-stack" ];then
-    addon="kube-prometheus-crds"
-  fi
-  helm_install ${addon} || utils_info "failed to install ${addon}"
-done
-IFS="
-"
+install_optional_addons ${Addons}
 
-kubectl create ns cluster-local || true
-
-# sleep for hybridnet webhook ready
-if kubectl get subnet init-2;then
-  exit 0
+if [ "$Network" == "hybridnet" ] || [ "$Network" == "rama" ];then
+  create_subnet "${HostIPFamily}" "$PodCIDR" "network-0" || exit 1
 fi
-
-if [ "$IPv6DualStack" == "true" ];then
-  secondFamily=6
-  if [ "$HostIPFamily" == "6" ];then
-    secondFamily=4
-  fi
-  cat >/tmp/subnet2.yaml <<EOF
----
-apiVersion: networking.alibaba.com/v1
-kind: Subnet
-metadata:
-  name: init-2
-  labels:
-    webhook.hybridnet.io/ignore: "true"
-spec:
-  config:
-    autoNatOutgoing: true
-  network: network-0
-  range:
-    cidr: ${PodCIDR##*,}
-    version: "${secondFamily}"
-EOF
-  for i in `seq 1 16`;do
-    kubectl apply -f /tmp/subnet2.yaml && break
-    sleep 30
-  done
-  if [ $? -ne 0 ];then
-    echo "failed to run kubectl apply -f /tmp/subnet2.yaml, ignore this, please apply it by yourself"
-  fi
-
-  kubectl -n kube-system delete pod -lk8s-app=kube-dns
-fi
-
-docker rm trident-registry || true
 
 for f in admin.conf controller-manager.conf scheduler.conf;do
   cp -n /etc/kubernetes/${f} /var/lib/sealer/data/my-cluster/rootfs/
 done
 cp -rn /etc/kubernetes/pki /var/lib/sealer/data/my-cluster/rootfs/
 
-
-gatewayAddress=${gatewayDomain}
-if [ "$gatewayExposeMode" == "ip" ];then
-  if [[ ${gatewayExternalIP} =~ ":" ]];then
-    gatewayAddress=[${gatewayExternalIP}]
-  else
-    gatewayAddress=${gatewayExternalIP}
-  fi
-fi
-
 # generate cluster info
 if [ "$GenerateClusterInfo" == "true" ];then
-  cat >/tmp/clusterinfo-cm.yaml <<EOF
----
-apiVersion: v1
-data:
-  deployMode: "${deployMode}"
-  gatewayExposeMode: "${gatewayExposeMode}"
-  gatewayAddress: "${gatewayAddress}"
-  gatewayDomain: "${gatewayDomain}"
-  gatewayExternalIP: "${gatewayExternalIP}"
-  gatewayInternalIP: "${gatewayInternalIP}"
-  gatewayPort: "${gatewayPort}"
-  gatewayAPIServerPort: "${gatewayAPIServerPort}"
-  ingressAddress: "${ingressAddress}"
-  ingressExternalIP: "${ingressExternalIP}"
-  ingressInternalIP: "${ingressInternalIP}"
-  ingressHttpPort: "${ingressHttpPort}"
-  ingressHttpsPort: "${ingressHttpsPort}"
-  harborAddress: "${harborAddress}"
-  vcnsOssAddress: "${vcnsOssAddress}"
-  clusterDomain: "${DNSDomain}"
-  defaultIPStack: "4"
-  registryURL: "${LocalRegistryURL}"
-  registryExternalURL: "${LocalRegistryDomain}:5001"
-  RegistryURL: "${LocalRegistryURL}"
-  platformType: "${PlatformType}"
-  clusterName: "cluster-local"
-kind: ConfigMap
-metadata:
-  name: clusterinfo
-  namespace: kube-public
-EOF
-
-  kubectl apply -f /tmp/clusterinfo-cm.yaml
+  gen_clusterinfo || exit 1
 fi
 
-if [ "${ComponentToInstall}" != "" ];then
-  ComponentToInstallFlag="--component-to-install ${ComponentToInstall}"
-fi
-if [ "${PlatformCAPath}" != "" ];then
-  PlatformCAFlag="--ca-path ${PlatformCAPath} --key-path ${PlatformCAKeyPath}"
-fi
-trident on-sealer -f /root/.sealer/Clusterfile --sealer --dump-managed-cluster ${GenerateCAFlag} ${ComponentToInstallFlag} ${PlatformCAFlag}
+trident_process_init "$ComponentToInstall" "$PlatformCAPath" "$PlatformCAKeyPath" "$GenerateCAFlag"
 if [ $? -ne 0 ];then
   exit 1
 fi
-
-# set default storageclass and snapshot
-kubectl annotate storageclass ${DefaultStorageClass} snapshot.storage.kubernetes.io/is-default-class="true" --overwrite
-kubectl annotate storageclass ${DefaultStorageClass} storageclass.kubernetes.io/is-default-class="true" --overwrite

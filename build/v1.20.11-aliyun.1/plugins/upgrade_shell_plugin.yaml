@@ -6,6 +6,5 @@ spec:
   type: SHELL
   action: upgrade
   data: |
-    set -x
-    # TODO check
+    set -x; set -e
     trident upgrade-trident --sealer -f /root/Clusterfile-from-trident --debug --force
