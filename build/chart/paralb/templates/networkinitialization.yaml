@@ -21,6 +21,7 @@ metadata:
 spec:
   vipNetwork: cnstack-proxy
   netID: 0
+  reserved: true
   range:
     {{- with (first $ingressVips) }}
     start: {{ . }}
@@ -40,7 +41,7 @@ spec:
 apiVersion: networking.alibaba.com/v1
 kind: VIPSubnet
 metadata:
-  name: ingress-controller-vip-v6
+  name: ingress-controller-vip
 spec:
   vipNetwork: cnstack-proxy
   netID: 0
@@ -66,6 +67,7 @@ metadata:
 spec:
   vipNetwork: cnstack-proxy
   netID: 0
+  reserved: true
   range:
     {{- with (first $iamVips) }}
     start: {{ . }}
@@ -85,7 +87,7 @@ spec:
 apiVersion: networking.alibaba.com/v1
 kind: VIPSubnet
 metadata:
-  name: iam-gateway-vip-v6
+  name: iam-gateway-vip
 spec:
   vipNetwork: cnstack-proxy
   netID: 0
@@ -111,6 +113,7 @@ metadata:
 spec:
   vipNetwork: cnstack-proxy
   netID: 0
+  reserved: true
   range:
     {{- with (first $apiVips) }}
     start: {{ . }}
@@ -130,7 +133,7 @@ spec:
 apiVersion: networking.alibaba.com/v1
 kind: VIPSubnet
 metadata:
-  name: api-server-vip-v6
+  name: api-server-vip
 spec:
   vipNetwork: cnstack-proxy
   netID: 0
