@@ -45,6 +45,7 @@ metadata:
 spec:
   vipNetwork: cnstack-proxy
   netID: 0
+  reserved: true
   range:
     {{- with (index $ingressVips 1) }}
     start: {{ . }}
@@ -91,6 +92,7 @@ metadata:
 spec:
   vipNetwork: cnstack-proxy
   netID: 0
+  reserved: true
   range:
     {{- with (index $iamVips 1) }}
     start: {{ . }}
@@ -137,6 +139,7 @@ metadata:
 spec:
   vipNetwork: cnstack-proxy
   netID: 0
+  reserved: true
   range:
     {{- with (index $apiVips 1) }}
     start: {{ . }}
