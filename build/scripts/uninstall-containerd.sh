@@ -51,6 +51,6 @@ rm -rf /var/lib/containerd/* || exit 1
 
 rm -rf /var/lib/nerdctl/* || exit 1
 
-rm -f /etc/containerd/* || exit 1
+rm -rf /etc/containerd/* || exit 1
 
 rm -rf /var/run/netns/cni-* || true
