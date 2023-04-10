@@ -30,11 +30,19 @@ upgrade_containerd() {
 
   # master
   if [ "$1" = "master" ]; then
-    bash init-registry.sh ${RegistryPort} $DIR_WORKSPACE/registry ${RegistryDomain}
+    bash init-registry.sh ${LocalRegistryPort} $DIR_WORKSPACE/registry ${LocalRegistryDomain}
   fi
 }
 
 upgrade_main() {
+  if [ "${LocalRegistryPort}" == "" ];then
+    echo "Env LocalRegistryPort must be set, please check"
+    exit 1
+  fi
+  if [ "${LocalRegistryDomain}" == "" ];then
+    echo "Env LocalRegistryDomain must be set, please check"
+    exit 1
+  fi
   systemctl stop kubelet
   uninstall_docker
   install_nerdctl
@@ -60,14 +68,6 @@ main() {
       ;;
     --dir-backup)
       DIR_BACKUP=$2
-      shift
-      ;;
-    --registry-port)
-      RegistryPort=$2
-      shift
-      ;;
-    --registry-domain)
-      RegistryDomain=$2
       shift
       ;;
     esac
