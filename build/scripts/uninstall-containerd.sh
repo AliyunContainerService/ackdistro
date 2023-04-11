@@ -47,12 +47,10 @@ rm -r $(which -a nerdctl)
 fuser -m /dev/mapper/ackdistro--pool-container -k || true
 
 # umount and clean containerd related directories
-rm -rf /var/lib/containerd/*
-if [[ $? != 0 ]]; then
-  exit 1
-fi
+rm -rf /var/lib/containerd/* || exit 1
 
-rm -rf /var/lib/nerdctl/*
-if [[ $? != 0 ]]; then
-  exit 1
-fi
+rm -rf /var/lib/nerdctl/* || exit 1
+
+rm -rf /etc/containerd/* || exit 1
+
+rm -rf /var/run/netns/cni-* || true

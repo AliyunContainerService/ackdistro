@@ -263,6 +263,22 @@ helm_install() {
 }
 
 prepare_helm_config() {
+  if [ "$ClusterScale" == "" ] || [ "$ClusterScale" == "small" ];then
+    hyMgrReqCpu=50m
+    hyMgrReqMem=128Mi
+    hyDsReqMem=64Mi
+    hyFelixReqMem=128Mi
+    hyWebReqCpu=10m
+    hyWebReqMem=64Mi
+  else
+    hyMgrReqCpu=250m
+    hyMgrReqMem=1024Mi
+    hyDsReqMem=100Mi
+    hyFelixReqMem=200Mi
+    hyWebReqCpu=100m
+    hyWebReqMem=100Mi
+  fi
+
   cat >/tmp/ackd-helmconfig.yaml <<EOF
 global:
   EnableLocalDNSCache: ${EnableLocalDNSCache}
@@ -296,30 +312,30 @@ daemon:
   resources:
     requests:
       cpu: "0"
-      memory: 100Mi
+      memory: ${hyDsReqMem}
   felix:
     resources:
       requests:
         cpu: "0"
-        memory: 200Mi
+        memory: ${hyFelixReqMem}
 manager:
   replicas: ${NumOfMasters}
   resources:
     requests:
-      cpu: 250m
-      memory: 1024Mi
+      cpu: ${hyMgrReqCpu}
+      memory: ${hyMgrReqMem}
 webhook:
   replicas: ${NumOfMasters}
   resources:
     requests:
-      cpu: 100m
-      memory: 100Mi
+      cpu: ${hyWebReqCpu}
+      memory: ${hyWebReqMem}
 typha:
   replicas: ${NumOfMasters}
   resources:
     requests:
-      cpu: 100m
-      memory: 100Mi
+      cpu: ${hyWebReqCpu}
+      memory: ${hyWebReqMem}
 metricsServer:
   replicas: ${MetricsServerReplicas}
 EOF

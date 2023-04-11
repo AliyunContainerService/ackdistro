@@ -7,6 +7,7 @@ set -x
 
 source "${scripts_path}"/default_values.sh
 
+export SkipCorednsConfigmap=true
 bash ${scripts_path}/install_addons.sh || exit 1
 
 kubectl -n kube-system delete deploy yoda-scheduler-extender || true
