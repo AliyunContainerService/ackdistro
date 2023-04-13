@@ -1,6 +1,9 @@
 #!/bin/bash
 
 export PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin
+export defaultVgName="ackdistro-pool"
+export extraMountPointAnno="#ackdistro-extra-mountpoint"
+export extraLVNamePrefix="ackdistro-extra-lv"
 
 utils_version_ge() {
   test "$(echo "$@" | tr ' ' '\n' | sort -rV | head -n 1)" == "$1"
@@ -112,11 +115,47 @@ utils_get_redhat_release() {
   echo "$redhat_release"
 }
 
-utils_shouldMkFs() {
-    if [ "$1" != "" ] && [ "$1" != "/" ] && [ "$1" != "\"/\"" ];then
-        return 0
+utils_no_need_mkfs() {
+  if [[ "$1" == "" ]] || [[ "$1" == "/" ]] || [[ "$1" == "\"/\"" ]];then
+    return 0
+  fi
+
+  return 1
+}
+
+utils_split_str_to_array() {
+  NEW_IFS=","
+  if echo ${1} | grep "&" &>/dev/null;then
+     NEW_IFS="&"
+  fi
+  OLD_IFS="$IFS"
+  IFS=${NEW_IFS}
+  for i in $1;do
+    echo $i
+  done
+  IFS="$OLD_IFS"
+}
+
+utils_is_device_array() {
+  utils_no_need_mkfs $1 && return 1
+
+  # check each dev name
+  for temp in `utils_split_str_to_array $1`;do
+    if [[ $temp =~ "/dev" ]];then
+      continue
+    else
+      return 1
     fi
-    return 1
+  done
+
+  return 0
+}
+
+utils_is_vgname() {
+  utils_no_need_mkfs $1 && return 1
+  utils_is_device_array $1 && return 1
+
+  return 0
 }
 
 disable_selinux() {

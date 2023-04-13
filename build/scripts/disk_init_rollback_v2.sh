@@ -8,10 +8,17 @@ set -x
 
 clean_vg_pool()
 {
-    tridentVGName="$1"
+    vgNameKeywordToDelete="$1"
+    vgNameKeywordToRetain="$2"
+
     # step 1: get yoda pvlist and vglist
-    pvs=`pvs|grep $tridentVGName|awk '{print $1}'`
-    vgs=`vgs|grep $tridentVGName|awk '{print $1}'`
+    if [ "$vgNameKeywordToRetain" != "" ];then
+        pvs=`pvs | grep $vgNameKeywordToDelete | grep -v $vgNameKeywordToRetain | awk '{print $1}'`
+        vgs=`vgs | grep $vgNameKeywordToDelete | grep -v $vgNameKeywordToRetain | awk '{print $1}'`
+    else
+        pvs=`pvs | grep $vgNameKeywordToDelete | awk '{print $1}'`
+        vgs=`vgs | grep $vgNameKeywordToDelete | awk '{print $1}'`
+    fi
     c=0
     pvlist=()
     vglist=()
@@ -54,6 +61,29 @@ clean_vg_pool()
     done
 }
 
+clean_yoda_lv() {
+  vgs=$(vgdisplay -s|awk '{print $1}'|tr -d '"')
+  echo $vgs
+  for i in "${vgs[@]}"; do
+      echo "vg is $i"
+      lvs1=$(lvscan|awk '/\/dev\/'$i'\/yoda/{print $2}'|tr -d "\'")
+      for j in "${lvs1[@]}"; do
+          if [ "$j" == "" ];then
+              continue
+          fi
+          lvremove -f $j
+      done
+
+      lvs2=$(lvscan|awk '/\/dev\/'$i'\/csi/{print $2}'|tr -d "\'")
+      for j in "${lvs2[@]}"; do
+          if [ "$j" == "" ];then
+              continue
+          fi
+          lvremove -f $j
+      done
+  done
+}
+
 # Step 0: lsblk check
 utils_info "disk_init_rollback.sh lsblk result:"
 lsblk
@@ -61,42 +91,43 @@ lsblk
 # Step 1: get device
 etcdDev=${EtcdDevice}
 storageDev=${StorageDevice}
+storageVGName=${StorageVGName}
 container_runtime=${ContainerRuntime}
+extraMountPointsArray=`utils_split_str_to_array ${ExtraMountPoints}`
+extraMountPointsRecyclePolicy=${ExtraMountPointsRecyclePolicy:-Retain}
 if [ "$container_runtime" == "" ];then
   container_runtime=docker
 fi
 
-containAnd=$(echo ${storageDev} | grep "&")
-NEW_IFS=","
-if [ "$containAnd" != "" ];then
-   NEW_IFS="&"
+if utils_no_need_mkfs $storageDev; then
+  echo "no need to mkfs for storage device $storageDev"
+else
+  utils_is_device_array $storageDev || panic "invalid input device name $storageDev, it must be /dev/***[,/dev/***]"
+  vgName=$defaultVgName
+  if [ "$VGPoolName" != "" ];then
+    vgName=$VGPoolName
+  fi
 fi
 
-vgName="ackdistro-pool"
-devPrefix="/dev"
-if [[ $storageDev =~ $devPrefix ]]
-then
-    # check each dev name
-    OLD_IFS="$IFS"
-    IFS=${NEW_IFS}
-    arr=($storageDev)
-    IFS="$OLD_IFS"
-    for temp in ${arr[@]};do
-        if [[ $temp =~ $devPrefix ]];then
-            echo "input device is "$temp
-        else
-            panic "invalid input device name, it must be /dev/***"
-        fi
-    done
-elif [ "$storageDev" != "" ] && [ "$storageDev" != "/" ];then
-    vgName=$storageDev
+if [ "$storageVGName" != "" ];then
+  if [ "$storageDev" != "" ];then
+    panic "only one of StorageDevice or StorageVGName should be specified"
+  fi
+  utils_is_vgname $storageVGName || panic "invalid vgname $storageVGName"
+  vgName=$storageVGName
 fi
 
-# Step 2: clean yoda pools
-clean_vg_pool "yoda-pool"
+reg="^\/(\w+\/?)+:[0-9]+$"
+for mp in $extraMountPointsArray;do
+  if [[ $mp =~ $reg ]];then
+    continue
+  else
+    panic "invalid ExtraMountPoints: $ExtraMountPoints, it must be /path1:size1,/path2:size2"
+  fi
+done
 
-# Step 3: clean mount info in /etc/fstab
-if utils_shouldMkFs $etcdDev;then
+# Step 2: clean mount info in /etc/fstab
+if ! utils_no_need_mkfs $etcdDev;then
   sed -i "/\\/var\\/lib\\/etcd/d"  /etc/fstab
 
   # umount etcd
@@ -116,9 +147,13 @@ if utils_shouldMkFs $etcdDev;then
   utils_info "umount etcd done!"
 fi
 
-if utils_shouldMkFs $storageDev;then
+if ! utils_no_need_mkfs $storageDev;then
   sed -i "/\\/var\\/lib\\/kubelet/d"  /etc/fstab
   sed -i "/\\/var\\/lib\\/${container_runtime}/d"  /etc/fstab
+  if [ "$ExtraMountPoints" != "" ] && [ "$extraMountPointsRecyclePolicy" == "Delete" ];then
+    sed -i "/${extraMountPointAnno}/d" /etc/fstab
+  fi
+
   # umount kubelet/docker
   suc=false
   for i in `seq 1 10`;do
@@ -140,6 +175,20 @@ if utils_shouldMkFs $storageDev;then
       if findmnt /var/lib/${container_runtime};then
           continue
       fi
+
+      if [ "$ExtraMountPoints" != "" ] && [ "$extraMountPointsRecyclePolicy" == "Delete" ];then
+        _lv_i=0
+        for _mp_sz in $extraMountPointsArray;do
+          _lv_name=${extraLVNamePrefix}${_lv_i}
+          umount /dev/$vgName/${_lv_name}
+          if findmnt /dev/$vgName/${_lv_name};then
+            continue 2
+          fi
+
+          let _lv_i=_lv_i+1
+        done
+      fi
+
       suc=true
       break
   done
@@ -149,33 +198,35 @@ if utils_shouldMkFs $storageDev;then
   utils_info "umount done!"
 fi
 
-# Step 5: clean ackdistro pool
-if [ "$vgName" = "ackdistro-pool" ];then
-    clean_vg_pool "ackdistro-pool"
-    if utils_shouldMkFs $storageDev;then
-        OLD_IFS="$IFS"
-        IFS=${NEW_IFS}
-        arr=($storageDev)
-        IFS="$OLD_IFS"
-        for temp in ${arr[@]};do
-            utils_info "wipefs $temp"
-            output=$(wipefs -a $temp)
-            if [ "$?" != "0" ]; then
-                echo -e "\033[1;31mPanic error: failed to exec [wipefs -a $temp]: $output, please check this panic\033[0m"
-            fi
-            utils_info "wipefs $temp done!"
-        done
-    fi
-else
-    lv_container_name="container"
-    lv_kubelet_name="kubelet"
-    lvremove /dev/$vgName/$lv_container_name -y
-    lvremove /dev/$vgName/$lv_kubelet_name -y
-    lvscan|awk "/$vgName/{print $2}"|xargs -I {} lvremove -f {}
+# Step 3: clean ackdistro pool
+if ! utils_no_need_mkfs $storageDev;then
+  if [ "$ExtraMountPoints" == "" ] || [ "$extraMountPointsRecyclePolicy" == "Delete" ];then
+    clean_vg_pool $vgName
+
+    for temp in `utils_split_str_to_array $storageDev`;do
+        utils_info "wipefs $temp"
+        output=$(wipefs -a $temp)
+        if [ "$?" != "0" ]; then
+            echo -e "\033[1;31mPanic error: failed to exec [wipefs -a $temp]: $output, please check this panic\033[0m"
+        fi
+        utils_info "wipefs $temp done!"
+    done
+  fi
+elif [ "$storageVGName" != "" ];then
+  lv_container_name="container"
+  lv_kubelet_name="kubelet"
+  lvremove /dev/$vgName/$lv_container_name -y
+  lvremove /dev/$vgName/$lv_kubelet_name -y
+  #lvscan|awk "/$vgName/{print $2}"|xargs -I {} lvremove -f {}
 fi
 
-# Step 6: wipe etcd device
-if ! utils_shouldMkFs $etcdDev; then
+# Step 4: clean yoda pools
+clean_yoda_lv
+
+clean_vg_pool "yoda-pool" $vgName
+
+# Step 5: wipe etcd device
+if utils_no_need_mkfs $etcdDev; then
     utils_info "target etcd device is empty!"
 else
     utils_info "wipefs $etcdDev"

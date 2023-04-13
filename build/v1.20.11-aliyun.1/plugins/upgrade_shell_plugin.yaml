@@ -7,4 +7,5 @@ spec:
   action: upgrade
   data: |
     set -x; set -e
-    trident upgrade-trident --sealer -f /root/Clusterfile-from-trident --debug --force
+    HealthCheckBeforeUpgrade=${HealthCheckBeforeUpgrade:=true}
+    trident upgrade-trident --sealer -f /root/Clusterfile-from-trident --debug --force --pre-health-check=${HealthCheckBeforeUpgrade}

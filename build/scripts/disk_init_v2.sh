@@ -8,26 +8,44 @@ set -x
 
 # Step 0: get device and parts size
 storageDev=${StorageDevice}
+storageVGName=${StorageVGName}
 etcdDev=${EtcdDevice}
 container_runtime_size=${DockerRunDiskSize}
 kubelet_size=${KubeletRunDiskSize}
 file_system=${DaemonFileSystem}
 container_runtime=${ContainerRuntime}
+extraMountPointsArray=`utils_split_str_to_array ${ExtraMountPoints}`
 
 if [ "$container_runtime" == "" ];then
   container_runtime=docker
-fi
-
-containAnd=$(echo ${storageDev} | grep "&")
-NEW_IFS=","
-if [ "$containAnd" != "" ];then
-   NEW_IFS="&"
 fi
 
 if [ -z "$file_system" ]; then
     file_system="ext4"
     utils_info "set file system to default value - ${file_system}"
 fi
+
+if utils_no_need_mkfs $storageDev; then
+  echo "no need to mkfs for storage device $storageDev"
+else
+  utils_is_device_array $storageDev || panic "invalid input device name $storageDev, it must be /dev/***[,/dev/***]"
+fi
+
+if [ "$storageVGName" != "" ];then
+  if [ "$storageDev" != "" ];then
+    panic "only one of StorageDevice or StorageVGName should be specified"
+  fi
+  utils_is_vgname $storageVGName || panic "invalid vgname $storageVGName"
+fi
+
+reg="^\/(\w+\/?)+:[0-9]+$"
+for mp in $extraMountPointsArray;do
+  if [[ $mp =~ $reg ]];then
+    continue
+  else
+    panic "invalid ExtraMountPoints: $ExtraMountPoints, it must be /path1:size1,/path2:size2"
+  fi
+done
 
 mkfsForce() {
     if [ "$file_system" = "ext4" ];then
@@ -64,14 +82,41 @@ mountEtcd() {
     echo "$etcdDev /var/lib/etcd ${file_system} defaults 0 0" >> /etc/fstab
 }
 
+createLv() {
+  _lvname=$1
+  _lvsize=$2
+  _vgname=$3
+  lvs|grep $_lvname
+  if [ "$?" == "0" ]; then
+    utils_info "lv $_lvname exists!"
+    return 0
+  fi
+
+  suc=false
+  for i in `seq 1 12`;do
+    if [ "$i" != "1" ];then
+        sleep 5
+    fi
+    lvcreate --name $_lvname --size ${_lvsize}"Gi" $_vgname -y 2>&1
+    if [ "$?" == "0" ]; then
+        suc=true
+        break
+    fi
+  done
+  if [ "$suc" != "true" ]; then
+    return 1
+  fi
+  return 0
+}
+
 # Step 0: init etcd device
-if utils_shouldMkFs $etcdDev;then
+if ! utils_no_need_mkfs $etcdDev;then
     mountEtcd
 fi
 
 # Step 1: check val
-if ! utils_shouldMkFs $storageDev; then
-    utils_info "device is empty! exit..."
+if utils_no_need_mkfs $storageDev && [ "$storageVGName" == "" ]; then
+    utils_info "device and vg name is empty! exit..."
     exit 0
 fi
 if [ -z "$container_runtime_size" ]; then
@@ -98,21 +143,12 @@ if [ "${check1}" != "0" ] && [ "${check2}" == "0" ];then
 fi
 
 # Step 2: create vg
-devPrefix="/dev/"
-vgName="ackdistro-pool"
-if [[ $storageDev =~ $devPrefix ]];then
-    # check each dev name
-    OLD_IFS="$IFS"
-    IFS=${NEW_IFS}
-    arr=($storageDev)
-    IFS="$OLD_IFS"
-    devForVG=""
-    for temp in ${arr[@]};do
-        if [[ $temp =~ $devPrefix ]];then
-            echo "input device is "$temp
-        else
-            panic "input device name is error, must be /dev/***"
-        fi
+if ! utils_no_need_mkfs $storageDev;then
+    vgName=$defaultVgName
+    if [ "$VGPoolName" != "" ];then
+        vgName=$VGPoolName
+    fi
+    for temp in `utils_split_str_to_array $storageDev`;do
         devForVG=$devForVG" "$temp
     done
 
@@ -126,59 +162,21 @@ if [[ $storageDev =~ $devPrefix ]];then
     else
         echo "vg "$vgName" exists!"
     fi
-else
-    vgName=$storageDev
+elif [ "$storageVGName" != "" ];then
+    vgName=$storageVGName
 fi
 
 # Step 3: create lv
-sed -i "/\\/var\\/lib\\/kubelet/d"  /etc/fstab
-sed -i "/\\/var\\/lib\\/${container_runtime}/d"  /etc/fstab
+sed -i "/\\/var\\/lib\\/kubelet/d" /etc/fstab
+sed -i "/\\/var\\/lib\\/${container_runtime}/d" /etc/fstab
+sed -i "/${extraMountPointAnno}/d" /etc/fstab
 
 lv_container_name="container"
 lv_kubelet_name="kubelet"
 
-container_runtime_size=$container_runtime_size"Gi"
-kubelet_size=$kubelet_size"Gi"
+createLv $lv_container_name $container_runtime_size $vgName || panic "failed to create $lv_container_name lv, please see log above"
 
-lvs|grep $lv_container_name
-if [ "$?" != "0" ]; then
-    suc=false
-    for i in `seq 1 12`;do
-        if [ "$i" != "1" ];then
-            sleep 5
-        fi
-        output1=$(lvcreate --name $lv_container_name --size $container_runtime_size $vgName -y 2>&1)
-        if [ "$?" == "0" ]; then
-            suc=true
-            break
-        fi
-    done
-    if [ "$suc" != "true" ]; then
-        panic "failed to create $lv_container_name lv: $output1"
-    fi
-else
-    utils_info "lv $lv_container_name exists!"
-fi
-
-lvs|grep $lv_kubelet_name
-if [ "$?" != "0" ]; then
-    suc=false
-    for i in `seq 1 12`;do
-        if [ "$i" != "1" ];then
-            sleep 5
-        fi
-        output2=$(lvcreate --name $lv_kubelet_name --size $kubelet_size $vgName -y 2>&1)
-        if [ "$?" == "0" ]; then
-            suc=true
-            break
-        fi
-    done
-    if [ "$suc" != "true" ]; then
-        panic "failed to create $lv_kubelet_name lv: $output2"
-    fi
-else
-    utils_info "lv $lv_kubelet_name exists!"
-fi
+createLv $lv_kubelet_name $kubelet_size $vgName || panic "failed to create $lv_kubelet_name lv, please see log above"
 
 # Step 3.5: sleep a little while
 sleep 1s
@@ -232,7 +230,7 @@ if [ "$?" != "0" ]; then
     lsblk
     utils_info "disk_init.sh mount -a result:"
     mount -a
-    panic "failed to exec [mount /dev/$vgName/$lv_container_name /var/lib/docker]: $output5"
+    panic "failed to exec [mount /dev/$vgName/$lv_container_name /var/lib/${container_runtime}]: $output5"
   fi
 fi
 mkdir -p /var/lib/${container_runtime}/logs
@@ -255,5 +253,56 @@ fi
 # Step 9: make mount persistent
 echo "/dev/$vgName/$lv_container_name /var/lib/${container_runtime} ${file_system} defaults 0 0" >> /etc/fstab
 echo "/dev/$vgName/$lv_kubelet_name /var/lib/kubelet ${file_system} defaults 0 0" >> /etc/fstab
+
+_lv_i=0
+for _mp_sz in $extraMountPointsArray;do
+  _mp=${_mp_sz%:*}
+  _sz=${_mp_sz#*:}
+
+  if ! checkMountOK $_mp;then
+    _lv_name=${extraLVNamePrefix}${_lv_i}
+    createLv ${_lv_name} $_sz $vgName || panic "failed to create ${_lv_name} lv, please see log above"
+
+    sleep 1s
+    #umount before mkfs
+    umount $_mp
+    if [ "$?" != "0" ]; then
+      utils_info "failed to umount, maybe you should clean this node before join"
+    fi
+
+    if ! blkid|grep $_lv_name|grep ${file_system}; then
+      # This func will exit when fail
+      mkfsForce /dev/$vgName/$_lv_name
+    else
+      utils_info "lv /dev/$vgName/$_lv_name has file system"
+    fi
+
+    #umount before mount
+    umount $_mp
+    if [ "$?" != "0" ]; then
+      utils_info "failed to umount, maybe you should clean this node before join"
+    fi
+
+    systemctl daemon-reexec
+
+    mkdir -p $_mp
+    output=$(mount /dev/$vgName/${_lv_name} $_mp 2>&1)
+    if [ "$?" != "0" ]; then
+      if echo "$output" |grep "is already mounted";then
+        utils_info "already mounted, continue"
+      else
+        utils_info "disk_init.sh lsblk result:"
+        lsblk
+        utils_info "disk_init.sh mount -a result:"
+        mount -a
+        panic "failed to exec [mount /dev/$vgName/$_lv_name $_mp]: $output"
+      fi
+    fi
+  fi
+
+  echo "/dev/$vgName/$_lv_name $_mp ${file_system} defaults 0 0 $extraMountPointAnno" >> /etc/fstab
+
+  let _lv_i=_lv_i+1
+done
 
 utils_info "disk_init success!"
