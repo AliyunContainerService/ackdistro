@@ -238,6 +238,7 @@ process_taints_labels "$RemoveMasterTaint" "$PlatformType" || exit 1
 # generate cluster info
 if [ "$GenerateClusterInfo" == "true" ];then
   gen_clusterinfo || exit 1
+  GenerateCAFlag="--generate-ca"
 fi
 
 trident_process_init "$ComponentToInstall" "$PlatformCAPath" "$PlatformCAKeyPath" "$GenerateCAFlag"
