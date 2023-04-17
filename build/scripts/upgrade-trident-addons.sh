@@ -209,7 +209,14 @@ helm_install csi-hostpath || panic "failed to install csi-hostpath"
 
 kubectl -n acs-system annotate CronJob backup-etcd meta.helm.sh/release-namespace=kube-system --overwrite
 
+if helm -n default status etcd-backup;then
+  helm -n default delete etcd-backup
+fi
 helm_install etcd-backup || panic "failed to install etcd-backup"
+
+if helm -n default status cluster-operator;then
+  helm -n default delete cluster-operator
+fi
 
 kubectl -n acs-system annotate opstask meta.helm.sh/release-namespace=kube-system --overwrite --all
 helm_install l-zero-library || panic "failed to install l-zero-library"
@@ -225,6 +232,8 @@ for f in admin.conf controller-manager.conf scheduler.conf;do
   cp -n /etc/kubernetes/${f} /var/lib/sealer/data/my-cluster/rootfs/
 done
 cp -rn /etc/kubernetes/pki /var/lib/sealer/data/my-cluster/rootfs/
+
+process_taints_labels "$RemoveMasterTaint" "$PlatformType" || exit 1
 
 # generate cluster info
 if [ "$GenerateClusterInfo" == "true" ];then
