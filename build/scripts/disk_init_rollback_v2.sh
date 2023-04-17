@@ -147,7 +147,7 @@ if ! utils_no_need_mkfs $etcdDev;then
   utils_info "umount etcd done!"
 fi
 
-if ! utils_no_need_mkfs $storageDev;then
+if ! utils_no_need_mkfs $storageDev || [ "$storageVGName" != "" ];then
   sed -i "/\\/var\\/lib\\/kubelet/d"  /etc/fstab
   sed -i "/\\/var\\/lib\\/${container_runtime}/d"  /etc/fstab
   if [ "$ExtraMountPoints" != "" ] && [ "$extraMountPointsRecyclePolicy" == "Delete" ];then
@@ -217,7 +217,15 @@ elif [ "$storageVGName" != "" ];then
   lv_kubelet_name="kubelet"
   lvremove /dev/$vgName/$lv_container_name -y
   lvremove /dev/$vgName/$lv_kubelet_name -y
-  #lvscan|awk "/$vgName/{print $2}"|xargs -I {} lvremove -f {}
+  if [ "$ExtraMountPoints" != "" ] && [ "$extraMountPointsRecyclePolicy" == "Delete" ];then
+    _lv_i=0
+    for _mp_sz in $extraMountPointsArray;do
+      _lv_name=${extraLVNamePrefix}${_lv_i}
+      lvremove /dev/$vgName/${_lv_name} -y
+
+      let _lv_i=_lv_i+1
+    done
+  fi
 fi
 
 # Step 4: clean yoda pools
