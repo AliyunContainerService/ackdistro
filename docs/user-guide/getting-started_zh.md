@@ -58,6 +58,7 @@ ACK Distro有丰富的生产级别集群管理经验，我们目前提供了以�
 
 - EtcdDevice: 分配给etcd的磁盘，容量必须大于20GiB，IOPS>3300，仅Master节点需要
 - StorageDevice: 分配给docker和kubelet的磁盘的盘符，ACK Distro会将该磁盘制作为VG Pool
+- StorageVGName: 分配给docker和kubelet的VG名称，不能和StorageDevice同时指定，ACK Distro会直接将该VG作为VG Pool，在清理节点时会将该VG还原到部署前的状态
 - DockerRunDiskSize, KubeletRunDiskSize: 分配给docker和kubelet的磁盘分区大小，默认各100GiB；ACK-D使用[LVM](https://wiki.archlinux.org/title/LVM)来管理磁盘分区，因此您可以在运维阶段按需伸缩磁盘分区的大小
 - DaemonFileSystem: 分区的文件系统，支持 ext4/xfs，默认为 ext4
 - ExtraMountPoints: 需要额外创建的挂载点及所需LV大小，格式为：path:size[,path2:size2]，ACK Distro会自动从VG Pool中划分出指定size的LV，挂载到path；例如"/data:200"、"/data:200,/root/data:100"
