@@ -128,18 +128,20 @@ if [ -z "$kubelet_size" ]; then
     utils_info "set partition /var/lib/kubelet size to default size - 100G"
 fi
 
+containerStorage=${ContainerDataRoot:-/var/lib/${container_runtime}}
+
 checkMountOK /var/lib/kubelet
 check1=$?
-checkMountOK /var/lib/${container_runtime}
+checkMountOK $containerStorage
 check2=$?
 if [ "${check1}" == "0" ] && [ "${check2}" == "0" ];then
     exit 0
 fi
 if [ "${check1}" == "0" ] && [ "${check2}" != "0" ];then
-    panic "mount for /var/lib/kubelet found, but not /var/lib/${container_runtime}, if you are scaling this node and some error occurs before, you can try delete it and try again"
+    panic "mount for /var/lib/kubelet found, but not ${containerStorage}, if you are scaling this node and some error occurs before, you can try delete it and try again"
 fi
 if [ "${check1}" != "0" ] && [ "${check2}" == "0" ];then
-    panic "mount for /var/lib/${container_runtime} found, but not /var/lib/kubelet, if you are scaling this node and some error occurs before, you can try delete it and try again"
+    panic "mount for ${containerStorage} found, but not /var/lib/kubelet, if you are scaling this node and some error occurs before, you can try delete it and try again"
 fi
 
 # Step 2: create vg
