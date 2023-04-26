@@ -65,6 +65,7 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
         mkdir -p ${arch}/bin
         mkdir -p ${arch}/rpm
         mkdir -p ${arch}/tgz
+        mkdir -p ${arch}/cri
 
         bins=(kubectl kubelet kubeadm)
         for bin in ${bins[@]};do
@@ -105,6 +106,7 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
         done
 
         wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/containerd-1.6.19-linux-${arch}.tar.gz -O ${arch}/tgz/containerd.tgz
+        wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/docker.tar.gz -O ${arch}/cri/docker.tar.gz
     done
 fi
 
