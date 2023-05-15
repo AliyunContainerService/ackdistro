@@ -237,7 +237,18 @@ spec:
       roles: [ node ]
 ```
 
-#### 8) 其他可配置项
+#### 8) 规格
+
+您可以通过.spec.env中ClusterScale来配置不同的规格，pod数<=60*node数：
+
+- small：0-50 nodes
+- medium：50-100 nodes
+- large：100-1000 nodes
+- xlarge：1000-3000 nodes
+
+具体的规格参数详见附录。
+
+#### 9) 其他可配置项
 
 在ClusterFile的.spec.env中，您还可以修改如下配置
 
@@ -250,6 +261,8 @@ spec:
 - CertSANs: 需要为APIServer证书额外签发的域名/IP
 - IgnoreErrors: 需要忽略的预检错误项
 - TrustedRegistry: 需要让容器运行时信任的镜像仓库地址
+- UseIPasNodeName: 是否使用节点ip作为NodeName，默认为false
+- DefaultIPRetain: 是否开启网络插件ip保留功能，默认为true
 
 ```yaml
 apiVersion: sealer.cloud/v2
@@ -268,6 +281,7 @@ spec:
     - CertSANs=1.1.1.1 # extra cert sans, if gatewayInternalIP not empty, must set it in CertSANs too
     - IgnoreErrors=OS # ignore errors for preflight
     - TrustedRegistry=your.registry.url # Registry Domain to be trusted by container runtime
+    - ContainerDataRoot=/root/docker-root # modify docker data root, default is /var/lib/docker
   ...
 ```
 
@@ -338,3 +352,45 @@ sealer delete -a
 
 ### 使用ACK纳管ACK-Distro集群：
 [https://help.aliyun.com/document_detail/121053.html](https://help.aliyun.com/document_detail/121053.html)
+
+## 附录
+### 规格参数
+
+| 规格 | 组件 | 参数配置 |
+| --- | --- | --- |
+| **small** | etcd | requests.cpu=100m<br />requests.mem=100Mi |
+|  | kube-apiserver | requests.cpu=250m |
+|  | kube-scheduler | requests.cpu=100m |
+|  | kube-controller-manager | requests.cpu=200m |
+|  | coredns | requests.cpu=100m<br />requests.mem=70Mi<br />limits.mem=170Mi |
+|  | metrics-server | requests.cpu=125m<br />requests.mem=500Mi<br />limits.cpu=2<br />limits.mem=2Gi |
+|  | node-problem-detector | requests.cpu=0<br />requests.mem=200Mi<br />limits.cpu=100m<br />limits.mem=200Mi |
+|  | yoda-agent | requests.cpu=0<br />requests.mem=64Mi<br />limits.cpu=200m<br />limits.mem=256Mi |
+|  | yoda-controller | requests.cpu=300m<br />requests.mem=768Mi<br />limits.cpu=2.5<br />limits.mem=2816Mi |
+| **medium** | etcd | requests.cpu=1<br />requests.mem=2Gi<br /><br />quota-backend-bytes: '8589934592'<br />max-request-bytes: '33554432'<br />experimental-compaction-batch-limit: '1000'<br />auto-compaction-retention: 5m<br />backend-batch-interval: 10ms<br />backend-batch-limit: '100' |
+|  | kube-apiserver | requests.cpu=4<br />requests.mem=8Gi<br /><br /> max-requests-inflight: '600'<br />max-mutating-requests-inflight: '300' |
+|  | kube-scheduler | requests.cpu=4<br />requests.mem=8Gi<br /><br />kube-api-qps: '1000'<br />kube-api-burst: '1000'  |
+|  | kube-controller-manager | requests.cpu=4<br />requests.mem=8Gi<br /><br />kube-api-qps: '500'<br />kube-api-burst: '500' |
+|  | coredns | requests.cpu=100m<br />requests.mem=70Mi<br />limits.mem=2Gi |
+|  | metrics-server | requests.cpu=125m<br />requests.mem=500Mi<br />limits.cpu=2<br />limits.mem=4Gi |
+|  | node-problem-detector | requests.cpu=0<br />requests.mem=200Mi<br />limits.cpu=4<br />limits.mem=8Gi |
+|  | yoda-agent | requests.cpu=0<br />requests.mem=64Mi<br />limits.cpu=1<br />limits.mem=2Gi |
+|  | yoda-controller | requests.cpu=300m<br />requests.mem=768Mi<br />limits.cpu=14<br />limits.mem=28Gi |
+| **large** | etcd | requests.cpu=1<br />requests.mem=2Gi<br /><br />quota-backend-bytes: '8589934592'<br />max-request-bytes: '33554432'<br />experimental-compaction-batch-limit: '1000'<br />auto-compaction-retention: 5m<br />backend-batch-interval: 10ms<br />backend-batch-limit: '100' |
+|  | kube-apiserver | requests.cpu=4<br />requests.mem=8Gi<br /><br /> max-requests-inflight: '600'<br />max-mutating-requests-inflight: '300' |
+|  | kube-scheduler | requests.cpu=4<br />requests.mem=8Gi<br /><br />kube-api-qps: '1000'<br />kube-api-burst: '1000'  |
+|  | kube-controller-manager | requests.cpu=4<br />requests.mem=8Gi<br /><br />kube-api-qps: '500'<br />kube-api-burst: '500' |
+|  | coredns | requests.cpu=100m<br />requests.mem=70Mi<br />limits.mem=2Gi |
+|  | metrics-server | requests.cpu=125m<br />requests.mem=500Mi<br />limits.cpu=2<br />limits.mem=4Gi |
+|  | node-problem-detector | requests.cpu=0<br />requests.mem=200Mi<br />limits.cpu=4<br />limits.mem=8Gi |
+|  | yoda-agent | requests.cpu=0<br />requests.mem=64Mi<br />limits.cpu=1<br />limits.mem=2Gi |
+|  | yoda-controller | requests.cpu=300m<br />requests.mem=768Mi<br />limits.cpu=14<br />limits.mem=28Gi |
+| **xlarge** | etcd | requests.cpu=8<br />requests.mem=16Gi<br /><br />quota-backend-bytes: '8589934592'<br />max-request-bytes: '33554432'<br />experimental-compaction-batch-limit: '1000'<br />auto-compaction-retention: 5m<br />backend-batch-interval: 10ms<br />backend-batch-limit: '100' |
+|  | kube-apiserver | requests.cpu=16<br />requests.mem=128Gi<br /><br /> max-requests-inflight: '600'<br />max-mutating-requests-inflight: '300' |
+|  | kube-scheduler | requests.cpu=8<br />requests.mem=32Gi<br /><br />kube-api-qps: '1000'<br />kube-api-burst: '1000'  |
+|  | kube-controller-manager | requests.cpu=8<br />requests.mem=32Gi<br /><br />kube-api-qps: '500'<br />kube-api-burst: '500' |
+|  | coredns | requests.cpu=100m<br />requests.mem=70Mi<br />limits.cpu=3<br />limits.mem=6Gi |
+|  | metrics-server | requests.cpu=125m<br />requests.mem=500Mi<br />limits.cpu=2<br />limits.mem=4Gi |
+|  | node-problem-detector | requests.cpu=0<br />requests.mem=200Mi<br />limits.cpu=4<br />limits.mem=8Gi |
+|  | yoda-agent | requests.cpu=0<br />requests.mem=64Mi<br />limits.cpu=1<br />limits.mem=2Gi |
+|  | yoda-controller | requests.cpu=300m<br />requests.mem=768Mi<br />limits.cpu=14<br />limits.mem=28Gi |
