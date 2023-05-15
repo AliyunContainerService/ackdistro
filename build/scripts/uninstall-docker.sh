@@ -3,6 +3,7 @@
 set -x
 
 # remove the containers and images
+nerdctl rm -f sealer-registry
 docker ps -aq | xargs -I '{}' docker stop {}
 docker ps -aq | xargs -I '{}' docker rm {}
 docker image ls -aq | xargs -I '{}' docker image rm {}
@@ -31,7 +32,7 @@ rm -f /var/run/docker.sock
 rm -f /var/run/dockershim.sock
 
 # umount and clean the docker related directories
-rm -rf /var/lib/docker/*
+rm -rf "${ContainerDataRoot:-/var/lib/docker}"/*
 
 rm -f /usr/bin/conntrack
 rm -f /usr/bin/containerd

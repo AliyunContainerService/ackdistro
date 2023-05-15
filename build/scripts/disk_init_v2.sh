@@ -13,12 +13,8 @@ etcdDev=${EtcdDevice}
 container_runtime_size=${DockerRunDiskSize}
 kubelet_size=${KubeletRunDiskSize}
 file_system=${DaemonFileSystem}
-container_runtime=${ContainerRuntime}
+container_runtime=${ContainerRuntime:-docker}
 extraMountPointsArray=`utils_split_str_to_array ${ExtraMountPoints}`
-
-if [ "$container_runtime" == "" ];then
-  container_runtime=docker
-fi
 
 if [ -z "$file_system" ]; then
     file_system="ext4"
@@ -115,31 +111,34 @@ if ! utils_no_need_mkfs $etcdDev;then
 fi
 
 # Step 1: check val
+containerStorage=${ContainerDataRoot:-/var/lib/${container_runtime}}
+
 if utils_no_need_mkfs $storageDev && [ "$storageVGName" == "" ]; then
     utils_info "device and vg name is empty! exit..."
     exit 0
 fi
 if [ -z "$container_runtime_size" ]; then
     container_runtime_size="100"
-    utils_info "set partition /var/lib/$container_runtime size to default size - 100G"
+    utils_info "set partition $containerStorage size to default size - 100G"
 fi
 if [ -z "$kubelet_size" ]; then
     kubelet_size="100"
     utils_info "set partition /var/lib/kubelet size to default size - 100G"
 fi
 
+
 checkMountOK /var/lib/kubelet
 check1=$?
-checkMountOK /var/lib/${container_runtime}
+checkMountOK $containerStorage
 check2=$?
 if [ "${check1}" == "0" ] && [ "${check2}" == "0" ];then
     exit 0
 fi
 if [ "${check1}" == "0" ] && [ "${check2}" != "0" ];then
-    panic "mount for /var/lib/kubelet found, but not /var/lib/${container_runtime}, if you are scaling this node and some error occurs before, you can try delete it and try again"
+    panic "mount for /var/lib/kubelet found, but not ${containerStorage}, if you are scaling this node and some error occurs before, you can try delete it and try again"
 fi
 if [ "${check1}" != "0" ] && [ "${check2}" == "0" ];then
-    panic "mount for /var/lib/${container_runtime} found, but not /var/lib/kubelet, if you are scaling this node and some error occurs before, you can try delete it and try again"
+    panic "mount for ${containerStorage} found, but not /var/lib/kubelet, if you are scaling this node and some error occurs before, you can try delete it and try again"
 fi
 
 # Step 2: create vg
@@ -186,7 +185,7 @@ umount /var/lib/kubelet
 if [ "$?" != "0" ]; then
   utils_info "failed to umount, maybe you should clean this node before join"
 fi
-umount /var/lib/${container_runtime}
+umount ${containerStorage}
 if [ "$?" != "0" ]; then
   utils_info "failed to umount, maybe you should clean this node before join"
 fi
@@ -211,7 +210,7 @@ umount /var/lib/kubelet
 if [ "$?" != "0" ]; then
   utils_info "failed to umount, maybe you should clean this node before join"
 fi
-umount /var/lib/${container_runtime}
+umount ${containerStorage}
 if [ "$?" != "0" ]; then
   utils_info "failed to umount, maybe you should clean this node before join"
 fi
@@ -219,9 +218,9 @@ fi
 # https://unix.stackexchange.com/a/474749
 systemctl daemon-reexec
 
-# Step 7: mount /var/lib/${container_runtime}
-mkdir -p /var/lib/${container_runtime}
-output5=$(mount /dev/$vgName/$lv_container_name /var/lib/${container_runtime} 2>&1)
+# Step 7: mount ${containerStorage}
+mkdir -p ${containerStorage}
+output5=$(mount /dev/$vgName/$lv_container_name ${containerStorage} 2>&1)
 if [ "$?" != "0" ]; then
   if echo "$output5" |grep "is already mounted";then
     utils_info "already mounted, continue"
@@ -230,10 +229,9 @@ if [ "$?" != "0" ]; then
     lsblk
     utils_info "disk_init.sh mount -a result:"
     mount -a
-    panic "failed to exec [mount /dev/$vgName/$lv_container_name /var/lib/${container_runtime}]: $output5"
+    panic "failed to exec [mount /dev/$vgName/$lv_container_name ${containerStorage}]: $output5"
   fi
 fi
-mkdir -p /var/lib/${container_runtime}/logs
 
 # Step 8: mount /var/lib/kubelet
 mkdir -p /var/lib/kubelet
@@ -251,7 +249,7 @@ if [ "$?" != "0" ]; then
 fi
 
 # Step 9: make mount persistent
-echo "/dev/$vgName/$lv_container_name /var/lib/${container_runtime} ${file_system} defaults 0 0" >> /etc/fstab
+echo "/dev/$vgName/$lv_container_name ${containerStorage} ${file_system} defaults 0 0" >> /etc/fstab
 echo "/dev/$vgName/$lv_kubelet_name /var/lib/kubelet ${file_system} defaults 0 0" >> /etc/fstab
 
 _lv_i=0

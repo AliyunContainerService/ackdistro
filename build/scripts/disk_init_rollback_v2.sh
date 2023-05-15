@@ -92,12 +92,11 @@ lsblk
 etcdDev=${EtcdDevice}
 storageDev=${StorageDevice}
 storageVGName=${StorageVGName}
-container_runtime=${ContainerRuntime}
+container_runtime=${ContainerRuntime:-docker}
 extraMountPointsArray=`utils_split_str_to_array ${ExtraMountPoints}`
 extraMountPointsRecyclePolicy=${ExtraMountPointsRecyclePolicy:-Retain}
-if [ "$container_runtime" == "" ];then
-  container_runtime=docker
-fi
+
+containerStorage=${ContainerDataRoot:-/var/lib/${container_runtime}}
 
 if utils_no_need_mkfs $storageDev; then
   echo "no need to mkfs for storage device $storageDev"
@@ -149,7 +148,7 @@ fi
 
 if ! utils_no_need_mkfs $storageDev || [ "$storageVGName" != "" ];then
   sed -i "/\\/var\\/lib\\/kubelet/d"  /etc/fstab
-  sed -i "/\\/var\\/lib\\/${container_runtime}/d"  /etc/fstab
+  sed -i "\#${containerStorage}#d"  /etc/fstab
   if [ "$ExtraMountPoints" != "" ] && [ "$extraMountPointsRecyclePolicy" == "Delete" ];then
     sed -i "/${extraMountPointAnno}/d" /etc/fstab
   fi
@@ -168,11 +167,11 @@ if ! utils_no_need_mkfs $storageDev || [ "$storageVGName" != "" ];then
         done
       fi
       umount /var/lib/kubelet
-      umount /var/lib/${container_runtime}
+      umount ${containerStorage}
       if findmnt /var/lib/kubelet;then
           continue
       fi
-      if findmnt /var/lib/${container_runtime};then
+      if findmnt ${containerStorage};then
           continue
       fi
 
@@ -193,7 +192,7 @@ if ! utils_no_need_mkfs $storageDev || [ "$storageVGName" != "" ];then
       break
   done
   if [ "$suc" != "true" ];then
-      panic "failed to umount [/var/lib/kubelet /var/lib/docker], some unknown error occurs, please run [umount /var/lib/kubelet;umount /var/lib/docker] on that node by yourself."
+      panic "failed to umount [/var/lib/kubelet ${containerStorage}], some unknown error occurs, please run [umount /var/lib/kubelet;umount ${containerStorage}] on that node by yourself."
   fi
   utils_info "umount done!"
 fi

@@ -378,6 +378,7 @@ typha:
 metricsServer:
   replicas: ${MetricsServerReplicas}
 EOF
+  cp -f /tmp/ackd-helmconfig.yaml /root/ackd-helmconfig.yaml
 }
 
 create_etcd_secret() {
