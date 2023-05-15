@@ -18,7 +18,7 @@ source "${scripts_path}"/utils.sh
 
 set -x
 
-DOCKER_VERSION="19.03.15"
+DOCKER_VERSION=${DockerVersion:-19.03.15}
 
 check_docker_valid() {
   if ! docker info 2>&1; then
@@ -78,7 +78,11 @@ if ! utils_command_exists docker; then
   [ -d /etc/docker/ ] || mkdir /etc/docker/ -p
 
   chmod -R 755 "${scripts_path}"/../cri
-  tar -zxvf "${scripts_path}"/../cri/docker.tar.gz -C /usr/bin
+  if [ "$DOCKER_VERSION" == "20.10.6" ];then
+    tar -zxvf "${scripts_path}"/../cri/docker-20.tar.gz -C /usr/bin
+  else
+    tar -zxvf "${scripts_path}"/../cri/docker.tar.gz -C /usr/bin
+  fi
   chmod a+x /usr/bin
   chmod a+x /usr/bin/docker
   chmod a+x /usr/bin/dockerd

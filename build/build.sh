@@ -106,11 +106,8 @@ if [ "$SKIP_DOWNLOAD_BINS" != "true" ];then
         done
 
         wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/containerd-1.6.19-linux-${arch}.tar.gz -O ${arch}/tgz/containerd.tgz
-        if [ "$DOCKER_VERSION" == "20" ];then
-          wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/docker-20.tar.gz -O ${arch}/cri/docker.tar.gz
-        else
-          wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/docker.tar.gz -O ${arch}/cri/docker.tar.gz
-        fi
+        wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/docker-20.tar.gz -O ${arch}/cri/docker-20.tar.gz
+        wget https://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/tgz/${arch}/docker.tar.gz -O ${arch}/cri/docker.tar.gz
     done
 fi
 
