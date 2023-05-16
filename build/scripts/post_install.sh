@@ -5,6 +5,9 @@ source "${scripts_path}"/utils.sh
 
 set -x
 
+# wait 120s for apiserver ready
+wait_for_apiserver || exit 1
+
 source "${scripts_path}"/default_values.sh
 
 process_taints_labels "$RemoveMasterTaint" "$PlatformType" || exit 1
