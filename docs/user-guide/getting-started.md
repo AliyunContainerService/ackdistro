@@ -257,27 +257,8 @@ In ClusterFile's .spec.env, you can also modify the following configuration
 - TrustedRegistry: The registry domain that needs to be trusted by the container runtime
 - UseIPasNodeName: Whether to use the node IP as the NodeName, default is false
 - DefaultIPRetain: Whether to enable the network plug-in IP retention function, default is true
-
-```yaml
-apiVersion: sealer.cloud/v2
-kind: Cluster
-metadata:
-  name: my-cluster # must be my-cluster
-spec:
-  ...
-  env: # all env are NOT necessary
-    - Addons=paralb,kube-prometheus-crds,ack-node-problem-detector # addons to install, now support paralb, kube-prometheus-crds, ack-node-problem-detector
-    - Network=hybridnet # support hybridnet/calico, default is hybridnet
-    - DNSDomain=cluster.local # default is cluster.local
-    - ServiceNodePortRange=30000-32767 # default is 30000-32767
-    - EnableLocalDNSCache=false # enable local dns cache component, default is false
-    - RemoveMasterTaint=false # remove master taint or not, default is false
-    - CertSANs=1.1.1.1 # extra cert sans, if gatewayInternalIP not empty, must set it in CertSANs too
-    - IgnoreErrors=OS # ignore errors for preflight
-    - TrustedRegistry=your.registry.url # Registry Domain to be trusted by container runtime
-    - ContainerDataRoot=/root/docker-root # modify docker data root, default is /var/lib/docker
-  ...
-```
+- DockerVersion: which docker version to installed, include 19.03.15, 20.10.6. default is 19.03.15
+- ContainerDataRoot: docker data root path, default is /var/lib/docker
 
 ### Operation and maintenance cluster
 

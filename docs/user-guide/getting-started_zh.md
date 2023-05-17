@@ -263,27 +263,8 @@ spec:
 - TrustedRegistry: 需要让容器运行时信任的镜像仓库地址
 - UseIPasNodeName: 是否使用节点ip作为NodeName，默认为false
 - DefaultIPRetain: 是否开启网络插件ip保留功能，默认为true
-
-```yaml
-apiVersion: sealer.cloud/v2
-kind: Cluster
-metadata:
-  name: my-cluster # must be my-cluster
-spec:
-  ...
-  env: # all env are NOT necessary
-    - Addons=paralb,kube-prometheus-crds,ack-node-problem-detector # addons to install, now support paralb, kube-prometheus-crds, ack-node-problem-detector
-    - Network=hybridnet # support hybridnet/calico, default is hybridnet
-    - DNSDomain=cluster.local # default is cluster.local
-    - ServiceNodePortRange=30000-32767 # default is 30000-32767
-    - EnableLocalDNSCache=false # enable local dns cache component, default is false
-    - RemoveMasterTaint=false # remove master taint or not, default is false
-    - CertSANs=1.1.1.1 # extra cert sans, if gatewayInternalIP not empty, must set it in CertSANs too
-    - IgnoreErrors=OS # ignore errors for preflight
-    - TrustedRegistry=your.registry.url # Registry Domain to be trusted by container runtime
-    - ContainerDataRoot=/root/docker-root # modify docker data root, default is /var/lib/docker
-  ...
-```
+- DockerVersion: docker版本，支持19.03.15/20.10.6，默认为19.03.15
+- ContainerDataRoot: docker data root路径，默认为/var/lib/docker
 
 ### 运维ACK Distro集群
 
