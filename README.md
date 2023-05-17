@@ -44,7 +44,7 @@ ACK Distro, as a downstream of ACK, will keep up-to-date with ACK's release. ACK
 
 ```bash
 ARCH=amd64 # or arm64
-wget http://sealerio.oss-cn-shanghai.aliyuncs.com/releases/sealer-v0.9.3-linux-${ARCH}.tar.gz -O sealer-latest-linux-${ARCH}.tar.gz && \
+wget http://ack-a-aecp.oss-cn-hangzhou.aliyuncs.com/ack-distro/sealer/sealer-0.9.4-beta2-linux-${ARCH}.tar.gz -O sealer-latest-linux-${ARCH}.tar.gz && \
       tar -xvf sealer-latest-linux-${ARCH}.tar.gz -C /usr/bin
 
 sealer run ack-agility-registry.cn-shanghai.cr.aliyuncs.com/ecp_builder/ackdistro:v1-22-15-ack-10 -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -p password
