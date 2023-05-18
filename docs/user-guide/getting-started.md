@@ -261,6 +261,7 @@ In ClusterFile's .spec.env, you can also modify the following configuration
 - ContainerDataRoot: docker data root path, default is /var/lib/docker
 
 ### Operation and maintenance cluster
+> Unless otherwise specified, all operations can be performed on any Master, provided that the Master node has a sealer bin and the correct version of the cluster image
 
 #### Scale-up node
 
@@ -272,6 +273,11 @@ sealer join -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...
 
 ```bash
 sealer delete -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...]
+```
+
+For a node that has not been added successfully, you may get the following prompt after executing the above command: "both master and node need to be deleted all not in current cluster, skip delete". If you need to forcibly clean up the node, you can execute the following command:
+```bash
+sealer delete -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -f /root/.sealer/Clusterfile
 ```
 
 #### Add new SANs for APIServer

@@ -267,6 +267,7 @@ spec:
 - ContainerDataRoot: docker data root路径，默认为/var/lib/docker
 
 ### 运维ACK Distro集群
+> 如无特殊说明，所有运维操作可以在任意Master执行，前提是该Master节点上具有sealer bin以及正确版本的集群镜像
 
 #### 扩容节点
 
@@ -278,6 +279,11 @@ sealer join -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...
 
 ```bash
 sealer delete -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...]
+```
+
+对于一个未成功添加的节点，执行以上命令可能会得到如下提示： "both master and node need to be deleted all not in current cluster, skip delete"，如果需要强制清理该节点，可以执行以下命令：
+```bash
+sealer delete -m ${master_ip1}[,${master_ip2},${master_ip3}] [ -n ${worker_ip1}...] -f /root/.sealer/Clusterfile
 ```
 
 #### 为APIServer证书增签新的域名/IP
