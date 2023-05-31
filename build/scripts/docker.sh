@@ -88,6 +88,7 @@ if ! utils_command_exists docker; then
   chmod a+x /usr/bin/dockerd
   systemctl enable docker.service
   cp "${scripts_path}"/../etc/daemon.json /etc/docker
+  sed -i "s#/var/lib/docker#${storage}#g" /etc/docker/daemon.json
   systemctl restart docker.service
   mkdir -p /root/.docker/
   cp "${scripts_path}"/../etc/docker-cli-config.json /root/.docker/config.json
