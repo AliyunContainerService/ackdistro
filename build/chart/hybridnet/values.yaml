@@ -1,7 +1,7 @@
 images:
   hybridnet:
     image: ecp_builder/hybridnet
-    tag: v0.8.0
+    tag: v0.8.4
     imagePullPolicy: IfNotPresent
 global:
   RegistryURL: "sea.hub:5000"
