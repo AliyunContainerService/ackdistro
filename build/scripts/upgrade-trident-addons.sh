@@ -10,7 +10,7 @@ source "${scripts_path}"/default_values.sh
 helm_install_hybridnet() {
   for i in `seq 1 3`;do
     sleep 1
-    helm -n kube-system upgrade -i --reuse-values $1 chart/$1 -f /tmp/ackd-helmconfig.yaml --set init=null --set daemon.enableFelixPolicy=true --set typha.serverPort=5473 --set images.hybridnet.image=ecp_builder/hybridnet --set images.hybridnet.tag=v0.8.0 && return 0
+    helm -n kube-system upgrade -i --reuse-values $1 chart/$1 -f /tmp/ackd-helmconfig.yaml --set init=null --set daemon.enableFelixPolicy=true --set typha.serverPort=5473 --set images.hybridnet.image=ecp_builder/hybridnet --set images.hybridnet.tag=v0.8.3 && return 0
   done
   return 1
 }
@@ -35,7 +35,7 @@ else
       kubectl apply -f chart/hybridnet/crds/
       for i in `seq 1 3`;do
         sleep 1
-        helm -n kube-system upgrade -i --reuse-values hybridnet chart/hybridnet -f /tmp/ackd-helmconfig.yaml --set init=null --set daemon.enableFelixPolicy=true --set typha.serverPort=5473 --set images.hybridnet.image=ecp_builder/hybridnet --set images.hybridnet.tag=v0.8.0 --set defaultIPRetain=false && break
+        helm -n kube-system upgrade -i --reuse-values hybridnet chart/hybridnet -f /tmp/ackd-helmconfig.yaml --set init=null --set daemon.enableFelixPolicy=true --set typha.serverPort=5473 --set images.hybridnet.image=ecp_builder/hybridnet --set images.hybridnet.tag=v0.8.3 --set defaultIPRetain=false && break
       done
       if [ $? -ne 0 ]; then
         panic "failed to install hybridnet"
