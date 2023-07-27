@@ -102,7 +102,7 @@ spec:
           limits:
             cpu: "2"
             {{- if eq .Values.global.ClusterScale "xlarge" }}
-            memory: 4Gi
+            memory: 8Gi
             {{- else if or (eq .Values.global.ClusterScale "medium") (eq .Values.global.ClusterScale "large") }}
             memory: 4Gi
             {{- else }}

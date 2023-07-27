@@ -1,0 +1,591 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.8.0
+  creationTimestamp: null
+  name: clusters.oecp.io
+spec:
+  group: oecp.io
+  names:
+    kind: Cluster
+    listKind: ClusterList
+    plural: clusters
+    singular: cluster
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: Cluster is the Schema for the clusters API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: 'EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN! NOTE:
+              json tags are required.  Any new fields you add must have json tags
+              for the fields to be serialized. ClusterSpec defines the desired state
+              of Cluster'
+            properties:
+              addons:
+                description: Addons will be install/upgrade. CAN be update after init,
+                  if add some item, will add into cluster, if remove, will NOT delete
+                  from cluster.
+                items:
+                  properties:
+                    addonEnv:
+                      description: TODO, useless now
+                      items:
+                        type: string
+                      type: array
+                    name:
+                      type: string
+                  type: object
+                type: array
+              apiServerDomain:
+                description: APIServerDomain set apiserver domain, default is "apiserver.cluster.local"
+                  CAN NOT be update after init.
+                type: string
+              apiServerVIP:
+                description: APIServerVIP set apiserver virtual IP, default is "10.103.97.2"
+                  CAN NOT be update after init.
+                type: string
+              certSANS:
+                description: CertSANs sets extra Subject Alternative Names for the
+                  API Server signing cert. CAN NOT be update after init.
+                items:
+                  type: string
+                type: array
+              clusterScale:
+                description: 'Cluster Scale can be: standard, large, xlarge (case
+                  sensitive, must be lower case)'
+                type: string
+              containerRuntime:
+                description: Container Runtime choice, Add 1.2.0.0 CAN NOT be update
+                  after init
+                type: string
+              containerRuntimeConfig:
+                description: ContainerRuntimeConfig set config for container runtime
+                  CAN NOT be update after init.
+                properties:
+                  cgroupDriver:
+                    type: string
+                  limitNofile:
+                    type: string
+                type: object
+              controlPlaneConfigs:
+                description: ControlPlaneConfigs set config for control planes CAN
+                  NOT be update after init.
+                properties:
+                  apiServer:
+                    properties:
+                      extraArgs:
+                        additionalProperties:
+                          type: string
+                        type: object
+                    type: object
+                  controllerManager:
+                    properties:
+                      extraArgs:
+                        additionalProperties:
+                          type: string
+                        type: object
+                    type: object
+                  scheduler:
+                    properties:
+                      extraArgs:
+                        additionalProperties:
+                          type: string
+                        type: object
+                    type: object
+                type: object
+              corednsConfig:
+                description: CoreDNSConfig set config for coredns
+                properties:
+                  filePath:
+                    type: string
+                type: object
+              dockerConfig:
+                description: DEPRECATED.
+                properties:
+                  cgroupDriver:
+                    type: string
+                  limitNofile:
+                    type: string
+                type: object
+              env:
+                description: DEPRECATED. Env is the ENV config for all hosts
+                items:
+                  type: string
+                type: array
+              externalRegistry:
+                description: ExternalRegistry config external registry
+                properties:
+                  auth:
+                    properties:
+                      htpasswd:
+                        properties:
+                          password:
+                            type: string
+                          username:
+                            type: string
+                        required:
+                        - password
+                        - username
+                        type: object
+                    type: object
+                  port:
+                    type: integer
+                  url:
+                    type: string
+                type: object
+              hostAliases:
+                description: HostAliases holds the mapping between IP and hostnames
+                  that will be injected as an entry in the pod's hosts file. CAN be
+                  update after init.
+                items:
+                  description: HostAlias holds the mapping between IP and hostnames
+                    that will be injected as an entry in the pod's hosts file.
+                  properties:
+                    hostnames:
+                      description: Hostnames for the above IP address.
+                      items:
+                        type: string
+                      type: array
+                    ip:
+                      description: IP address of the host file entry.
+                      type: string
+                  type: object
+                type: array
+              ignorePreflightErrors:
+                description: TODO, useless now
+                items:
+                  type: string
+                type: array
+              image:
+                description: TODO, useless now
+                type: string
+              imgURL:
+                description: ImgURL is path for trident image package TODO, CAN be
+                  update after init.
+                type: string
+              kubeadmFile:
+                description: TODO, useless now
+                type: string
+              kubeletConfig:
+                description: KubeletConfig set config for kubelet CAN NOT be update
+                  after init.
+                properties:
+                  extraArgs:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  kubeReserved:
+                    type: string
+                  systemReserved:
+                    type: string
+                type: object
+              kubernetesVersion:
+                description: DEPRECATED. KubernetesVersion is implied in PkgURL
+                type: string
+              localRegistry:
+                description: LocalRegistry config registry CAN NOT be update after
+                  init.
+                properties:
+                  auth:
+                    properties:
+                      htpasswd:
+                        properties:
+                          password:
+                            type: string
+                          username:
+                            type: string
+                        required:
+                        - password
+                        - username
+                        type: object
+                    type: object
+                  cert:
+                    properties:
+                      subjectAltName:
+                        properties:
+                          dnsNames:
+                            items:
+                              type: string
+                            type: array
+                          ips:
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                    type: object
+                  dataDir:
+                    type: string
+                  port:
+                    type: integer
+                  url:
+                    type: string
+                type: object
+              masterGroups:
+                description: MasterGroups explain desired master groups. CAN be update
+                  after init, if add some item, will scale them into cluster, if remove,
+                  will NOT delete them from cluster.
+                items:
+                  properties:
+                    count:
+                      type: string
+                    cpu:
+                      type: string
+                    dataDisk:
+                      type: string
+                    env:
+                      description: Env is the ENV config for specified hosts
+                      items:
+                        type: string
+                      type: array
+                    ipList:
+                      items:
+                        type: string
+                      type: array
+                    ipRange:
+                      items:
+                        type: string
+                      type: array
+                    memory:
+                      type: string
+                    ssh:
+                      description: SSH is the default ssh config for specified hosts
+                      properties:
+                        passwd:
+                          type: string
+                        pk:
+                          type: string
+                        pkPasswd:
+                          type: string
+                        port:
+                          type: integer
+                        user:
+                          type: string
+                      type: object
+                    systemDisk:
+                      type: string
+                  type: object
+                type: array
+              masters:
+                description: DEPRECATED. Masters explain desired masters. if MasterGroups
+                  is specified, Masters will be ignored CAN be update after init,
+                  if add some item, will scale them into cluster, if remove, will
+                  NOT delete them from cluster.
+                properties:
+                  count:
+                    type: string
+                  cpu:
+                    type: string
+                  dataDisk:
+                    type: string
+                  env:
+                    description: Env is the ENV config for specified hosts
+                    items:
+                      type: string
+                    type: array
+                  ipList:
+                    items:
+                      type: string
+                    type: array
+                  ipRange:
+                    items:
+                      type: string
+                    type: array
+                  memory:
+                    type: string
+                  ssh:
+                    description: SSH is the default ssh config for specified hosts
+                    properties:
+                      passwd:
+                        type: string
+                      pk:
+                        type: string
+                      pkPasswd:
+                        type: string
+                      port:
+                        type: integer
+                      user:
+                        type: string
+                    type: object
+                  systemDisk:
+                    type: string
+                type: object
+              network:
+                description: Network is network config. CAN NOT be update after init.
+                properties:
+                  accessKey:
+                    type: string
+                  accessSecret:
+                    type: string
+                  cniName:
+                    type: string
+                  credentialType:
+                    type: string
+                  dnsDomain:
+                    type: string
+                  interface:
+                    type: string
+                  ipip:
+                    type: string
+                  mtu:
+                    type: string
+                  podCIDR:
+                    type: string
+                  podCIDRv6:
+                    type: string
+                  ramaDefaultNetworkType:
+                    type: string
+                  ramaNetworks:
+                    items:
+                      properties:
+                        hosts:
+                          items:
+                            type: string
+                          type: array
+                        name:
+                          type: string
+                        netID:
+                          format: int32
+                          type: integer
+                        subnets:
+                          items:
+                            properties:
+                              aswname:
+                                type: string
+                              cidr:
+                                type: string
+                              config:
+                                properties:
+                                  autoNatOutgoing:
+                                    type: boolean
+                                type: object
+                              end:
+                                type: string
+                              excludeIPs:
+                                items:
+                                  type: string
+                                type: array
+                              gateway:
+                                type: string
+                              name:
+                                type: string
+                              netID:
+                                format: int32
+                                type: integer
+                              reservedIPs:
+                                items:
+                                  type: string
+                                type: array
+                              start:
+                                type: string
+                              version:
+                                type: string
+                            type: object
+                          type: array
+                        type:
+                          type: string
+                      type: object
+                    type: array
+                  subnetSize:
+                    type: integer
+                  svcCIDR:
+                    type: string
+                  svcCIDRv6:
+                    type: string
+                  vpcType:
+                    type: string
+                  withoutCNI:
+                    type: boolean
+                type: object
+              nodeGroups:
+                description: Nodes explain desired node groups. CAN be update after
+                  init, if add some item, will scale them into cluster, if remove,
+                  will NOT delete them from cluster.
+                items:
+                  properties:
+                    count:
+                      type: string
+                    cpu:
+                      type: string
+                    dataDisk:
+                      type: string
+                    env:
+                      description: Env is the ENV config for specified hosts
+                      items:
+                        type: string
+                      type: array
+                    ipList:
+                      items:
+                        type: string
+                      type: array
+                    ipRange:
+                      items:
+                        type: string
+                      type: array
+                    memory:
+                      type: string
+                    ssh:
+                      description: SSH is the default ssh config for specified hosts
+                      properties:
+                        passwd:
+                          type: string
+                        pk:
+                          type: string
+                        pkPasswd:
+                          type: string
+                        port:
+                          type: integer
+                        user:
+                          type: string
+                      type: object
+                    systemDisk:
+                      type: string
+                  type: object
+                type: array
+              nodes:
+                description: DEPRECATED. Nodes explain desired nodes. if NodeGroups
+                  is specified, Nodes will be ignored CAN be update after init, if
+                  add some item, will scale them into cluster, if remove, will NOT
+                  delete them from cluster.
+                properties:
+                  count:
+                    type: string
+                  cpu:
+                    type: string
+                  dataDisk:
+                    type: string
+                  env:
+                    description: Env is the ENV config for specified hosts
+                    items:
+                      type: string
+                    type: array
+                  ipList:
+                    items:
+                      type: string
+                    type: array
+                  ipRange:
+                    items:
+                      type: string
+                    type: array
+                  memory:
+                    type: string
+                  ssh:
+                    description: SSH is the default ssh config for specified hosts
+                    properties:
+                      passwd:
+                        type: string
+                      pk:
+                        type: string
+                      pkPasswd:
+                        type: string
+                      port:
+                        type: integer
+                      user:
+                        type: string
+                    type: object
+                  systemDisk:
+                    type: string
+                type: object
+              ntpServers:
+                description: NtpServers give external ntp servers address or master0
+                  ip. if config master0 as ntp server, trident will install ntp server
+                  in master0. CAN be update config after init.
+                items:
+                  type: string
+                type: array
+              pkgURL:
+                description: PkgURL is path for trident package. TODO, CAN be update
+                  after init.
+                type: string
+              provider:
+                description: 'DEPRECATED: Provider is deprecated.'
+                type: string
+              ssh:
+                description: DEPRECATED. SSH is the default ssh config for all hosts
+                  CAN be update after init.
+                properties:
+                  passwd:
+                    type: string
+                  pk:
+                    type: string
+                  pkPasswd:
+                    type: string
+                  port:
+                    type: integer
+                  user:
+                    type: string
+                type: object
+            type: object
+          status:
+            description: ClusterStatus defines the observed state of Cluster
+            properties:
+              components:
+                items:
+                  description: ComponentStatus represents component's status
+                  properties:
+                    creationTimestamp:
+                      format: date-time
+                      type: string
+                    description:
+                      type: string
+                    matchLabels:
+                      additionalProperties:
+                        type: string
+                      type: object
+                    message:
+                      type: string
+                    name:
+                      type: string
+                    namespace:
+                      type: string
+                    phase:
+                      type: string
+                    version:
+                      type: string
+                    versionDescription:
+                      type: string
+                  type: object
+                type: array
+              joinToken:
+                type: string
+              nodes:
+                items:
+                  properties:
+                    ip:
+                      type: string
+                    message:
+                      type: string
+                    name:
+                      type: string
+                    phase:
+                      type: string
+                  type: object
+                type: array
+              tokenCaCertHash:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
