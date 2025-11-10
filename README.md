@@ -77,11 +77,5 @@ Including docker, containerd, nvidia-docker, etc.
 ## Community
 Please refer to: [community](docs/community.md)
 
-## Communication Channels
-
-dingtalk support group
-
-![image](https://user-images.githubusercontent.com/8002217/219262137-9c809d26-fc37-4bef-b0ba-4c7fbe4bbdeb.png)
-
 ## License
 ACK Distro is licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the full license text.
