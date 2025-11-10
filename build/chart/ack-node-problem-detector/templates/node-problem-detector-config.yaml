@@ -62,6 +62,11 @@ data:
                 "condition": "ReadonlyFilesystem",
                 "reason": "FilesystemIsReadOnly",
                 "pattern": "Remounting filesystem read-only"
+            },
+            {
+                "type": "temporary",
+                "reason": "NewKernelWarning",
+                "pattern": "WARNING: \\w+ - potential issue detected in kernel module \\w+\\."
             }
         ]
     }
