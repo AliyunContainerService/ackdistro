@@ -1,3 +1,6 @@
+## ⚠️ Project Archived  
+This project is no longer actively maintained. The code remains available for reference.
+
 # Home
 
 Alibaba ACK Distro is a Kubernetes distribution based on Alibaba Container Service for Kubernetes to support production ready Kubernetes deployment for heterogeneous IaaS environment. Users can get complete content and community support for free through Alibaba Cloud. Its components have been verified and security checked by Alibaba Cloud Container Service for Kubernetes (ACK) and Alibaba Group's core business scenarios in large-scale production environment, with industry-leading security and reliability.
