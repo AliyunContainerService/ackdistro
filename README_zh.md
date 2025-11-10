@@ -1,3 +1,6 @@
+## ⚠️ 项目归档
+本项目已归档，不再接受新功能开发或问题修复。代码库将保持只读状态，现有代码仅供学习参考。
+
 # ACK Distro
 ## 简介
 Alibaba ACK Distro（即ACK发行版）是阿里巴巴针对异构Iaas环境发布的Kubernetes发行版，使用者可通过阿里云ACR免费获取完整内容并获得社区支持。其核心组件经过阿里云ACK服务和阿里巴巴集团核心业务场景的大规模生产环境验证和安全检查，具备业界领先的安全性与可靠性。
@@ -75,12 +78,6 @@ kubectl get cs
 
 ## 社区
 请见：[community](docs/community_zh.md)
-
-## 联系我们
-
-客户支持钉钉群
-
-![image](https://user-images.githubusercontent.com/8002217/219262258-f3ced02a-c361-4191-b55b-99e932dfbc6e.png)
 
 ## License
 ACK Distro is licensed under the Apache License, Version 2.0. See LICENSE for the full license text.
