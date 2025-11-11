@@ -14,16 +14,76 @@ data:
                 "message": "kernel has no deadlock"
             },
             {
+            	"type": "Kernel.KernelBug",
+            	"reason": "KernelHasNoBug",
+            	"message": "kernel has no bug"
+            },
+            {
                 "type": "ReadonlyFilesystem",
                 "reason": "FilesystemIsReadOnly",
                 "message": "Filesystem is read-only"
+            },
+            {
+            	"type": "Kernel.CPUTemperatureHigh",
+            	"reason": "CPUTemperatureNormal",
+            	"message": "CPU temperature normal"
+            },
+            {
+            	"type": "Kernel.HardwareErr",
+            	"reason": "HardwareHasNoError",
+            	"message": "Hardware has no error"
+            },
+            {
+            	"type": "Kernel.CPUSoftLockErr",
+            	"reason": "CPUHasNotSoftLockError",
+            	"message": "CPU has not soft lockup"
+            },
+            {
+            	"type": "Kernel.CPUHardLockErr",
+            	"reason": "CPUHasNotHardLockError",
+            	"message": "CPU has not hard lockup"
+            },
+            {
+                "type": "Kernel.OOMKilling",
+                "reason": "NothingOom",
+                "message": "nothing oom"
             }
         ],
         "rules": [
             {
-                "type": "temporary",
-                "reason": "PodOOMKilling",
-                "pattern": "Task in /kubepods.slice/(.+) killed as a result of limit of .*"
+            	"type": "permanent",
+            	"condition": "Kernel.KernelBug",
+            	"reason": "KernelBug",
+            	"pattern": "kernel BUG at.*"
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.KernelBug",
+            	"reason": "KernelBug",
+            	"pattern": "Kernel panic - not syncing.*"
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.KernelBug",
+            	"reason": "KernelBug",
+            	"pattern": "BUG: unable to handle kernel NULL pointer dereference at.*"
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.KernelBug",
+            	"reason": "KernelBug",
+            	"pattern": "general protection fault:.*"
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.KernelBug",
+            	"reason": "KernelBug",
+            	"pattern": "divide error: 0000 \\[#\\d+\\] SMP"
+            },
+            {
+            	"type": "permanent",
+            	"reason": "OOMKilling",
+            	"pattern": "Kill process \\d+ (.+) score \\d+ or sacrifice child"
             },
             {
                 "type": "temporary",
@@ -34,16 +94,6 @@ data:
                 "type": "temporary",
                 "reason": "UnregisterNetDevice",
                 "pattern": "unregister_netdevice: waiting for \\w+ to become free. Usage count = \\d+"
-            },
-            {
-                "type": "temporary",
-                "reason": "KernelOops",
-                "pattern": "BUG: unable to handle kernel NULL pointer dereference at .*"
-            },
-            {
-                "type": "temporary",
-                "reason": "KernelOops",
-                "pattern": "divide error: 0000 \\[#\\d+\\] SMP"
             },
             {
                 "type": "permanent",
@@ -62,6 +112,36 @@ data:
                 "condition": "ReadonlyFilesystem",
                 "reason": "FilesystemIsReadOnly",
                 "pattern": "Remounting filesystem read-only"
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.CPUTemperatureHigh",
+            	"reason": "CPUTemperatureHigh",
+            	"pattern": "temperature above threshold.*"
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.HardwareErr",
+            	"reason": "NvmeError",
+            	"pattern": "nvme.* Timeout I/O"
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.HardwareErr",
+            	"reason": "NvmeError",
+            	"pattern": "nvme.* timeout.*"
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.CPUSoftLockErr",
+            	"reason": "CPUSoftLockup",
+            	"pattern": "BUG: soft lockup.*"
+            },
+            {
+            	"type": "permanent",
+            	"condition": "Kernel.CPUHardLockErr",
+            	"reason": "CPUHardLockup",
+            	"pattern": "NMI watchdog: Watchdog detected hard LOCKUP.*"
             }
         ]
     }
@@ -149,114 +229,6 @@ data:
     echo "NTP service is running"
     exit $OK
 
-  instance_expired_checker.json: |
-    {
-      "plugin": "custom",
-      "pluginConfig": {
-        "invoke_interval": "600s",
-        "timeout": "30s",
-        "max_output_length": 80,
-        "concurrency": 3,
-        "enable_message_change_based_condition_update": false
-      },
-      "source": "instance_termination_custom_checker",
-      "conditions": [
-        {
-          "type": "InstanceExpired",
-          "reason": "InstanceNotToBeTerminated",
-          "message": "instance is not going to be terminated"
-        }
-      ],
-      "rules": [
-        {
-          "type": "temporary",
-          "reason": "InstanceToBeTerminated",
-          "path": "./config/plugin/instance_expired_checker.sh",
-          "timeout": "30s"
-        },
-        {
-          "type": "permanent",
-          "condition": "InstanceExpired",
-          "reason": "InstanceToBeTerminated",
-          "path": "./config/plugin/instance_expired_checker.sh",
-          "timeout": "30s"
-        }
-      ]
-    }
-  instance_expired_checker.sh: |
-    #!/bin/bash
-    OK=0
-    NONOK=1
-    UNKNOWN=2
-
-    check_url='http://100.100.100.200/latest/meta-data/instance/spot/termination-time'
-    for ((i=1; i<=5; i ++))
-    do
-      resp=$(curl --max-time 5 -s $check_url)
-      if [ $? != 0 ]; then
-        sleep 1
-      else
-        echo $resp
-        date --date $resp +"%s"
-        if [ $? != 0 ]; then
-          exit $OK
-        else
-          echo "instance is going to be terminated at $resp"
-          exit $NONOK
-        fi
-      fi
-    done
-    echo "curl $check_url exe fail after try 5 times"
-    exit $OK
-
-  ram-role-problem-monitor.json: |
-    {
-      "plugin": "custom",
-      "pluginConfig": {
-        "timeout": "60s",
-        "invoke_interval": "600s",
-        "concurrency": 3
-      },
-      "source": "ram-role-monitor",
-      "conditions": [
-        {
-          "type": "RAMRoleError",
-          "reason": "NodeHasRAMRole",
-          "message": "node has ram role"
-        }
-      ],
-      "rules": [
-        {
-          "type": "permanent",
-          "condition": "RAMRoleError",
-          "reason": "NodeHasNoRAMRole",
-          "message": "node has no ram role",
-          "path": "/config/plugin/check_ram-role.sh",
-          "timeout": "60s"
-        }
-      ]
-    }
-  check_ram-role.sh: |
-    #!/bin/bash
-    # check node has ram-role
-    OK=0
-    NONOK=1
-    UNKNOWN=2
-    for ((i=1; i<=5; i ++))
-    do
-      ram_role=$(curl --max-time 5 http://100.100.100.200/latest/meta-data/ram/security-credentials/ )
-      resp=$(curl --max-time 5 http://100.100.100.200/latest/meta-data/ram/security-credentials/$ram_role)
-      found=$(echo $resp | grep "Success")
-      if [[ "$found" != "" ]]; then
-        echo "node has ram role"
-        exit $OK
-      fi
-      sleep 5
-    done
-    echo "node has no ram role"
-    exit $NONOK
-
-
   fd-problem-monitor.json: |
     {
       "plugin": "custom",
@@ -303,6 +275,90 @@ data:
     fi
     echo "node has no fd pressure"
     exit $OK
+
+
+  docker-status-monitor.json: |
+    {
+      "plugin": "custom",
+      "pluginConfig": {
+        "timeout": "30s",
+        "invoke_interval": "120s",
+        "concurrency": 3
+      },
+      "source": "docker-custom-plugin-monitor",
+      "conditions": [
+        {
+          "type": "dockerStatus",
+          "reason": "dockerOpen",
+          "message": "node docker service open"
+        }
+      ],
+      "rules": [
+        {
+          "type": "permanent",
+          "condition": "dockerStatus",
+          "reason": "dockerClose",
+          "message": "node close docker",
+          "path": "/config/plugin/check_docker.sh",
+          "timeout": "30s"
+        }
+      ]
+    }
+  check_docker.sh: |
+    #!/bin/bash
+    OK=0
+    NONOK=1
+    UNKNOWN=2
+    A=$(systemctl status docker |grep "active (running)")
+    if [[ $A != "" ]]; then
+    echo "node open docker service"
+    exit $OK
+    fi
+    echo "node close docker service"
+    systemctl start docker
+    exit $NONOK
+
+
+  kubelet-status-monitor.json: |
+    {
+      "plugin": "custom",
+      "pluginConfig": {
+        "timeout": "30s",
+        "invoke_interval": "120s",
+        "concurrency": 3
+      },
+      "source": "kubelet-custom-plugin-monitor",
+      "conditions": [
+        {
+          "type": "kubeletStatus",
+          "reason": "kubeletOpen",
+          "message": "node kubelet service open"
+        }
+      ],
+      "rules": [
+        {
+          "type": "permanent",
+          "condition": "kubeletStatus",
+          "reason": "kubeletClose",
+          "message": "node close kubelet",
+          "path": "/config/plugin/check_kubelet.sh",
+          "timeout": "30s"
+        }
+      ]
+    }
+  check_kubelet.sh: |
+    #!/bin/bash
+    OK=0
+    NONOK=1
+    UNKNOWN=2
+    A=$(systemctl status kubelet |grep "active (running)")
+    if [[ $A != "" ]]; then
+    echo "node open kubelet service"
+    exit $OK
+    fi
+    echo "node close kubelet service"
+    systemctl start kubelet
+    exit $NONOK
 
 
   irqbalance-monitor.json: |
@@ -578,54 +634,6 @@ data:
     }
 
 
-  check_csi_hang.sh: |
-    #!/bin/sh
-
-    OK=0
-    NONOK=1
-
-
-    for pid in `ps -ef |grep plugin.csi.alibabacloud | awk '{print $2}'`
-    do
-        checkD=$(cat /host/proc/$pid/status |grep "State.*D")
-        checkP=$(cat /host/proc/$pid/status |grep "Name.*plugin.csi")
-        if [ "$checkP" != "" ] && [ "$checkD" != "" ]; then
-            echo "process diskplugin.csi is in State D"
-            exit $NONOK
-        fi
-    done
-
-    echo "procss diskplugin.csi State ok"
-    exit $OK
-  csi-hang-problem-monitor.json: |
-    {
-      "plugin": "custom",
-      "pluginConfig": {
-        "invoke_interval": "600s",
-        "timeout": "120s",
-        "max_output_length": 80,
-        "concurrency": 3,
-        "enable_message_change_based_condition_update": false
-      },
-      "source": "csi-hang-custom-plugin-monitor",
-      "conditions": [
-        {
-          "type": "CSIProcessWorks",
-          "reason": "CSIProcessWorks",
-          "message": "csi process works"
-        }
-      ],
-      "rules": [
-        {
-          "type": "temporary",
-          "reason": "CSIProcessIsHung",
-          "path": "./config/plugin/check_csi_hang.sh",
-          "timeout": "60s"
-        }
-      ]
-    }
-
-
   check_inodes.sh: |
     #!/bin/bash
     # check inode utilization on block device of mounting point /
@@ -823,7 +831,6 @@ data:
       },
       "source": "system-custom-plugin-monitor.json",
       "conditions": [
-
         {
           "type": "Node.IOPressureOK",
           "reason": "CPULoadOK",
@@ -833,6 +840,11 @@ data:
           "type": "Node.IOHang",
           "reason": "IOHangOK",
           "message": "IO hang is not happening"
+        },
+        {
+          "type": "Node.DiskUnmount",
+          "reason": "DiskUnmount",
+          "message": "Disk mountpoints are ok"
         }
       ],
       "rules": [
@@ -849,6 +861,13 @@ data:
           "reason": "IOHang",
           "path": "/config/plugin/check_io_hang.sh",
           "timeout": "60s"
+        },
+        {
+          "type": "permanent",
+          "condition": "Node.DiskUnmount",
+          "reason": "DiskUnmount",
+          "path": "/config/plugin/check_disk_unmount.sh",
+          "timeout": "5s"
         }
       ]
     }
@@ -1097,7 +1116,7 @@ data:
           "type": "Container.LogPermission",
           "reason": "LogDirectoryPermissionIsOK",
           "message": "/var/log directory permission is 755"
-        }
+        },
       ],
       "rules": [
         {
@@ -1120,7 +1139,7 @@ data:
           "reason": "LogDirectoryPermissionUnhealthy",
           "path": "/config/plugin/check_log_directory_permission.sh",
           "timeout": "60s"
-        }
+        },
       ]
     }
   check_container_net.sh: |
@@ -1328,6 +1347,147 @@ data:
         echo ${UNKNOWN}
         return
     }
+  check_disk_unmount.sh: |
+    #!/usr/bin/env bash
+
+    source "$(cd "$(dirname $0)/.." || exit 0; pwd)/lib/lib.sh"
+
+    mnt_check=$(cat /etc/fstab | grep '^UUID' | grep home | awk '{print $2}' | xargs -r -I {} mountpoint {})
+
+    if [[ $? ==  0 ]]; then
+        exit "${OK}"
+    else
+        echo "${mnt_check}"
+        exit "${NONOK}"
+    fi
+  check_cgroup_num.sh: |
+    #!/bin/bash
+
+    source "$(cd $(dirname $0)/..;pwd)/lib/lib.sh"
+
+    consistency=0
+    errMsg=""
+
+    # cgroup过多
+    cgroupNumThreshold=1000
+
+    output() {
+      if [[ ${consistency} -eq 0 ]]; then
+        echo "cgroup num is normal"
+        exit ${OK}
+      elif [[ ${consistency} -eq 1 ]]; then
+        echo ${errMsg}
+        exit ${NONOK}
+      else
+        echo ${errMsg}
+        exit ${UNKNOWN}
+      fi
+    }
+
+    # content of /proc/cgroups:
+    #
+    # #subsys_name	hierarchy	num_cgroups	enabled
+    # cpuset	8	268	1
+    # cpu	8	268	1
+    # cpuacct	8	268	1
+    # blkio	5	377	1
+    # memory	2	307	1
+    #
+    # $4=="1" represents it's enabled
+
+    # check cpu cgroup num
+    cgroupNum=$(curl -sg 'localhost:9199/api/v1/query?query=node_num_cgroups{cgroup="cpu"}' | \
+    python -c "import sys, json, re; data=json.load(sys.stdin)['data']
+    resultNum=0
+    count=0
+    for r in data['result']:
+      resultKey=str(r['metric']['cgroup'])
+      resultValue=r['value']
+      if(resultKey == 'cpu' and len(resultValue) == 2):
+        resultNum=resultNum+float(resultValue[1])
+        count=count+1
+    print resultNum/count"
+    )
+
+    if [[ $(echo "${cgroupNum} > ${cgroupNumThreshold}" | bc) -eq 1 ]]; then
+      consistency=1
+      errMsg="number of cgroup is too many: ${cgroupNum}"
+      output
+    fi
+
+    output
+  check_cgroup_mount.sh: |
+    #!/bin/bash
+
+    source "$(cd $(dirname $0)/..;pwd)/lib/lib.sh"
+
+    consistency=0
+    errMsg=""
+
+    output() {
+      if [[ ${consistency} -eq 0 ]]; then
+        echo "cgroup mount is normal"
+        exit ${OK}
+      elif [[ ${consistency} -eq 1 ]]; then
+        echo ${errMsg}
+        exit ${NONOK}
+      fi
+    }
+
+    # `lssubsys -a` shows
+    # cpuset,cpu,cpuacct
+    # blkio
+    # memory
+    # ...
+    # `lssubsys -am` shows
+    # memory /cgroup/memory
+    # ...
+    # The cgroup counts from `lssubsys -a` and `lssubsys -am` should be consistent!
+
+    cgroupNumA=$(lssubsys -a | wc -l)
+    if [[ ! $? -eq 0 ]]; then
+        echo "Failed to exec lssubsys -a"
+        exit ${UNKNOWN}
+    fi
+
+    cgroupNumB=$(lssubsys -am | wc -l)
+    if [[ ! $? -eq 0 ]]; then
+        echo "Failed to exec lssubsys -am"
+        exit ${UNKNOWN}
+    fi
+
+    if [[ "${cgroupNumA}" != "${cgroupNumB}" ]]; then
+      consistency=1
+      errMsg="cgroup mount inconsistent - (lssubsys -a): ${cgroupNumA}, (lssubsys -am): ${cgroupNumB} "
+    fi
+
+    output
+  check_systemd_cgroup_exist.sh: |
+    #!/bin/bash
+
+    source "$(cd $(dirname $0)/..;pwd)/lib/lib.sh"
+
+    exist=1
+    errMsg=""
+    systemdCgroupDir="/sys/fs/cgroup/systemd"
+
+    output() {
+      if [[ ${exist} -eq 1 ]]; then
+        echo "${systemdCgroupDir} exists"
+        exit ${OK}
+      elif [[ ${exist} -eq 0 ]]; then
+        echo ${errMsg}
+        exit ${NONOK}
+      fi
+    }
+
+    if [[ ! -d ${systemdCgroupDir} ]]; then
+      exist=0
+      errMsg="${systemdCgroupDir} does not exist!"
+      output
+    fi
+
+    output
 kind: ConfigMap
 metadata:
   name: node-problem-detector-config
